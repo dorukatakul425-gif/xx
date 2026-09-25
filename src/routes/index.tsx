@@ -103,7 +103,7 @@ function AureliaApp() {
 
   const signIn = async (provider: "google" | "apple") => {
     setLoading(provider); setError("");
-    const result = await lovable.auth.signInWithOAuth(provider, { redirect_uri: window.location.origin });
+    const result = await supabase.auth.signInWithOAuth({ provider, options: { redirectTo: window.location.origin } });
     if (result.error) setError("Giriş başlatılamadı. Lütfen tekrar deneyin.");
     setLoading(null);
   };
