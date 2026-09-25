@@ -17,7 +17,6 @@ import {
 } from "lucide-react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { useVoiceRoom } from "@/hooks/use-voice-room";
 
@@ -259,8 +258,8 @@ function AureliaApp() {
   const signIn = async (provider: "google" | "apple") => {
     setLoading(provider);
     setError("");
-    const result = await lovable.auth.signInWithOAuth(provider, {
-      redirect_uri: window.location.origin,
+    const result = await supabase.auth.signInWithOAuth({ provider, options: {
+      redirectTo: window.location.origin
     });
     if (result.error) setError("Giriş başlatılamadı. Lütfen tekrar deneyin.");
     setLoading(null);
