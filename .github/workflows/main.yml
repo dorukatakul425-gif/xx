@@ -1,0 +1,14 @@
+name: Extract ZIP
+on: push
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: unzip aurelia-premium-v2.zip
+      - run: cp -r aurelia-v2-source/* .
+      - run: git config user.email "bot@bot.com"
+      - run: git config user.name "bot"
+      - run: git add .
+      - run: git commit -m "extracted" || echo "nothing"
+      - run: git push
