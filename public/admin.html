@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Velvet Admin Panel</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#07000f;font-family:-apple-system,'Helvetica Neue',sans-serif;color:#fff;min-height:100vh;}
+
+/* ── ANIMATIONS ── */
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes pulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes orbPulse{0%,100%{transform:scale(1);opacity:.3}50%{transform:scale(1.08);opacity:.6}}
+@keyframes scanline{0%{top:-100%}100%{top:200%}}
+@keyframes warnBlink{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes particleFloat{0%{transform:translateY(0) translateX(0);opacity:1}100%{transform:translateY(-120px) translateX(var(--tx));opacity:0}}
+@keyframes countUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── LOGIN ── */
+.login{display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;padding:24px;position:relative;overflow:hidden;}
+.login-orb{position:absolute;border-radius:50%;pointer-events:none;}
+.login-orb1{width:400px;height:400px;background:radial-gradient(circle,rgba(123,47,247,.12) 0%,transparent 70%);top:-100px;left:-100px;animation:orbPulse 6s ease-in-out infinite;}
+.login-orb2{width:300px;height:300px;background:radial-gradient(circle,rgba(255,62,165,.08) 0%,transparent 70%);bottom:-50px;right:-80px;animation:orbPulse 5s ease-in-out infinite .8s;}
+.login-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:24px;padding:36px 32px;width:100%;max-width:400px;position:relative;z-index:2;backdrop-filter:blur(20px);}
+.login-card::before{content:'';position:absolute;inset:0;border-radius:24px;background:linear-gradient(135deg,rgba(123,47,247,.06) 0%,transparent 50%,rgba(255,62,165,.04) 100%);pointer-events:none;}
+.login-logo{font-size:32px;font-weight:900;letter-spacing:8px;background:linear-gradient(135deg,#fff 0%,#c084fc 50%,#ff3ea5 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:6px;}
+.login-sub{font-size:10px;color:rgba(255,255,255,.25);text-align:center;letter-spacing:4px;text-transform:uppercase;margin-bottom:32px;}
+.inp{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:15px 18px;color:#fff;font-size:14px;outline:none;margin-bottom:12px;transition:.3s;}
+.inp:focus{border-color:rgba(123,47,247,.5);background:rgba(123,47,247,.06);box-shadow:0 0 0 3px rgba(123,47,247,.08);}
+.btn-login{width:100%;background:linear-gradient(135deg,#7b2ff7,#c084fc,#ff3ea5);background-size:200% 100%;border:none;border-radius:14px;padding:15px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.5px;transition:.3s;animation:shimmer 3s linear infinite;}
+.btn-login:hover{transform:scale(1.01);box-shadow:0 8px 30px rgba(123,47,247,.35);}
+.err{color:#ff3ea5;font-size:12px;text-align:center;margin-top:10px;}
+
+/* ── DASHBOARD ── */
+.dash{display:none;max-width:960px;margin:0 auto;padding:24px 20px 40px;}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;padding-bottom:20px;border-bottom:1px solid rgba(255,255,255,.05);}
+.logo-sm{font-size:22px;font-weight:900;letter-spacing:5px;background:linear-gradient(135deg,#c084fc,#ff3ea5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.badge-admin{background:rgba(123,47,247,.15);border:1px solid rgba(123,47,247,.3);border-radius:10px;padding:5px 14px;font-size:11px;color:#c084fc;font-weight:600;letter-spacing:1px;}
+.btn-logout{background:rgba(255,60,60,.08);border:1px solid rgba(255,60,60,.15);border-radius:10px;padding:9px 18px;color:rgba(255,80,80,.6);font-size:12px;cursor:pointer;transition:.2s;}
+.btn-logout:hover{background:rgba(255,60,60,.15);}
+
+/* ── STATS ── */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:28px;}
+.stat-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:18px;padding:20px;position:relative;overflow:hidden;animation:fadeIn .5s ease both;}
+.stat-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.02) 0%,transparent 60%);pointer-events:none;}
+.stat-val{font-size:30px;font-weight:900;margin-bottom:5px;animation:countUp .6s ease both;}
+.stat-lbl{font-size:9px;color:rgba(255,255,255,.25);letter-spacing:2.5px;text-transform:uppercase;}
+
+/* ── SECTION ── */
+.section{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:20px;padding:24px;margin-bottom:16px;animation:fadeIn .4s ease both;}
+.section-title{font-size:10px;font-weight:700;letter-spacing:3px;color:rgba(255,255,255,.25);text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:8px;}
+.section-title::before{content:'';width:3px;height:14px;background:linear-gradient(#7b2ff7,#ff3ea5);border-radius:2px;}
+
+/* ── TOGGLE ── */
+.status-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.status-row:last-child{border-bottom:none;padding-bottom:0;}
+.status-info{display:flex;align-items:center;gap:10px;}
+.status-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.dot-on{background:#50c050;box-shadow:0 0 10px rgba(80,200,80,.7);}
+.dot-off{background:#ff4444;box-shadow:0 0 10px rgba(255,60,60,.6);}
+.status-lbl{font-size:14px;font-weight:600;}
+.status-desc{font-size:11px;color:rgba(255,255,255,.3);margin-top:2px;}
+.toggle{width:54px;height:30px;border-radius:15px;border:none;cursor:pointer;position:relative;transition:.35s;flex-shrink:0;}
+.toggle.on{background:linear-gradient(135deg,#50c050,#30a030);box-shadow:0 0 14px rgba(80,200,80,.3);}
+.toggle.off{background:rgba(255,255,255,.08);}
+.toggle::after{content:'';position:absolute;top:4px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.35s;box-shadow:0 2px 6px rgba(0,0,0,.4);}
+.toggle.on::after{left:28px;}
+.toggle.off::after{left:4px;}
+
+/* ── MAINTENANCE SCREEN (PREMIUM) ── */
+.maint-overlay{display:none;position:fixed;inset:0;z-index:500;background:#07000f;overflow:hidden;}
+.maint-overlay.show{display:flex;align-items:center;justify-content:center;flex-direction:column;}
+.maint-bg{position:absolute;inset:0;}
+.maint-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(123,47,247,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(123,47,247,.04) 1px,transparent 1px);background-size:40px 40px;}
+.maint-orb1{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(123,47,247,.15) 0%,transparent 70%);top:-150px;left:-150px;animation:orbPulse 7s ease-in-out infinite;}
+.maint-orb2{position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(255,62,165,.1) 0%,transparent 70%);bottom:-100px;right:-100px;animation:orbPulse 6s ease-in-out infinite .5s;}
+.maint-ring{position:absolute;border-radius:50%;border:1px solid;}
+.maint-ring1{width:600px;height:600px;border-color:rgba(123,47,247,.06);top:50%;left:50%;transform:translate(-50%,-50%);animation:spin 40s linear infinite;}
+.maint-ring2{width:450px;height:450px;border-color:rgba(255,62,165,.05);top:50%;left:50%;transform:translate(-50%,-50%);animation:spin 30s linear infinite reverse;}
+.maint-ring3{width:300px;height:300px;border-color:rgba(192,132,252,.07);top:50%;left:50%;transform:translate(-50%,-50%);animation:spin 20s linear infinite;}
+/* Scan line */
+.maint-scan{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(123,47,247,.4),rgba(255,62,165,.3),transparent);animation:scanline 4s linear infinite;box-shadow:0 0 20px rgba(123,47,247,.3);}
+/* Content */
+.maint-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;padding:24px;text-align:center;max-width:420px;}
+/* SVG icon */
+.maint-icon-wrap{width:100px;height:100px;border-radius:28px;background:rgba(123,47,247,.12);border:1px solid rgba(123,47,247,.2);display:flex;align-items:center;justify-content:center;margin-bottom:28px;position:relative;animation:pulse 3s ease-in-out infinite;}
+.maint-icon-wrap::before{content:'';position:absolute;inset:-8px;border-radius:34px;border:1px solid rgba(123,47,247,.08);animation:pulse 3s ease-in-out infinite .3s;}
+.maint-icon-wrap::after{content:'';position:absolute;inset:-16px;border-radius:40px;border:1px solid rgba(123,47,247,.04);animation:pulse 3s ease-in-out infinite .6s;}
+.maint-title{font-size:28px;font-weight:900;letter-spacing:-0.5px;margin-bottom:8px;background:linear-gradient(135deg,#fff,#c084fc,#ff3ea5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.maint-brand{font-size:11px;font-weight:700;letter-spacing:5px;color:rgba(255,255,255,.2);text-transform:uppercase;margin-bottom:20px;}
+.maint-desc{font-size:15px;color:rgba(255,255,255,.5);line-height:1.7;margin-bottom:32px;}
+/* Progress bar */
+.maint-bar-wrap{width:260px;margin-bottom:28px;}
+.maint-bar-label{display:flex;justify-content:space-between;margin-bottom:10px;}
+.maint-bar-label span{font-size:10px;color:rgba(255,255,255,.25);letter-spacing:2px;text-transform:uppercase;}
+.maint-bar-track{width:100%;height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;}
+.maint-bar-fill{height:100%;width:68%;background:linear-gradient(90deg,#7b2ff7,#c084fc,#ff3ea5);background-size:200% 100%;animation:shimmer 2s linear infinite;border-radius:2px;}
+/* Status pills */
+.maint-pills{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:32px;}
+.maint-pill{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:8px 14px;font-size:11px;color:rgba(255,255,255,.4);}
+.pill-dot{width:6px;height:6px;border-radius:50%;background:#50c050;box-shadow:0 0 6px rgba(80,200,80,.6);animation:warnBlink 2s ease-in-out infinite;}
+.pill-dot.warn{background:#ff9500;box-shadow:0 0 6px rgba(255,150,0,.6);}
+/* Timer */
+.maint-timer{font-size:13px;color:rgba(255,255,255,.25);letter-spacing:1px;}
+.maint-timer span{color:#c084fc;font-weight:700;font-size:15px;}
+/* Particles */
+.particle{position:absolute;width:4px;height:4px;border-radius:50%;animation:particleFloat 4s ease-out infinite;bottom:20%;}
+
+/* ── USERS TABLE ── */
+.user-search{display:flex;gap:10px;margin-bottom:18px;}
+.user-inp{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:11px 16px;color:#fff;font-size:13px;outline:none;transition:.3s;}
+.user-inp:focus{border-color:rgba(123,47,247,.4);}
+.tbl-wrap{overflow-x:auto;}
+.tbl{width:100%;border-collapse:collapse;min-width:600px;}
+.tbl th{font-size:9px;letter-spacing:2.5px;color:rgba(255,255,255,.2);text-align:left;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.05);}
+.tbl td{padding:13px 14px;border-bottom:1px solid rgba(255,255,255,.03);font-size:13px;vertical-align:middle;}
+.tbl tr:hover td{background:rgba(255,255,255,.02);}
+.vip-badge{display:inline-block;padding:4px 10px;border-radius:8px;font-size:10px;font-weight:700;background:rgba(255,200,0,.1);color:#ffd700;border:1px solid rgba(255,200,0,.2);}
+.btn-sm{padding:6px 14px;border-radius:9px;font-size:11px;font-weight:700;cursor:pointer;border:none;transition:.2s;}
+.btn-edit{background:rgba(123,47,247,.15);color:#c084fc;}
+.btn-edit:hover{background:rgba(123,47,247,.25);}
+.btn-ban{background:rgba(255,60,60,.1);color:rgba(255,80,80,.8);}
+.btn-ban:hover{background:rgba(255,60,60,.2);}
+
+/* ── VIP MODAL ── */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);z-index:999;align-items:center;justify-content:center;}
+.modal.show{display:flex;}
+.modal-card{background:linear-gradient(135deg,#120025,#0a001a);border:1px solid rgba(255,255,255,.07);border-radius:24px;padding:32px;width:100%;max-width:380px;margin:20px;animation:fadeIn .3s ease;}
+.modal-title{font-size:17px;font-weight:700;margin-bottom:6px;}
+.modal-sub{font-size:12px;color:rgba(255,255,255,.3);margin-bottom:24px;}
+.vip-slider{width:100%;-webkit-appearance:none;height:4px;border-radius:2px;background:linear-gradient(90deg,#7b2ff7,#ff3ea5);outline:none;margin-bottom:8px;}
+.vip-slider::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.5);cursor:pointer;}
+.vip-display{text-align:center;margin-bottom:20px;}
+.vip-num{font-size:40px;font-weight:900;background:linear-gradient(135deg,#ffd700,#ff9500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.vip-lbl{font-size:10px;color:rgba(255,255,255,.3);letter-spacing:2px;text-transform:uppercase;}
+.modal-btns{display:flex;gap:10px;margin-top:4px;}
+.btn-save{flex:1;background:linear-gradient(135deg,#7b2ff7,#ff3ea5);border:none;border-radius:12px;padding:13px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;}
+.btn-cancel{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:13px;color:rgba(255,255,255,.4);font-size:13px;cursor:pointer;}
+
+/* ── NOTIFICATION ── */
+.notif{position:fixed;top:24px;right:24px;border-radius:14px;padding:14px 20px;font-size:13px;display:none;z-index:9999;backdrop-filter:blur(10px);min-width:200px;}
+.notif.show{display:flex;align-items:center;gap:10px;animation:fadeIn .3s ease;}
+.notif-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<!-- LOGİN -->
+<div class="login" id="loginPage">
+  <div class="maint-orb1" style="position:absolute"></div>
+  <div class="maint-orb2" style="position:absolute"></div>
+  <div class="login-card">
+    <div class="login-logo">VELVET</div>
+    <div class="login-sub">Admin Paneli</div>
+    <input class="inp" type="text" id="adminUser" placeholder="İstifadəçi adı"/>
+    <input class="inp" type="password" id="adminPass" placeholder="Şifrə" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <button class="btn-login" onclick="doLogin()">Daxil ol</button>
+    <div class="err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dash" id="dashPage">
+  <div class="topbar">
+    <div class="logo-sm">VELVET</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="badge-admin">ADMİN</span>
+      <button class="btn-logout" onclick="doLogout()">Çıxış</button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-card" style="animation-delay:.05s">
+      <div class="stat-val" style="color:#c084fc">1,247</div>
+      <div class="stat-lbl">Ümumi istifadəçi</div>
+    </div>
+    <div class="stat-card" style="animation-delay:.1s">
+      <div class="stat-val" style="color:#00d4ff">89</div>
+      <div class="stat-lbl">İndi online</div>
+    </div>
+    <div class="stat-card" style="animation-delay:.15s">
+      <div class="stat-val" style="color:#ffd700">342</div>
+      <div class="stat-lbl">VIP istifadəçi</div>
+    </div>
+    <div class="stat-card" style="animation-delay:.2s">
+      <div class="stat-val" style="color:#50c050">₼2,840</div>
+      <div class="stat-lbl">Bu ay gəlir</div>
+    </div>
+  </div>
+
+  <!-- Tətbiq idarəetməsi -->
+  <div class="section" style="animation-delay:.1s">
+    <div class="section-title">Tətbiq İdarəetməsi</div>
+
+    <div class="status-row">
+      <div class="status-info">
+        <div class="status-dot dot-on" id="appDot"></div>
+        <div>
+          <div class="status-lbl" id="appStatusLbl">Tətbiq aktiv</div>
+          <div class="status-desc" id="appStatusDesc">İstifadəçilər giriş edə bilər</div>
+        </div>
+      </div>
+      <button class="toggle on" id="appToggle" onclick="toggleApp()"></button>
+    </div>
+
+    <div class="status-row">
+      <div class="status-info">
+        <div class="status-dot dot-on" id="regDot"></div>
+        <div>
+          <div class="status-lbl" id="regStatusLbl">Qeydiyyat açıq</div>
+          <div class="status-desc">Yeni hesab yaratmaq mümkündür</div>
+        </div>
+      </div>
+      <button class="toggle on" id="regToggle" onclick="toggleReg()"></button>
+    </div>
+
+    <div class="status-row">
+      <div class="status-info">
+        <div class="status-dot dot-on" id="chatDot"></div>
+        <div>
+          <div class="status-lbl" id="chatStatusLbl">Söhbət aktiv</div>
+          <div class="status-desc">Real vaxt mesajlaşma işləyir</div>
+        </div>
+      </div>
+      <button class="toggle on" id="chatToggle" onclick="toggleChat()"></button>
+    </div>
+  </div>
+
+  <!-- İstifadəçilər -->
+  <div class="section" style="animation-delay:.15s">
+    <div class="section-title">İstifadəçi İdarəetməsi</div>
+    <div class="user-search">
+      <input class="user-inp" placeholder="Ad, ID və ya email ilə axtar..." oninput="filterUsers(this.value)"/>
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl" id="userTable">
+        <thead>
+          <tr>
+            <th>İSTİFADƏÇİ</th>
+            <th>ID</th>
+            <th>VIP</th>
+            <th>STATUS</th>
+            <th>QEYDİYYAT</th>
+            <th>ƏMƏLİYYAT</th>
+          </tr>
+        </thead>
+        <tbody id="userBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- TEXNİKİ XİDMƏT EKRANI (PREMİUM) -->
+<div class="maint-overlay" id="maintOverlay">
+  <div class="maint-bg">
+    <div class="maint-grid"></div>
+    <div class="maint-orb1"></div>
+    <div class="maint-orb2"></div>
+    <div class="maint-ring maint-ring1"></div>
+    <div class="maint-ring maint-ring2"></div>
+    <div class="maint-ring maint-ring3"></div>
+    <div class="maint-scan"></div>
+    <!-- Particles -->
+    <div class="particle" style="left:15%;background:#7b2ff7;animation-delay:0s;animation-duration:3.5s;--tx:20px"></div>
+    <div class="particle" style="left:30%;background:#c084fc;animation-delay:.8s;animation-duration:4s;--tx:-15px"></div>
+    <div class="particle" style="left:50%;background:#ff3ea5;animation-delay:1.5s;animation-duration:3s;--tx:10px"></div>
+    <div class="particle" style="left:65%;background:#7b2ff7;animation-delay:.3s;animation-duration:4.5s;--tx:-20px"></div>
+    <div class="particle" style="left:80%;background:#c084fc;animation-delay:1s;animation-duration:3.8s;--tx:15px"></div>
+    <div class="particle" style="left:90%;background:#ff3ea5;animation-delay:2s;animation-duration:3.2s;--tx:-10px"></div>
+  </div>
+
+  <div class="maint-content">
+    <!-- İkon -->
+    <div class="maint-icon-wrap">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2L2 7v10l10 5 10-5V7L12 2z" stroke="url(#mg1)" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M12 22V12" stroke="url(#mg2)" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M2 7l10 5 10-5" stroke="url(#mg1)" stroke-width="1.5" stroke-linejoin="round"/>
+        <circle cx="12" cy="12" r="3" fill="url(#mg2)" opacity=".6"/>
+        <defs>
+          <linearGradient id="mg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#7b2ff7"/><stop offset="100%" stop-color="#c084fc"/></linearGradient>
+          <linearGradient id="mg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#c084fc"/><stop offset="100%" stop-color="#ff3ea5"/></linearGradient>
+        </defs>
+      </svg>
+    </div>
+
+    <div class="maint-brand">VELVET</div>
+    <div class="maint-title">Texniki Xidmət</div>
+    <div class="maint-desc">
+      Tətbiqimizi sizin üçün daha yaxşı etmək üzərində işləyirik.<br/>
+      Qısa müddət ərzində geri qayıdacağıq.
+    </div>
+
+    <!-- Progress bar -->
+    <div class="maint-bar-wrap">
+      <div class="maint-bar-label">
+        <span>İrəliləyiş</span>
+        <span id="maintPct">68%</span>
+      </div>
+      <div class="maint-bar-track">
+        <div class="maint-bar-fill" id="maintBarFill"></div>
+      </div>
+    </div>
+
+    <!-- Status pillər -->
+    <div class="maint-pills">
+      <div class="maint-pill"><span class="pill-dot"></span>Server aktiv</div>
+      <div class="maint-pill"><span class="pill-dot warn"></span>Yeniləmə gedir</div>
+      <div class="maint-pill"><span class="pill-dot"></span>Verilənlər qorunur</div>
+    </div>
+
+    <!-- Geri sayım -->
+    <div class="maint-timer">Təxmini bitiş: <span id="maintTimer">00:00:00</span></div>
+  </div>
+</div>
+
+<!-- VIP MODAL -->
+<div class="modal" id="vipModal">
+  <div class="modal-card">
+    <div class="modal-title">VIP Səviyyəsini Dəyiş</div>
+    <div class="modal-sub" id="modalUserName"></div>
+    <div class="vip-display">
+      <div class="vip-num" id="vipNumDisplay">0</div>
+      <div class="vip-lbl">VIP Səviyyəsi</div>
+    </div>
+    <input class="vip-slider" type="range" min="0" max="17" value="0" id="vipSlider"
+      oninput="document.getElementById('vipNumDisplay').textContent=this.value"/>
+    <div style="display:flex;justify-content:space-between;margin-bottom:20px">
+      <span style="font-size:10px;color:rgba(255,255,255,.2)">VIP 0</span>
+      <span style="font-size:10px;color:rgba(255,255,255,.2)">VIP 17</span>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">Ləğv et</button>
+      <button class="btn-save" onclick="saveVip()">Yadda saxla</button>
+    </div>
+  </div>
+</div>
+
+<!-- Notification -->
+<div class="notif" id="notif">
+  <div class="notif-icon" id="notifIcon"></div>
+  <span id="notifText"></span>
+</div>
+
+<script>
+const ADMIN = { user:"admin", pass:"admin" };
+let currentUserId = null;
+let appOn=true, regOn=true, chatOn=true;
+
+const users = [
+  {id:"47291834",name:"Doruk A.",email:"doruk@email.com",vip:17,status:"active",joined:"12.01.2025"},
+  {id:"83920147",name:"Aynur M.",email:"aynur@email.com",vip:7,status:"active",joined:"15.01.2025"},
+  {id:"29183047",name:"Rauf K.",email:"rauf@email.com",vip:3,status:"active",joined:"20.01.2025"},
+  {id:"91827364",name:"Sevinc H.",email:"sevinc@email.com",vip:12,status:"active",joined:"22.01.2025"},
+  {id:"38291047",name:"Tural B.",email:"tural@email.com",vip:0,status:"active",joined:"01.02.2025"},
+  {id:"72018394",name:"Nigar A.",email:"nigar@email.com",vip:5,status:"banned",joined:"05.02.2025"},
+  {id:"10293847",name:"Kənan S.",email:"kenan@email.com",vip:9,status:"active",joined:"10.02.2025"},
+  {id:"56473829",name:"Leyla R.",email:"leyla@email.com",vip:2,status:"active",joined:"14.02.2025"},
+];
+
+function doLogin(){
+  const u=document.getElementById("adminUser").value;
+  const p=document.getElementById("adminPass").value;
+  if(u===ADMIN.user && p===ADMIN.pass){
+    document.getElementById("loginPage").style.display="none";
+    document.getElementById("dashPage").style.display="block";
+    renderUsers(users);
+  } else {
+    document.getElementById("loginErr").textContent="İstifadəçi adı və ya şifrə yanlışdır!";
+  }
+}
+
+function doLogout(){
+  document.getElementById("loginPage").style.display="flex";
+  document.getElementById("dashPage").style.display="none";
+  document.getElementById("adminUser").value="";
+  document.getElementById("adminPass").value="";
+}
+
+function renderUsers(list){
+  document.getElementById("userBody").innerHTML=list.map(u=>`
+    <tr>
+      <td><div style="font-weight:600">${u.name}</div><div style="font-size:11px;color:rgba(255,255,255,.3)">${u.email}</div></td>
+      <td style="font-family:monospace;color:rgba(255,255,255,.4);font-size:12px">${u.id}</td>
+      <td><span class="vip-badge">VIP ${u.vip}</span></td>
+      <td><span style="display:inline-flex;align-items:center;gap:6px;font-size:12px">
+        <span style="width:7px;height:7px;border-radius:50%;background:${u.status==='active'?'#50c050':'#ff4444'};box-shadow:0 0 6px ${u.status==='active'?'rgba(80,200,80,.6)':'rgba(255,60,60,.5)'}"></span>
+        ${u.status==='active'?'Aktiv':'Banlı'}
+      </span></td>
+      <td style="color:rgba(255,255,255,.35);font-size:12px">${u.joined}</td>
+      <td><div style="display:flex;gap:6px">
+        <button class="btn-sm btn-edit" onclick="openVipEdit('${u.id}','${u.name}',${u.vip})">VIP dəyiş</button>
+        <button class="btn-sm btn-ban" onclick="toggleBan('${u.id}')">${u.status==='active'?'Banla':'Burax'}</button>
+      </div></td>
+    </tr>
+  `).join("");
+}
+
+function filterUsers(q){
+  renderUsers(users.filter(u=>
+    u.name.toLowerCase().includes(q.toLowerCase())||
+    u.id.includes(q)||
+    u.email.toLowerCase().includes(q.toLowerCase())
+  ));
+}
+
+function openVipEdit(id,name,vip){
+  currentUserId=id;
+  document.getElementById("modalUserName").textContent=name+" · ID: "+id;
+  document.getElementById("vipSlider").value=vip;
+  document.getElementById("vipNumDisplay").textContent=vip;
+  document.getElementById("vipModal").classList.add("show");
+}
+
+function closeModal(){ document.getElementById("vipModal").classList.remove("show"); }
+
+function saveVip(){
+  const newVip=parseInt(document.getElementById("vipSlider").value);
+  const u=users.find(x=>x.id===currentUserId);
+  if(u){ u.vip=newVip; renderUsers(users); }
+  // Velvet tətbiqinə real vaxt VIP göndər
+  try { localStorage.setItem("velvet_admin_vip", String(newVip)); } catch {}
+  closeModal();
+  showNotif("VIP "+newVip+" uğurla təyin edildi — tətbiqə göndərildi","success");
+}
+
+function toggleBan(id){
+  const u=users.find(x=>x.id===id);
+  if(u){
+    u.status=u.status==="active"?"banned":"active";
+    renderUsers(users);
+    showNotif(u.status==="banned"?"İstifadəçi banlandı":"Ban götürüldü", u.status==="banned"?"warn":"success");
+  }
+}
+
+// Maintenance toggle
+let maintTimer=null, maintSeconds=0;
+function toggleApp(){
+  appOn=!appOn;
+  const btn=document.getElementById("appToggle");
+  const dot=document.getElementById("appDot");
+  const lbl=document.getElementById("appStatusLbl");
+  const desc=document.getElementById("appStatusDesc");
+  btn.className="toggle "+(appOn?"on":"off");
+  dot.className="status-dot "+(appOn?"dot-on":"dot-off");
+  lbl.textContent=appOn?"Tətbiq aktiv":"Texniki xidmət rejimi";
+  desc.textContent=appOn?"İstifadəçilər giriş edə bilər":"İstifadəçilər tətbiqə girə bilmir";
+
+  if(!appOn){
+    document.getElementById("maintOverlay").classList.add("show");
+    maintSeconds=3600;
+    updateMaintTimer();
+    maintTimer=setInterval(()=>{ if(maintSeconds>0){ maintSeconds--; updateMaintTimer(); } },1000);
+    try { localStorage.setItem("velvet_maintenance","1"); } catch {}
+    showNotif("Texniki xidmət rejimi aktivdir — tətbiq bağlandı","warn");
+  } else {
+    document.getElementById("maintOverlay").classList.remove("show");
+    if(maintTimer){ clearInterval(maintTimer); maintTimer=null; }
+    try { localStorage.removeItem("velvet_maintenance"); } catch {}
+    showNotif("Tətbiq yenidən aktivləşdirildi","success");
+  }
+}
+
+function updateMaintTimer(){
+  const h=Math.floor(maintSeconds/3600).toString().padStart(2,"0");
+  const m=Math.floor((maintSeconds%3600)/60).toString().padStart(2,"0");
+  const s=(maintSeconds%60).toString().padStart(2,"0");
+  document.getElementById("maintTimer").textContent=h+":"+m+":"+s;
+}
+
+function toggleReg(){
+  regOn=!regOn;
+  const btn=document.getElementById("regToggle");
+  const dot=document.getElementById("regDot");
+  const lbl=document.getElementById("regStatusLbl");
+  btn.className="toggle "+(regOn?"on":"off");
+  dot.className="status-dot "+(regOn?"dot-on":"dot-off");
+  lbl.textContent=regOn?"Qeydiyyat açıq":"Qeydiyyat bağlı";
+  showNotif(regOn?"Qeydiyyat açıldı":"Qeydiyyat bağlandı",regOn?"success":"warn");
+}
+
+function toggleChat(){
+  chatOn=!chatOn;
+  const btn=document.getElementById("chatToggle");
+  const dot=document.getElementById("chatDot");
+  const lbl=document.getElementById("chatStatusLbl");
+  btn.className="toggle "+(chatOn?"on":"off");
+  dot.className="status-dot "+(chatOn?"dot-on":"dot-off");
+  lbl.textContent=chatOn?"Söhbət aktiv":"Söhbət bağlı";
+  showNotif(chatOn?"Söhbət açıldı":"Söhbət bağlandı",chatOn?"success":"warn");
+}
+
+function showNotif(msg,type){
+  const n=document.getElementById("notif");
+  const icon=document.getElementById("notifIcon");
+  const text=document.getElementById("notifText");
+  const colors={success:"rgba(80,200,80,.15)",warn:"rgba(255,150,0,.15)",error:"rgba(255,60,60,.15)"};
+  const borders={success:"rgba(80,200,80,.25)",warn:"rgba(255,150,0,.25)",error:"rgba(255,60,60,.25)"};
+  const textColors={success:"#50c050",warn:"#ff9500",error:"#ff6060"};
+  const icons={success:"✓",warn:"⚠",error:"✕"};
+  n.style.background=colors[type||"success"];
+  n.style.border="1px solid "+(borders[type||"success"]);
+  n.style.color=textColors[type||"success"];
+  icon.textContent=icons[type||"success"];
+  text.textContent=msg;
+  n.classList.add("show");
+  setTimeout(()=>n.classList.remove("show"),2800);
+}
+</script>
+</body>
+</html>
