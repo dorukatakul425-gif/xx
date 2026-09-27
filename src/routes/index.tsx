@@ -1,6 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+// @ts-nocheck — imported prototype contains intentionally loose backend response shapes.
+import { ClientOnly, createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Crown, LogOut, MessageCircle, Mic, MicOff, MoreHorizontal, Radio, Send, Users, X } from "lucide-react";
+import { BadgeHelp, ChevronRight, Crown, Gift, LogOut, Medal, MessageCircle, Mic, MicOff, MoreHorizontal, Radio, Send, Settings, ShieldCheck, ShoppingBag, Users, WalletCards, X } from "lucide-react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -11,13 +12,22 @@ const ROOM_ID = "11111111-1111-4111-8111-111111111111";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Velvet" },
+      { title: "Velvet — Sosial səsli söhbət" },
+      { name: "description", content: "Velvet sosial səsli söhbət tətbiqi" },
+      { property: "og:title", content: "Velvet — Sosial səsli söhbət" },
+      { property: "og:description", content: "Velvet sosial səsli söhbət tətbiqi" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "viewport", content: "width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
     ],
   }),
-  component: VelvetApp,
+  component: VelvetAppClient,
 });
+
+function VelvetAppClient() {
+  return <ClientOnly fallback={null}><VelvetApp /></ClientOnly>;
+}
 
 type Screen = "login" | "home" | "room" | "profile" | "vip";
 type Member = { user_id: string; role: string; is_muted: boolean };
@@ -856,13 +866,24 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
         .p-coin-border{position:absolute;inset:0;border-radius:22px;border:1px solid rgba(255,180,0,.2);z-index:3;pointer-events:none}
         .p-coin-shine{position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,220,100,.05) 50%,transparent 65%);background-size:200% 100%;animation:vshimmer 4s ease-in-out infinite;z-index:2}
         .gem{position:relative;width:56px;height:56px;flex-shrink:0;animation:vcoinPulse 2.5s ease-in-out infinite}
-        .p-menu{margin:16px 18px 0}
-        .p-ms-title{font-size:10px;letter-spacing:3px;color:rgba(80,60,140,.5);text-transform:uppercase;margin-bottom:10px;padding-left:4px}
-        .p-mi{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:14px;cursor:pointer;background:rgba(255,255,255,.02);border:1px solid rgba(100,80,160,.07);margin-bottom:4px}
-        .p-mi:active{background:rgba(100,80,160,.08)}
-        .p-mi-l{width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-        .p-mi-lbl{flex:1;font-size:14px;font-weight:600;color:#1a1a2e}
-        .p-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px}
+        .p-menu{margin:16px 16px 0}
+        .p-ms-title{font-size:11px;letter-spacing:0;color:#1a1a2e;margin-bottom:12px;padding-left:2px;font-weight:800;text-transform:none}
+        .p-menu-section{margin-bottom:18px}
+        .p-menu-section-title{font-size:10px;line-height:1.3;color:rgba(40,20,80,.46);font-weight:700;text-transform:uppercase;margin:0 4px 7px;letter-spacing:0}
+        .p-menu-list{overflow:hidden;border:1px solid rgba(74,40,128,.1);border-radius:14px;background:#fff;box-shadow:0 4px 16px rgba(37,20,72,.045)}
+        .p-mi{width:100%;height:66px;display:flex;align-items:center;gap:12px;padding:0 14px;border-radius:0;cursor:pointer;background:#fff;border:0;box-shadow:none;text-align:left;transition:background .16s ease}
+        .p-mi+.p-mi{border-top:1px solid rgba(74,40,128,.075)}
+        .p-mi:active{background:#f7f4fb}
+        .p-mi-l{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#f2eef8;color:#6744a0}
+        .p-mi-copy{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+        .p-mi-lbl{font-size:13px;line-height:1.25;font-weight:750;color:#1a1a2e}
+        .p-mi-desc{font-size:10px;line-height:1.3;color:rgba(40,20,80,.48);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .p-mi-end{display:flex;align-items:center;gap:8px;flex-shrink:0}
+        .p-badge{font-size:9px;line-height:1;font-weight:800;padding:5px 7px;border-radius:6px}
+        .p-badge-vip{background:#fff6d8;color:#8c6600;border:1px solid #f1df9a}
+        .p-badge-rank{background:#eaf7fb;color:#17718b;border:1px solid #c9eaf2}
+        .p-mi-end>svg{color:rgba(74,40,128,.28)}
+        .p-logout{width:calc(100% - 32px);height:48px;margin:2px 16px 24px;border-radius:12px;border:1px solid rgba(220,50,70,.14);background:#fff7f8;color:#c93d53;box-shadow:none;font-size:12px;font-weight:750}
       `}</style>
       <div className="p-scroll">
         <div className="p-hero">
@@ -1034,32 +1055,57 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
         <div className="p-menu">
           <div className="p-ms-title">Hesabım</div>
           {[
-            { png:"pulqabi.PNG", label:"Cüzdanım", onClick: undefined },
-            { png:"vip.PNG", label:"VIP", badge:`VIP ${displayVip}`, badgeColor:"rgba(255,200,0,.12)", badgeText:"#ffd700", badgeBorder:"rgba(255,200,0,.25)", onClick: onVip },
-            { png:"reyting.PNG", label:"Reyting", badge:"#142", badgeColor:"rgba(0,212,255,.08)", badgeText:"#00d4ff", badgeBorder:"rgba(0,212,255,.18)", onClick: undefined },
-            { png:"magaza.PNG", label:"Mağaza", onClick: () => setMagazaOpen(true) },
-            { png:"bonus.PNG", label:"Gündəlik bonus", onClick: undefined },
-            { png:"komek.PNG", label:"Köməyə ehtiyacınız var?", onClick: undefined },
-            { png:"ayarlar.PNG", label:"Parametrlər", muted:true, onClick: undefined },
-          ].map((item, i) => (
-            <div key={i} className="p-mi" onClick={item.onClick} style={item.onClick ? { cursor:"pointer" } : {}}>
-              <div className="p-mi-l" style={{ background:"rgba(100,80,160,.07)", overflow:"hidden" }}>
-                <img src={`/images/images/${item.png}`} width="28" height="28" style={{ objectFit:"contain" }} alt={item.label}/>
+            {
+              title:"Hesab və status",
+              items:[
+                { icon:WalletCards, label:"Cüzdanım", description:"Balans və ödənişlər" },
+                { icon:ShieldCheck, label:"VIP", description:"Üstünlüklər və səviyyələr", badge:`VIP ${displayVip}`, badgeClass:"p-badge-vip", onClick:onVip },
+                { icon:Medal, label:"Reytinq", description:"Ümumi sıralamadakı yerin", badge:"#142", badgeClass:"p-badge-rank" },
+              ],
+            },
+            {
+              title:"Mağaza və bonuslar",
+              items:[
+                { icon:ShoppingBag, label:"Mağaza", description:"Çərçivələr və bəzəklər", onClick:() => setMagazaOpen(true) },
+                { icon:Gift, label:"Gündəlik bonus", description:"Bugünkü hədiyyəni götür" },
+              ],
+            },
+            {
+              title:"Dəstək",
+              items:[
+                { icon:BadgeHelp, label:"Kömək mərkəzi", description:"Suallar və dəstək" },
+                { icon:Settings, label:"Parametrlər", description:"Hesab və məxfilik" },
+              ],
+            },
+          ].map((section) => (
+            <section className="p-menu-section" key={section.title} aria-label={section.title}>
+              <div className="p-menu-section-title">{section.title}</div>
+              <div className="p-menu-list">
+                {section.items.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Button key={item.label} type="button" variant="ghost" className="p-mi" onClick={item.onClick}>
+                      <span className="p-mi-l"><Icon size={18} strokeWidth={1.9}/></span>
+                      <span className="p-mi-copy">
+                        <span className="p-mi-lbl">{item.label}</span>
+                        <span className="p-mi-desc">{item.description}</span>
+                      </span>
+                      <span className="p-mi-end">
+                        {item.badge ? <span className={`p-badge ${item.badgeClass || ""}`}>{item.badge}</span> : null}
+                        <ChevronRight size={15} strokeWidth={2.1}/>
+                      </span>
+                    </Button>
+                  );
+                })}
               </div>
-              <span className="p-mi-lbl" style={item.muted ? { color:"rgba(40,20,80,.6)" } : {}}>{item.label}</span>
-              <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-                {item.badge && <span className="p-badge" style={{ background:item.badgeColor, color:item.badgeText, border:`1px solid ${item.badgeBorder}` }}>{item.badge}</span>}
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(100,80,160,.18)" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
-              </div>
-            </div>
+            </section>
           ))}
         </div>
 
-
-        <div onClick={() => { supabase.auth.signOut(); }} style={{ margin:"16px 18px 24px", display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:15, borderRadius:16, background:"rgba(255,60,60,.05)", border:"1px solid rgba(255,60,60,.12)", cursor:"pointer" }}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,80,80,.6)" strokeWidth="2" strokeLinecap="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          <span style={{ fontSize:13, fontWeight:700, color:"rgba(255,80,80,.6)" }}>Çıxış</span>
-        </div>
+        <Button type="button" variant="outline" onClick={() => { supabase.auth.signOut(); }} className="p-logout">
+          <LogOut size={15} strokeWidth={2}/>
+          Çıxış
+        </Button>
       </div>
 
       <BottomNav active="profile" onHome={onBack} onRoom={onEnterRoom} onProfile={() => {}}/>
