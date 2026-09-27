@@ -202,7 +202,7 @@ function VelvetApp() {
 
 
   if (screen === "login" && !isDemo) return <><style>{GLOBAL_CSS}</style><LoginScreen signIn={signIn} loading={loading} error={error} demoLogin={demoLogin} /></>;
-  if (screen === "home" && (session || isDemo)) return <><style>{GLOBAL_CSS}</style><HomeScreen name={displayName} onEnterRoom={() => { enterRoom(); go("room"); }} onProfile={() => go("profile")} /></>;
+  if (screen === "home" && (session || isDemo)) return <><style>{GLOBAL_CSS}</style><HomeScreen name={displayName} avatarUrl={avatarUrl} onEnterRoom={() => { enterRoom(); go("room"); }} onProfile={() => go("profile")} /></>;
   if (screen === "profile" && (session || isDemo)) return <><style>{GLOBAL_CSS}</style><ProfileScreen name={displayName} onBack={() => go("home")} onEnterRoom={() => { enterRoom(); go("room"); }} onVip={() => go("vip")} /></>;
   if (screen === "vip" && (session || isDemo)) return <><style>{GLOBAL_CSS}</style><VipScreen onBack={() => go("profile")} /></>;
 
@@ -448,106 +448,62 @@ function LoginScreen({ signIn, loading, error, demoLogin }: { signIn: (p: "googl
 /* ─── NAV BAR ─── */
 function BottomNav({ active, onHome, onRoom, onProfile }: { active: Screen; onHome: () => void; onRoom: () => void; onProfile: () => void }) {
   const items = [
-    { key:"home", label:"Ana Səhifə", onTap: onHome,
-      icon: (on: boolean) => (
-        <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
-          <defs>
-            <linearGradient id="nh1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={on?"#c084fc":"#b0a8c8"}/><stop offset="100%" stopColor={on?"#7b2ff7":"#8880a0"}/></linearGradient>
-            <linearGradient id="nh2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={on?"#e0b0ff":"#d8d0e8"}/><stop offset="100%" stopColor={on?"#c084fc":"#b0a8c8"}/></linearGradient>
-            <filter id="nhf"><feDropShadow dx="0" dy="2" stdDeviation="1.5" floodColor={on?"rgba(123,47,247,.4)":"rgba(0,0,0,.15)"}/></filter>
-          </defs>
-          <g filter="url(#nhf)">
-            <path d="M4 14L16 4l12 10v14a2 2 0 01-2 2H6a2 2 0 01-2-2V14z" fill="url(#nh1)"/>
-            <path d="M4 14L16 4l12 10" fill="url(#nh2)" opacity=".9"/>
-            <rect x="11" y="18" width="10" height="10" rx="1.5" fill={on?"rgba(255,255,255,.25)":"rgba(255,255,255,.15)"}/>
-            <rect x="13" y="22" width="6" height="6" rx="1" fill={on?"rgba(255,255,255,.35)":"rgba(255,255,255,.2)"}/>
-            <path d="M4 14L16 4l12 10" fill="none" stroke={on?"rgba(255,255,255,.4)":"rgba(255,255,255,.2)"} strokeWidth="1"/>
-          </g>
-        </svg>
-      )
-    },
-    { key:"games", label:"Oyunlar", onTap: onHome,
-      icon: (on: boolean) => (
-        <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
-          <defs>
-            <linearGradient id="ng1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={on?"#ff80c0":"#c0a0b8"}/><stop offset="100%" stopColor={on?"#ff3ea5":"#9080a0"}/></linearGradient>
-            <filter id="ngf"><feDropShadow dx="0" dy="2" stdDeviation="1.5" floodColor={on?"rgba(255,62,165,.4)":"rgba(0,0,0,.15)"}/></filter>
-          </defs>
-          <g filter="url(#ngf)">
-            <rect x="2" y="9" width="28" height="16" rx="8" fill="url(#ng1)"/>
-            <rect x="2" y="9" width="28" height="8" rx="8" fill={on?"rgba(255,255,255,.2)":"rgba(255,255,255,.1)"}/>
-            <line x1="9" y1="17" x2="13" y2="17" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-            <line x1="11" y1="15" x2="11" y2="19" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-            <circle cx="21" cy="15" r="1.5" fill="white"/>
-            <circle cx="24" cy="18" r="1.5" fill="white"/>
-          </g>
-        </svg>
-      )
-    },
-    { key:"room", label:"Otaq", onTap: onRoom,
-      icon: (on: boolean) => (
-        <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
-          <defs>
-            <linearGradient id="nr1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={on?"#60e0ff":"#a0c8d8"}/><stop offset="100%" stopColor={on?"#00d4ff":"#60a0c0"}/></linearGradient>
-            <filter id="nrf"><feDropShadow dx="0" dy="2" stdDeviation="1.5" floodColor={on?"rgba(0,212,255,.4)":"rgba(0,0,0,.15)"}/></filter>
-          </defs>
-          <g filter="url(#nrf)">
-            <ellipse cx="16" cy="13" rx="7" ry="8" fill="url(#nr1)"/>
-            <ellipse cx="16" cy="11" rx="7" ry="5" fill={on?"rgba(255,255,255,.25)":"rgba(255,255,255,.15)"}/>
-            <rect x="15" y="21" width="2" height="6" rx="1" fill="url(#nr1)"/>
-            <ellipse cx="16" cy="27" rx="4" ry="1.5" fill={on?"rgba(0,212,255,.4)":"rgba(100,150,180,.3)"}/>
-          </g>
-        </svg>
-      )
-    },
-    { key:"messages", label:"Mesajlar", onTap: onHome, badge:"18",
-      icon: (on: boolean) => (
-        <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
-          <defs>
-            <linearGradient id="nm1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={on?"#60ff90":"#90c8a0"}/><stop offset="100%" stopColor={on?"#00c050":"#508060"}/></linearGradient>
-            <filter id="nmf"><feDropShadow dx="0" dy="2" stdDeviation="1.5" floodColor={on?"rgba(0,192,80,.4)":"rgba(0,0,0,.15)"}/></filter>
-          </defs>
-          <g filter="url(#nmf)">
-            <path d="M3 5h26a2 2 0 012 2v14a2 2 0 01-2 2H9l-6 6V7a2 2 0 012-2z" fill="url(#nm1)"/>
-            <path d="M3 5h26a2 2 0 012 2v7H3V5z" fill={on?"rgba(255,255,255,.2)":"rgba(255,255,255,.1)"}/>
-            <line x1="9" y1="13" x2="23" y2="13" stroke="white" strokeWidth="1.5" strokeLinecap="round" opacity=".6"/>
-            <line x1="9" y1="17" x2="18" y2="17" stroke="white" strokeWidth="1.5" strokeLinecap="round" opacity=".4"/>
-          </g>
-        </svg>
-      )
-    },
-    { key:"profile", label:"Profil", onTap: onProfile,
-      icon: (on: boolean) => (
-        <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
-          <defs>
-            <linearGradient id="np1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={on?"#ffd700":"#c8c0a0"}/><stop offset="100%" stopColor={on?"#ff9500":"#908070"}/></linearGradient>
-            <linearGradient id="np2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={on?"#c084fc":"#b0a0c8"}/><stop offset="100%" stopColor={on?"#7b2ff7":"#806090"}/></linearGradient>
-            <filter id="npf"><feDropShadow dx="0" dy="2" stdDeviation="1.5" floodColor={on?"rgba(255,150,0,.4)":"rgba(0,0,0,.15)"}/></filter>
-          </defs>
-          <g filter="url(#npf)">
-            <circle cx="16" cy="11" r="6" fill="url(#np1)"/>
-            <ellipse cx="16" cy="9" rx="6" ry="3.5" fill={on?"rgba(255,255,255,.3)":"rgba(255,255,255,.15)"}/>
-            <path d="M4 28a12 12 0 0124 0" fill="url(#np2)"/>
-            <path d="M4 28a12 12 0 0124 0" fill={on?"rgba(255,255,255,.15)":"rgba(255,255,255,.08)"} clipPath="inset(0 0 50% 0)"/>
-          </g>
-        </svg>
-      )
-    },
+    { key:"home", label:"Ana səhifə", onTap:onHome, icon:(on:boolean) => (
+      <svg width="27" height="27" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+        <path d="M3.75 12.05 14 3.55l10.25 8.5v10.2a2 2 0 0 1-2 2H5.75a2 2 0 0 1-2-2v-10.2Z" fill={on?"url(#homeActive)":"url(#navIdle)"}/>
+        <path d="M10.25 24.25v-7.1a1.9 1.9 0 0 1 1.9-1.9h3.7a1.9 1.9 0 0 1 1.9 1.9v7.1" fill="rgba(255,255,255,.38)"/>
+        <path d="m3.75 12.05 9.1-7.55a1.8 1.8 0 0 1 2.3 0l9.1 7.55" stroke="rgba(255,255,255,.58)" strokeWidth="1.2" strokeLinecap="round"/>
+        <defs><linearGradient id="homeActive" x1="5" y1="4" x2="23" y2="25"><stop stopColor="#B878FF"/><stop offset="1" stopColor="#7130ED"/></linearGradient><linearGradient id="navIdle" x1="5" y1="4" x2="23" y2="25"><stop stopColor="#B8B2C7"/><stop offset="1" stopColor="#817A94"/></linearGradient></defs>
+      </svg>
+    )},
+    { key:"games", label:"Oyunlar", onTap:onHome, icon:(on:boolean) => (
+      <svg width="28" height="27" viewBox="0 0 29 28" fill="none" aria-hidden="true">
+        <path d="M8.1 8.1h12.8c3 0 5.12 2.1 5.58 5.06l1.05 6.76c.42 2.71-2.83 4.42-4.81 2.52l-2.35-2.26H8.63l-2.35 2.26c-1.98 1.9-5.23.19-4.81-2.52l1.05-6.76C2.98 10.2 5.1 8.1 8.1 8.1Z" fill={on?"url(#gameActive)":"url(#navIdleGame)"}/>
+        <path d="M8.35 11.9v5.4M5.65 14.6h5.4" stroke="white" strokeWidth="1.8" strokeLinecap="round"/>
+        <circle cx="20.3" cy="13.1" r="1.35" fill="white"/><circle cx="23.3" cy="16.1" r="1.35" fill="white"/>
+        <path d="M8.2 8.1c1.15-2.35 3.08-3.35 5.48-2.25" stroke={on?"#FF75C1":"#A59DAF"} strokeWidth="1.5" strokeLinecap="round"/>
+        <defs><linearGradient id="gameActive" x1="4" y1="9" x2="24" y2="23"><stop stopColor="#FF7FC8"/><stop offset="1" stopColor="#F2389B"/></linearGradient><linearGradient id="navIdleGame" x1="4" y1="9" x2="24" y2="23"><stop stopColor="#B8B2C7"/><stop offset="1" stopColor="#817A94"/></linearGradient></defs>
+      </svg>
+    )},
+    { key:"room", label:"Otaq", onTap:onRoom, icon:(on:boolean) => (
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+        {on && <circle cx="14" cy="14" r="13" fill="url(#roomHalo)"/>}
+        <rect x="9.15" y="3.2" width="9.7" height="14.4" rx="4.85" fill={on?"url(#roomActive)":"url(#navIdleRoom)"}/>
+        <path d="M5.9 13.6a8.1 8.1 0 0 0 16.2 0M14 21.7v3.1M10.9 24.8h6.2" stroke={on?"#22CAE8":"#8A839B"} strokeWidth="1.8" strokeLinecap="round"/>
+        <path d="M11.4 7.45h5.2M11.4 10.4h5.2M11.4 13.35h5.2" stroke="rgba(255,255,255,.72)" strokeWidth="1.05" strokeLinecap="round"/>
+        <defs><linearGradient id="roomActive" x1="10" y1="4" x2="19" y2="18"><stop stopColor="#73EEFF"/><stop offset="1" stopColor="#00B9E7"/></linearGradient><linearGradient id="navIdleRoom" x1="10" y1="4" x2="19" y2="18"><stop stopColor="#B8B2C7"/><stop offset="1" stopColor="#817A94"/></linearGradient><radialGradient id="roomHalo"><stop stopColor="#00D4FF" stopOpacity=".2"/><stop offset="1" stopColor="#00D4FF" stopOpacity="0"/></radialGradient></defs>
+      </svg>
+    )},
+    { key:"messages", label:"Mesajlar", onTap:onHome, badge:"18", icon:(on:boolean) => (
+      <svg width="28" height="27" viewBox="0 0 29 28" fill="none" aria-hidden="true">
+        <path d="M4.1 4.6h20.8a2.45 2.45 0 0 1 2.45 2.45v12.1a2.45 2.45 0 0 1-2.45 2.45H11.15l-6.6 4.05.9-4.05H4.1a2.45 2.45 0 0 1-2.45-2.45V7.05A2.45 2.45 0 0 1 4.1 4.6Z" fill={on?"url(#messageActive)":"url(#navIdleMessage)"}/>
+        <path d="M7.2 10.25h14.6M7.2 14h10.3M7.2 17.75h6.4" stroke="rgba(255,255,255,.72)" strokeWidth="1.35" strokeLinecap="round"/>
+        <defs><linearGradient id="messageActive" x1="4" y1="5" x2="24" y2="24"><stop stopColor="#66EA9B"/><stop offset="1" stopColor="#1EBA69"/></linearGradient><linearGradient id="navIdleMessage" x1="4" y1="5" x2="24" y2="24"><stop stopColor="#B8B2C7"/><stop offset="1" stopColor="#817A94"/></linearGradient></defs>
+      </svg>
+    )},
+    { key:"profile", label:"Profil", onTap:onProfile, icon:(on:boolean) => (
+      <svg width="27" height="27" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+        <circle cx="14" cy="9" r="6" fill={on?"url(#profileHead)":"url(#navIdleProfile)"}/>
+        <path d="M3.4 25c.7-5.52 4.34-8.28 10.6-8.28S23.9 19.48 24.6 25" fill={on?"url(#profileBody)":"url(#navIdleProfile)"}/>
+        <ellipse cx="12.1" cy="6.8" rx="2.7" ry="1.5" fill="rgba(255,255,255,.36)" transform="rotate(-18 12.1 6.8)"/>
+        <path d="M5.8 22.8c2.2-3.04 4.92-4.56 8.2-4.56s6 1.52 8.2 4.56" stroke="rgba(255,255,255,.28)" strokeWidth="1.2" strokeLinecap="round"/>
+        <defs><linearGradient id="profileHead" x1="9" y1="3" x2="18" y2="15"><stop stopColor="#FFD85C"/><stop offset="1" stopColor="#FF9E2D"/></linearGradient><linearGradient id="profileBody" x1="5" y1="17" x2="23" y2="26"><stop stopColor="#B878FF"/><stop offset="1" stopColor="#7130ED"/></linearGradient><linearGradient id="navIdleProfile" x1="6" y1="3" x2="22" y2="25"><stop stopColor="#B8B2C7"/><stop offset="1" stopColor="#817A94"/></linearGradient></defs>
+      </svg>
+    )},
   ];
 
   return (
-    <nav style={{ position:"fixed", bottom:0, left:0, right:0, background:"rgba(255,255,255,.97)", backdropFilter:"blur(20px)", borderTop:"1px solid rgba(100,80,160,.1)", display:"flex", paddingBottom:`max(8px,env(safe-area-inset-bottom))`, zIndex:100, boxShadow:"0 -4px 24px rgba(80,60,140,.08)" }}>
+    <nav aria-label="Əsas menyu" style={{ position:"fixed", bottom:0, left:0, right:0, height:"calc(70px + env(safe-area-inset-bottom))", background:"rgba(255,255,255,.96)", backdropFilter:"blur(24px) saturate(1.4)", WebkitBackdropFilter:"blur(24px) saturate(1.4)", borderTop:"1px solid rgba(97,73,137,.1)", display:"flex", alignItems:"flex-start", padding:`7px 7px max(7px,env(safe-area-inset-bottom))`, zIndex:100, boxShadow:"0 -8px 30px rgba(65,38,104,.09)" }}>
       {items.map(it => {
         const on = active === it.key;
         return (
-          <button key={it.key} onClick={it.onTap} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:2, paddingTop:10, paddingBottom:4, background:"none", border:"none", cursor:"pointer", position:"relative", transition:".2s" }}>
-            {/* Aktiv indicator */}
-            {on && <div style={{ position:"absolute", top:0, left:"50%", transform:"translateX(-50%)", width:28, height:3, borderRadius:"0 0 3px 3px", background:"linear-gradient(90deg,#7b2ff7,#c084fc)" }}/>}
-            <div style={{ position:"relative", transform: on ? "scale(1.1)" : "scale(1)", transition:"transform .2s" }}>
+          <button type="button" aria-label={it.label} aria-current={on ? "page" : undefined} key={it.key} onClick={it.onTap} style={{ flex:1, minWidth:0, height:55, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:2, padding:0, background:"none", border:"none", cursor:"pointer", position:"relative", fontFamily:"inherit" }}>
+            {on && <span style={{ position:"absolute", top:-7, left:"50%", transform:"translateX(-50%)", width:32, height:3, borderRadius:"0 0 4px 4px", background:"linear-gradient(90deg,#7b2ff7,#ff3ea5)", boxShadow:"0 2px 8px rgba(123,47,247,.32)" }}/>} 
+            <span style={{ position:"relative", width:34, height:30, display:"grid", placeItems:"center", transform:on?"translateY(-1px) scale(1.06)":"none", transition:"transform .2s ease", filter:on?"drop-shadow(0 4px 5px rgba(74,31,130,.18))":"none" }}>
               {it.icon(on)}
-              {"badge" in it && it.badge && <span style={{ position:"absolute", top:-4, right:-8, minWidth:14, height:14, borderRadius:7, background:"#ff3ea5", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#fff", fontWeight:800, padding:"0 3px" }}>{it.badge}</span>}
-            </div>
-            <span style={{ fontSize:9, fontWeight: on ? 700 : 500, letterSpacing:.2, color: on ? "#7b2ff7" : "rgba(80,60,140,.35)" }}>{it.label}</span>
+              {"badge" in it && it.badge && <span style={{ position:"absolute", top:-3, right:-6, minWidth:16, height:16, borderRadius:8, background:"linear-gradient(135deg,#ff5f9e,#ee247f)", border:"2px solid #fff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#fff", fontWeight:900, padding:"0 3px", boxShadow:"0 2px 5px rgba(238,36,127,.3)" }}>{it.badge}</span>}
+            </span>
+            <span style={{ maxWidth:"100%", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", fontSize:9, lineHeight:"12px", fontWeight:on?800:600, letterSpacing:0, color:on?"#6f2bd9":"#8d879a", transition:"color .2s ease" }}>{it.label}</span>
           </button>
         );
       })}
@@ -556,7 +512,7 @@ function BottomNav({ active, onHome, onRoom, onProfile }: { active: Screen; onHo
 }
 
 /* ─── HOME ─── */
-function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoom: () => void; onProfile: () => void }) {
+function HomeScreen({ name, avatarUrl, onEnterRoom, onProfile }: { name: string; avatarUrl?: string | null; onEnterRoom: () => void; onProfile: () => void }) {
   const [showModal, setShowModal] = useState(false);
   return (
     <main style={{ background:"#f5f5f7", minHeight:"100dvh", display:"flex", flexDirection:"column", fontFamily:"'Helvetica Neue',Arial,sans-serif", position:"relative", overflow:"hidden" }}>
@@ -565,16 +521,20 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
         .h-orb2{position:absolute;width:200px;height:200px;border-radius:50%;background:#ff3ea5;opacity:.06;top:-20px;right:-40px;pointer-events:none}
         .h-scroll{flex:1;overflow-y:auto;padding-bottom:80px}
         .h-scroll::-webkit-scrollbar{display:none}
-        .topbar{display:flex;align-items:center;padding:max(16px,env(safe-area-inset-top)) 16px 10px;gap:10px;position:relative;z-index:10}
-        .t-av{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#7b2ff7,#ff3ea5);border:2px solid rgba(192,132,252,.5);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#fff;flex-shrink:0}
-        .t-coins{display:flex;align-items:center;gap:6px;background:rgba(10,0,30,.6);border:1px solid rgba(255,180,0,.3);border-radius:24px;padding:5px 10px 5px 5px}
-        .coin-hex{width:26px;height:26px;position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .topbar{display:flex;align-items:center;gap:10px;padding:max(12px,env(safe-area-inset-top)) 14px 12px;position:relative;z-index:10;background:rgba(255,255,255,.96);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);border-bottom:1px solid rgba(97,73,137,.1);box-shadow:0 4px 22px rgba(65,38,104,.07)}
+        .t-av-wrap{position:relative;width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#B878FF,#7130ED);padding:2.5px;box-shadow:0 4px 14px rgba(113,48,237,.28);flex-shrink:0;cursor:pointer;border:none}
+        .t-av{width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,#f4ecff,#ffe9f6);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;color:#7130ED;overflow:hidden}
+        .t-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+        .t-av-dot{position:absolute;bottom:0;right:0;width:12px;height:12px;border-radius:50%;background:linear-gradient(135deg,#66EA9B,#1EBA69);border:2.5px solid #fff;box-shadow:0 1px 4px rgba(30,186,105,.4)}
+        .t-coins{display:flex;align-items:center;gap:7px;background:linear-gradient(135deg,rgba(255,214,64,.18),rgba(255,140,0,.12));border:1px solid rgba(255,180,0,.4);border-radius:24px;padding:4px 5px 4px 4px;box-shadow:0 3px 12px rgba(255,150,0,.16)}
+        .coin-hex{width:26px;height:26px;position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0;filter:drop-shadow(0 2px 4px rgba(255,150,0,.4))}
         .coin-hex-bg{position:absolute;inset:0;background:linear-gradient(135deg,#ffd700,#ff8c00);clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%)}
-        .coin-hex-v{position:relative;z-index:1;font-size:9px;font-weight:900;color:#5a2800;font-style:italic}
-        .t-coin-num{font-size:13px;font-weight:800;color:#ffd700}
-        .t-add{width:20px;height:20px;border-radius:50%;background:rgba(123,47,247,.5);border:1px solid rgba(192,132,252,.4);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-        .t-icon-btn{width:38px;height:38px;border-radius:50%;background:rgba(100,80,160,.09);border:1px solid rgba(100,80,160,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-        .t-notif-dot{position:absolute;top:1px;right:1px;width:9px;height:9px;border-radius:50%;background:#ff3ea5;border:2px solid #0a0018}
+        .coin-hex-bg::after{content:"";position:absolute;inset:2px;background:linear-gradient(135deg,#ffe98a,#ffb52e);clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%)}
+        .coin-hex-v{position:relative;z-index:1;font-size:9px;font-weight:900;color:#8a4a00;font-style:italic}
+        .t-coin-num{font-size:13px;font-weight:900;letter-spacing:.2px;background:linear-gradient(135deg,#ffb400,#ff7a00);-webkit-background-clip:text;background-clip:text;color:transparent}
+        .t-add{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#FFD85C,#FF9E2D);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 6px rgba(255,158,45,.45);cursor:pointer}
+        .t-icon-btn{width:40px;height:40px;border-radius:50%;background:#fff;border:1px solid rgba(113,48,237,.16);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 3px 10px rgba(65,38,104,.08);position:relative;cursor:pointer}
+        .t-notif-dot{position:absolute;top:2px;right:2px;width:11px;height:11px;border-radius:50%;background:linear-gradient(135deg,#ff5f9e,#ee247f);border:2px solid #fff;box-shadow:0 1px 5px rgba(238,36,127,.45)}
         .hero-box{margin:8px 16px 14px;border-radius:24px;overflow:hidden;position:relative;height:150px}
         .hero-bg2{position:absolute;inset:0;background:#0d0022}
         .hero-g1{position:absolute;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(123,47,247,.35) 0%,transparent 70%);top:-40px;left:-20px;animation:vpulse 3s ease-in-out infinite}
@@ -633,18 +593,33 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
 
       {/* TOPBAR */}
       <div className="topbar">
-        <div className="t-av">D</div>
+        <button type="button" className="t-av-wrap" aria-label="Profil" onClick={onProfile}>
+          <div className="t-av">{avatarUrl ? <img src={avatarUrl} alt={name} referrerPolicy="no-referrer"/> : name.charAt(0).toUpperCase()}</div>
+          <div className="t-av-dot"/>
+        </button>
         <div className="t-coins">
           <div className="coin-hex"><div className="coin-hex-bg"/><span className="coin-hex-v">V</span></div>
           <span className="t-coin-num">210</span>
-          <div className="t-add"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="3.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+          <div className="t-add"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.4" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
         </div>
         <div style={{ marginLeft:"auto", display:"flex", gap:8 }}>
-          <div style={{ position:"relative" }}>
-            <div className="t-icon-btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a3a7a" strokeWidth="2" strokeLinecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+          <div className="t-icon-btn" role="button" aria-label="Bildirişlər">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-2.6 8.6-2.6 8.6a.8.8 0 0 0 .7 1.3h15.8a.8.8 0 0 0 .7-1.3S18 15 18 8Z" fill="url(#bellGrad)" stroke="url(#bellGrad)" strokeWidth="1.4" strokeLinejoin="round"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="url(#bellGrad)" strokeWidth="1.9" strokeLinecap="round"/>
+              <path d="M9.4 7.2a3.6 3.6 0 0 1 2.3-1.7" stroke="rgba(255,255,255,.75)" strokeWidth="1.3" strokeLinecap="round" fill="none"/>
+              <defs><linearGradient id="bellGrad" x1="3" y1="3" x2="21" y2="22"><stop stopColor="#B878FF"/><stop offset="1" stopColor="#F2389B"/></linearGradient></defs>
+            </svg>
             <div className="t-notif-dot"/>
           </div>
-          <div className="t-icon-btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a3a7a" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+          <div className="t-icon-btn" role="button" aria-label="Axtarış">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="11" cy="11" r="7.1" stroke="url(#searchGrad)" strokeWidth="2.3"/>
+              <line x1="16.4" y1="16.4" x2="21" y2="21" stroke="url(#searchGrad)" strokeWidth="2.5" strokeLinecap="round"/>
+              <path d="M7.6 9.3a4.2 4.2 0 0 1 2.1-2" stroke="rgba(255,255,255,.7)" strokeWidth="1.2" strokeLinecap="round"/>
+              <defs><linearGradient id="searchGrad" x1="3" y1="3" x2="21" y2="21"><stop stopColor="#73EEFF"/><stop offset="1" stopColor="#00B9E7"/></linearGradient></defs>
+            </svg>
+          </div>
         </div>
       </div>
 
