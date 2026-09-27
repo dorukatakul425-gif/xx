@@ -1,7 +1,7 @@
 // @ts-nocheck — imported prototype contains intentionally loose backend response shapes.
 import { ClientOnly, createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { BadgeHelp, ChevronRight, Crown, Gift, LogOut, Medal, MessageCircle, Mic, MicOff, MoreHorizontal, Radio, Send, Settings, ShieldCheck, ShoppingBag, Users, WalletCards, X } from "lucide-react";
+import { ArrowLeft, BadgeHelp, ChevronRight, Crown, Eye, Gift, LockKeyhole, LogOut, Medal, MessageCircle, Mic, MicOff, MoreHorizontal, PenLine, Radio, Send, Settings, ShieldCheck, ShoppingBag, Users, WalletCards, X } from "lucide-react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -853,7 +853,20 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
         .p-ring1{position:absolute;width:320px;height:320px;top:-100px;left:-80px;border-radius:50%;border:1px solid rgba(192,132,252,.06);animation:vrotate 20s linear infinite;z-index:2}
         .p-ring2{position:absolute;width:240px;height:240px;top:-60px;left:-40px;border-radius:50%;border:1px dashed rgba(255,62,165,.05);animation:vrotate 14s linear infinite reverse;z-index:2}
         .p-top{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:max(16px,env(safe-area-inset-top)) 18px 0;z-index:8}
-        .p-ibtn{width:36px;height:36px;border-radius:12px;background:rgba(100,80,160,.15);border:1px solid rgba(100,80,160,.14);display:flex;align-items:center;justify-content:center;cursor:pointer}
+        .p-ibtn{width:38px;height:38px;border-radius:11px;background:rgba(255,255,255,.92);border:1px solid rgba(255,255,255,.72);color:#35244f;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 3px 12px rgba(29,17,49,.14);backdrop-filter:blur(10px);transition:transform .16s ease,background .16s ease}
+        .p-ibtn:active{transform:scale(.94);background:#fff}
+        .p-vis-backdrop{position:fixed;inset:0;z-index:998;background:rgba(24,17,35,.38);backdrop-filter:blur(5px);display:flex;align-items:flex-end;justify-content:center}
+        .p-vis-sheet{width:100%;max-width:430px;max-height:min(78dvh,680px);display:flex;flex-direction:column;background:#fff;border-radius:20px 20px 0 0;box-shadow:0 -12px 42px rgba(25,15,42,.18);animation:vslideSheet .24s ease-out}
+        .p-vis-handle{width:36px;height:4px;border-radius:2px;background:rgba(39,29,54,.18);margin:9px auto 3px}
+        .p-vis-head{padding:12px 18px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(64,44,91,.09)}
+        .p-vis-close{width:34px;height:34px;border-radius:10px;background:#f5f3f8;border:0;color:#3b2d4d;padding:0}
+        .p-vis-list{overflow-y:auto;padding:6px 18px 10px;flex:1}
+        .p-vis-row{position:relative;display:flex;align-items:center;gap:12px;min-height:68px;border-bottom:1px solid rgba(64,44,91,.075)}
+        .p-vis-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0}
+        .p-vis-lock{position:absolute;inset:0;display:flex;align-items:center;justify-content:flex-end;background:linear-gradient(90deg,rgba(255,255,255,.32),#fff 62%);padding-right:12px}
+        .p-vis-foot{padding:14px 18px max(18px,env(safe-area-inset-bottom));border-top:1px solid rgba(64,44,91,.09);background:#fff}
+        .p-vis-upgrade{width:100%;height:48px;border-radius:12px;background:#6f43c0;color:#fff;border:0;font-size:13px;font-weight:750;box-shadow:0 6px 16px rgba(111,67,192,.22)}
+        @keyframes vslideSheet{from{transform:translateY(24px);opacity:.6}to{transform:translateY(0);opacity:1}}
         .p-upload{position:absolute;bottom:12px;right:14px;z-index:8;display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.55);border:1px solid rgba(100,80,160,.18);border-radius:20px;padding:6px 11px;cursor:pointer}
         .p-av-outer{width:78px;height:78px;border-radius:50%;background:conic-gradient(#ffd700,#ff8c00,#c084fc,#7b2ff7,#ffd700);padding:2.5px;animation:vglow 3s ease-in-out infinite;flex-shrink:0}
         .p-av-inner{width:100%;height:100%;border-radius:50%;background:#e8e0f5;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:#1a1a2e;overflow:hidden}
@@ -935,43 +948,17 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
           />
           <div className="p-mesh"/><div className="p-ring1"/><div className="p-ring2"/><div className="p-fade"/>
           <div className="p-top">
-            {/* Geri — 3D mavi ox */}
-            <button className="p-ibtn" onClick={onBack} style={{background:"linear-gradient(145deg,#e8e0f8,#d0c8ee)",boxShadow:"0 3px 8px rgba(80,60,140,.2),inset 0 1px 0 rgba(255,255,255,.6)"}}>
-              <svg width="18" height="18" viewBox="0 0 32 32" fill="none">
-                <defs><linearGradient id="bk1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#a080e0"/><stop offset="100%" stopColor="#6040b0"/></linearGradient><filter id="bkf"><feDropShadow dx="0" dy="1" stdDeviation="1" floodColor="rgba(60,20,120,.4)"/></filter></defs>
-                <g filter="url(#bkf)">
-                  <path d="M20 8L12 16l8 8" stroke="url(#bk1)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M20 8L12 16l8 8" stroke="rgba(255,255,255,.35)" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
-                </g>
-              </svg>
-            </button>
+            <Button type="button" variant="ghost" size="icon" className="p-ibtn" onClick={onBack} aria-label="Geri">
+              <ArrowLeft size={20} strokeWidth={2.2}/>
+            </Button>
             <span style={{ fontSize:13, fontWeight:700, color:"#4a2880", letterSpacing:3, textTransform:"uppercase" }}>Profil</span>
             <div style={{ display:"flex", gap:8 }}>
-              {/* Göz — 3D bənövşəyi */}
-              <button className="p-ibtn" onClick={() => setVisitorOpen(true)} style={{background:"linear-gradient(145deg,#e0d8f8,#c8c0ee)",boxShadow:"0 3px 8px rgba(123,47,247,.25),inset 0 1px 0 rgba(255,255,255,.6)"}}>
-                <svg width="18" height="18" viewBox="0 0 32 32" fill="none">
-                  <defs><linearGradient id="ey1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#c084fc"/><stop offset="100%" stopColor="#7b2ff7"/></linearGradient><linearGradient id="ey2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#1a0050"/><stop offset="100%" stopColor="#3a00a0"/></linearGradient><filter id="eyf"><feDropShadow dx="0" dy="1" stdDeviation="1" floodColor="rgba(123,47,247,.5)"/></filter></defs>
-                  <g filter="url(#eyf)">
-                    <path d="M3 16s5-10 13-10 13 10 13 10-5 10-13 10S3 16 3 16z" fill="url(#ey1)"/>
-                    <path d="M3 16s5-6 13-6 13 6 13 6" fill="rgba(255,255,255,.2)"/>
-                    <circle cx="16" cy="16" r="5" fill="url(#ey2)"/>
-                    <circle cx="16" cy="16" r="3" fill="#1a0050"/>
-                    <circle cx="14.5" cy="14.5" r="1.2" fill="rgba(255,255,255,.7)"/>
-                  </g>
-                </svg>
-              </button>
-              {/* Kalem — 3D qızıl */}
-              <button className="p-ibtn" onClick={() => { setDraft(profileData); setEditOpen(true); }} style={{background:"linear-gradient(145deg,#fff8e0,#ffedb0)",boxShadow:"0 3px 8px rgba(255,150,0,.25),inset 0 1px 0 rgba(255,255,255,.8)"}}>
-                <svg width="18" height="18" viewBox="0 0 32 32" fill="none">
-                  <defs><linearGradient id="pe1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#ffd700"/><stop offset="100%" stopColor="#ff9500"/></linearGradient><linearGradient id="pe2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#ff6000"/><stop offset="100%" stopColor="#cc4000"/></linearGradient><filter id="pef"><feDropShadow dx="0" dy="1" stdDeviation="1" floodColor="rgba(255,150,0,.5)"/></filter></defs>
-                  <g filter="url(#pef)">
-                    <path d="M22 5l5 5L12 25l-6 1 1-6L22 5z" fill="url(#pe1)"/>
-                    <path d="M22 5l5 5-3 3-5-5 3-3z" fill="url(#pe2)"/>
-                    <path d="M22 5l5 5" stroke="rgba(255,255,255,.5)" strokeWidth="1" strokeLinecap="round"/>
-                    <path d="M6 26l1-6" stroke="rgba(255,200,0,.6)" strokeWidth="1.5" strokeLinecap="round"/>
-                  </g>
-                </svg>
-              </button>
+              <Button type="button" variant="ghost" size="icon" className="p-ibtn" onClick={() => setVisitorOpen(true)} aria-label="Profil ziyarətçiləri">
+                <Eye size={19} strokeWidth={2}/>
+              </Button>
+              <Button type="button" variant="ghost" size="icon" className="p-ibtn" onClick={() => { setDraft(profileData); setEditOpen(true); }} aria-label="Profili düzəlt">
+                <PenLine size={18} strokeWidth={2}/>
+              </Button>
             </div>
           </div>
         </div>
@@ -1427,72 +1414,44 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
 
       {/* ZİYARƏTÇİLƏR PANELİ */}
       {visitorOpen && (
-        <div style={{ position:"fixed", inset:0, zIndex:998, background:"rgba(60,40,120,.6)", backdropFilter:"blur(16px)", display:"flex", alignItems:"center", justifyContent:"center", padding:"20px" }} onClick={() => setVisitorOpen(false)}>
-          <div style={{ width:"100%", maxWidth:400, background:"#ffffff", borderRadius:28, border:"1px solid rgba(100,80,160,.12)", maxHeight:"80vh", display:"flex", flexDirection:"column", boxShadow:"0 24px 60px rgba(60,40,120,.25), 0 0 0 1px rgba(255,255,255,.8)" }}
-            onClick={e => e.stopPropagation()}>
-            {/* Header */}
-            <div style={{ padding:"20px 20px 14px", display:"flex", alignItems:"center", justifyContent:"space-between", flexShrink:0, borderBottom:"1px solid rgba(100,80,160,.08)" }}>
+        <div className="p-vis-backdrop" onClick={() => setVisitorOpen(false)}>
+          <section className="p-vis-sheet" role="dialog" aria-modal="true" aria-labelledby="visitor-title" onClick={e => e.stopPropagation()}>
+            <div className="p-vis-handle"/>
+            <div className="p-vis-head">
               <div>
-                <div style={{ fontSize:17, fontWeight:800, color:"#1a1a2e" }}>Profil Ziyarətçiləri</div>
-                <div style={{ fontSize:11, color:"rgba(40,20,80,.45)", marginTop:2 }}>Son 7 günün statistikası</div>
+                <div id="visitor-title" style={{ fontSize:17, fontWeight:800, color:"#1a1a2e" }}>Profil ziyarətçiləri</div>
+                <div style={{ fontSize:11, color:"rgba(40,20,80,.5)", marginTop:3 }}>Son 7 gün · 143 ziyarət</div>
               </div>
-              <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-                <div style={{ textAlign:"right" }}>
-                  <div style={{ fontSize:26, fontWeight:900, background:"linear-gradient(135deg,#7b2ff7,#ff3ea5)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>143</div>
-                  <div style={{ fontSize:10, color:"rgba(123,47,247,.4)" }}>ümumi ziyarət</div>
-                </div>
-                <button onClick={() => setVisitorOpen(false)} style={{ width:32, height:32, borderRadius:"50%", background:"rgba(100,80,160,.08)", border:"1px solid rgba(100,80,160,.12)", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4a2880" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                </button>
-              </div>
+              <Button type="button" variant="ghost" size="icon" className="p-vis-close" onClick={() => setVisitorOpen(false)} aria-label="Bağla">
+                <X size={17} strokeWidth={2.2}/>
+              </Button>
             </div>
-            {/* Siyahı */}
-            <div style={{ overflowY:"auto", padding:"0 16px 20px", flex:1 }}>
+            <div className="p-vis-list">
               {visitors.map((v, i) => {
                 const isBlurred = userVip === 0;
                 return (
-                  <div key={i} style={{ position:"relative", marginBottom:8 }}>
-                    <div style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 14px", background:"rgba(100,80,160,.06)", border:"1px solid rgba(100,80,160,.08)", borderRadius:16, filter: isBlurred ? "blur(5px)" : "none", pointerEvents: isBlurred ? "none" : "auto" }}>
-                      {/* Avatar */}
-                      <div style={{ width:44, height:44, borderRadius:"50%", background:v.color, display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, fontWeight:800, color:"#1a1a2e", flexShrink:0 }}>{v.initials}</div>
+                  <div className="p-vis-row" key={i}>
+                      <div className="p-vis-avatar" style={{ background:v.color }}>{v.initials}</div>
                       <div style={{ flex:1, minWidth:0 }}>
                         <div style={{ fontSize:14, fontWeight:700, color:"#1a1a2e", marginBottom:2 }}>{v.name}</div>
-                        <div style={{ display:"flex", alignItems:"center", gap:6, flexWrap:"wrap" }}>
-                          <span style={{ fontSize:10, color:"rgba(40,20,80,.6)" }}>{v.country}</span>
-                          <span style={{ width:3, height:3, borderRadius:"50%", background:"rgba(80,60,140,.2)", display:"inline-block" }}/>
-                          <span style={{ fontSize:10, color:"rgba(40,20,80,.6)" }}>{v.time}</span>
-                          <span style={{ width:3, height:3, borderRadius:"50%", background:"rgba(80,60,140,.2)", display:"inline-block" }}/>
-                          <span style={{ fontSize:10, color:"rgba(192,132,252,.6)" }}>{v.visits}× ziyarət</span>
+                        <div style={{ display:"flex", alignItems:"center", gap:5 }}>
+                          <span style={{ fontSize:10, color:"rgba(40,20,80,.55)" }}>{v.time}</span>
+                          <span style={{ color:"rgba(40,20,80,.25)" }}>·</span>
+                          <span style={{ fontSize:10, color:"rgba(40,20,80,.55)" }}>{v.visits} dəfə baxıb</span>
                         </div>
                       </div>
-                      {v.vip > 0
-                        ? <div style={{ background:"rgba(255,200,0,.1)", border:"1px solid rgba(255,200,0,.22)", borderRadius:8, padding:"3px 8px", fontSize:10, fontWeight:700, color:"#ffd700", flexShrink:0 }}>VIP{v.vip}</div>
-                        : <div style={{ background:"rgba(100,80,160,.07)", border:"1px solid rgba(100,80,160,.12)", borderRadius:8, padding:"3px 8px", fontSize:10, color:"rgba(80,60,140,.2)", flexShrink:0 }}>VIP0</div>
-                      }
-                    </div>
-                    {/* Blur overlay */}
-                    {isBlurred && (
-                      <div style={{ position:"absolute", inset:0, borderRadius:16, display:"flex", alignItems:"center", justifyContent:"center", background:"rgba(100,80,160,.3)" }}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(40,20,80,.55)" strokeWidth="2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                      </div>
-                    )}
+                    {isBlurred && <div className="p-vis-lock"><LockKeyhole size={17} strokeWidth={2} color="#6f43c0"/></div>}
                   </div>
                 );
               })}
-
-              {/* VIP0 — alt CTA */}
-              {userVip === 0 && (
-                <div style={{ margin:"8px 0 0", padding:"16px", background:"linear-gradient(135deg,rgba(123,47,247,.12),rgba(255,62,165,.08))", border:"1px solid rgba(123,47,247,.2)", borderRadius:20, textAlign:"center" }}>
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,200,0,.7)" strokeWidth="2" strokeLinecap="round" style={{ marginBottom:8 }}><path d="M2 8l4 8h12l4-8-5 3-5-7-5 7-5-3z"/></svg>
-                  <div style={{ fontSize:14, fontWeight:700, color:"#1a1a2e", marginBottom:4 }}>Ziyarət edənləri görmək üçün</div>
-                  <div style={{ fontSize:13, color:"rgba(255,200,0,.8)", fontWeight:700, marginBottom:12 }}>VIP 1-ə yüksəlin</div>
-                  <button onClick={() => { setVisitorOpen(false); onVip(); }} style={{ background:"linear-gradient(135deg,#ffd700,#ff9500)", border:"none", borderRadius:14, padding:"10px 28px", fontSize:13, fontWeight:800, color:"#2a0e00", cursor:"pointer" }}>
-                    VIP-ə keç →
-                  </button>
-                </div>
-              )}
             </div>
-          </div>
+            {userVip === 0 && (
+              <div className="p-vis-foot">
+                <div style={{ fontSize:12, lineHeight:1.45, color:"rgba(40,20,80,.58)", textAlign:"center", marginBottom:11 }}>Ziyarətçi məlumatlarını görmək üçün VIP 1 tələb olunur.</div>
+                <Button type="button" className="p-vis-upgrade" onClick={() => { setVisitorOpen(false); onVip(); }}>VIP 1-ə yüksəlt</Button>
+              </div>
+            )}
+          </section>
         </div>
       )}
 
