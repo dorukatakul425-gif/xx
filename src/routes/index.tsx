@@ -914,14 +914,42 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
           />
           <div className="p-mesh"/><div className="p-ring1"/><div className="p-ring2"/><div className="p-fade"/>
           <div className="p-top">
-            <button className="p-ibtn" onClick={onBack}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(40,20,100,.5)" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-            <span style={{ fontSize:13, fontWeight:700, color:"rgba(40,20,100,.5)", letterSpacing:3, textTransform:"uppercase" }}>Profil</span>
+            {/* Geri — 3D mavi ox */}
+            <button className="p-ibtn" onClick={onBack} style={{background:"linear-gradient(145deg,#e8e0f8,#d0c8ee)",boxShadow:"0 3px 8px rgba(80,60,140,.2),inset 0 1px 0 rgba(255,255,255,.6)"}}>
+              <svg width="18" height="18" viewBox="0 0 32 32" fill="none">
+                <defs><linearGradient id="bk1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#a080e0"/><stop offset="100%" stopColor="#6040b0"/></linearGradient><filter id="bkf"><feDropShadow dx="0" dy="1" stdDeviation="1" floodColor="rgba(60,20,120,.4)"/></filter></defs>
+                <g filter="url(#bkf)">
+                  <path d="M20 8L12 16l8 8" stroke="url(#bk1)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M20 8L12 16l8 8" stroke="rgba(255,255,255,.35)" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+                </g>
+              </svg>
+            </button>
+            <span style={{ fontSize:13, fontWeight:700, color:"#4a2880", letterSpacing:3, textTransform:"uppercase" }}>Profil</span>
             <div style={{ display:"flex", gap:8 }}>
-              <button className="p-ibtn" onClick={() => setVisitorOpen(true)}>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(40,20,100,.5)" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              {/* Göz — 3D bənövşəyi */}
+              <button className="p-ibtn" onClick={() => setVisitorOpen(true)} style={{background:"linear-gradient(145deg,#e0d8f8,#c8c0ee)",boxShadow:"0 3px 8px rgba(123,47,247,.25),inset 0 1px 0 rgba(255,255,255,.6)"}}>
+                <svg width="18" height="18" viewBox="0 0 32 32" fill="none">
+                  <defs><linearGradient id="ey1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#c084fc"/><stop offset="100%" stopColor="#7b2ff7"/></linearGradient><linearGradient id="ey2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#1a0050"/><stop offset="100%" stopColor="#3a00a0"/></linearGradient><filter id="eyf"><feDropShadow dx="0" dy="1" stdDeviation="1" floodColor="rgba(123,47,247,.5)"/></filter></defs>
+                  <g filter="url(#eyf)">
+                    <path d="M3 16s5-10 13-10 13 10 13 10-5 10-13 10S3 16 3 16z" fill="url(#ey1)"/>
+                    <path d="M3 16s5-6 13-6 13 6 13 6" fill="rgba(255,255,255,.2)"/>
+                    <circle cx="16" cy="16" r="5" fill="url(#ey2)"/>
+                    <circle cx="16" cy="16" r="3" fill="#1a0050"/>
+                    <circle cx="14.5" cy="14.5" r="1.2" fill="rgba(255,255,255,.7)"/>
+                  </g>
+                </svg>
               </button>
-              <button className="p-ibtn" onClick={() => { setDraft(profileData); setEditOpen(true); }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(40,20,100,.5)" strokeWidth="2" strokeLinecap="round"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+              {/* Kalem — 3D qızıl */}
+              <button className="p-ibtn" onClick={() => { setDraft(profileData); setEditOpen(true); }} style={{background:"linear-gradient(145deg,#fff8e0,#ffedb0)",boxShadow:"0 3px 8px rgba(255,150,0,.25),inset 0 1px 0 rgba(255,255,255,.8)"}}>
+                <svg width="18" height="18" viewBox="0 0 32 32" fill="none">
+                  <defs><linearGradient id="pe1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#ffd700"/><stop offset="100%" stopColor="#ff9500"/></linearGradient><linearGradient id="pe2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#ff6000"/><stop offset="100%" stopColor="#cc4000"/></linearGradient><filter id="pef"><feDropShadow dx="0" dy="1" stdDeviation="1" floodColor="rgba(255,150,0,.5)"/></filter></defs>
+                  <g filter="url(#pef)">
+                    <path d="M22 5l5 5L12 25l-6 1 1-6L22 5z" fill="url(#pe1)"/>
+                    <path d="M22 5l5 5-3 3-5-5 3-3z" fill="url(#pe2)"/>
+                    <path d="M22 5l5 5" stroke="rgba(255,255,255,.5)" strokeWidth="1" strokeLinecap="round"/>
+                    <path d="M6 26l1-6" stroke="rgba(255,200,0,.6)" strokeWidth="1.5" strokeLinecap="round"/>
+                  </g>
+                </svg>
               </button>
             </div>
           </div>
@@ -1353,20 +1381,23 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
 
       {/* ZİYARƏTÇİLƏR PANELİ */}
       {visitorOpen && (
-        <div style={{ position:"fixed", inset:0, zIndex:998, background:"rgba(80,60,140,.78)", backdropFilter:"blur(10px)" }} onClick={() => setVisitorOpen(false)}>
-          <div style={{ position:"absolute", bottom:0, left:0, right:0, maxWidth:430, margin:"0 auto", background:"linear-gradient(180deg,#f0ecf8,#f8f8ff)", borderRadius:"24px 24px 0 0", border:"1px solid rgba(100,80,160,.1)", paddingBottom:"env(safe-area-inset-bottom,16px)", maxHeight:"80vh", display:"flex", flexDirection:"column" }}
+        <div style={{ position:"fixed", inset:0, zIndex:998, background:"rgba(60,40,120,.6)", backdropFilter:"blur(16px)", display:"flex", alignItems:"center", justifyContent:"center", padding:"20px" }} onClick={() => setVisitorOpen(false)}>
+          <div style={{ width:"100%", maxWidth:400, background:"#ffffff", borderRadius:28, border:"1px solid rgba(100,80,160,.12)", maxHeight:"80vh", display:"flex", flexDirection:"column", boxShadow:"0 24px 60px rgba(60,40,120,.25), 0 0 0 1px rgba(255,255,255,.8)" }}
             onClick={e => e.stopPropagation()}>
-            {/* Handle */}
-            <div style={{ display:"flex", justifyContent:"center", padding:"12px 0 0" }}><div style={{ width:36, height:4, borderRadius:2, background:"rgba(100,80,160,.15)" }}/></div>
             {/* Header */}
-            <div style={{ padding:"14px 20px 12px", display:"flex", alignItems:"center", justifyContent:"space-between", flexShrink:0 }}>
+            <div style={{ padding:"20px 20px 14px", display:"flex", alignItems:"center", justifyContent:"space-between", flexShrink:0, borderBottom:"1px solid rgba(100,80,160,.08)" }}>
               <div>
-                <div style={{ fontSize:16, fontWeight:700, color:"#1a1a2e" }}>Profil Ziyarətçiləri</div>
-                <div style={{ fontSize:11, color:"rgba(40,20,80,.55)", marginTop:2 }}>Son 7 günün statistikası</div>
+                <div style={{ fontSize:17, fontWeight:800, color:"#1a1a2e" }}>Profil Ziyarətçiləri</div>
+                <div style={{ fontSize:11, color:"rgba(40,20,80,.45)", marginTop:2 }}>Son 7 günün statistikası</div>
               </div>
-              <div style={{ textAlign:"right" }}>
-                <div style={{ fontSize:26, fontWeight:900, background:"linear-gradient(135deg,#c084fc,#ff3ea5)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>143</div>
-                <div style={{ fontSize:10, color:"rgba(192,132,252,.5)" }}>ümumi ziyarət</div>
+              <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+                <div style={{ textAlign:"right" }}>
+                  <div style={{ fontSize:26, fontWeight:900, background:"linear-gradient(135deg,#7b2ff7,#ff3ea5)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>143</div>
+                  <div style={{ fontSize:10, color:"rgba(123,47,247,.4)" }}>ümumi ziyarət</div>
+                </div>
+                <button onClick={() => setVisitorOpen(false)} style={{ width:32, height:32, borderRadius:"50%", background:"rgba(100,80,160,.08)", border:"1px solid rgba(100,80,160,.12)", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4a2880" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
               </div>
             </div>
             {/* Siyahı */}
@@ -1430,22 +1461,22 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
         const IcBio = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(40,20,80,.65)" strokeWidth="2" strokeLinecap="round"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg>;
         const IcImg = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(40,20,80,.65)" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>;
         const row = (icon: JSX.Element, label: string, right: JSX.Element) => (
-          <div style={{ background:"rgba(100,80,160,.06)", border:"1px solid rgba(100,80,160,.09)", borderRadius:16, margin:"0 18px 8px", padding:"14px 18px", display:"flex", alignItems:"center", gap:12 }}>
+          <div style={{ background:"#f8f6ff", border:"1px solid rgba(100,80,160,.1)", borderRadius:16, margin:"0 18px 8px", padding:"14px 18px", display:"flex", alignItems:"center", gap:12 }}>
             {icon}
-            <span style={{ fontSize:13, color:"rgba(40,20,80,.65)", flexShrink:0, minWidth:100 }}>{label}</span>
+            <span style={{ fontSize:13, color:"#2a1060", fontWeight:600, flexShrink:0, minWidth:100 }}>{label}</span>
             <div style={{ flex:1, display:"flex", justifyContent:"flex-end" }}>{right}</div>
           </div>
         );
         return (
-          <div style={{ position:"fixed", inset:0, zIndex:999, background:"rgba(80,60,140,.8)", backdropFilter:"blur(10px)", overflowY:"auto", WebkitOverflowScrolling:"touch" }}>
+          <div style={{ position:"fixed", inset:0, zIndex:999, background:"rgba(255,255,255,.98)", backdropFilter:"blur(10px)", overflowY:"auto", WebkitOverflowScrolling:"touch" }}>
             <div style={{ maxWidth:430, margin:"0 auto", paddingBottom:40 }}>
               {/* Header */}
-              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"max(20px,env(safe-area-inset-top)) 20px 16px" }}>
-                <button onClick={() => setEditOpen(false)} style={{ background:"rgba(100,80,160,.1)", border:"1px solid rgba(100,80,160,.14)", borderRadius:12, width:38, height:38, color:"rgba(30,10,80,.6)", fontSize:18, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center" }}>
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"max(20px,env(safe-area-inset-top)) 20px 16px", borderBottom:"1px solid rgba(100,80,160,.1)" }}>
+                <button onClick={() => setEditOpen(false)} style={{ background:"rgba(100,80,160,.08)", border:"1px solid rgba(100,80,160,.12)", borderRadius:12, width:38, height:38, color:"#4a2880", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center" }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
                 <span style={{ fontSize:16, fontWeight:700, color:"#1a1a2e" }}>Profili Düzəlt</span>
-                <button onClick={() => { saveProfile(draft); setEditOpen(false); }} style={{ background:"linear-gradient(135deg,#7b2ff7,#ff3ea5)", border:"none", borderRadius:12, padding:"8px 18px", color:"#1a1a2e", fontSize:13, fontWeight:700, cursor:"pointer" }}>Saxla</button>
+                <button onClick={() => { saveProfile(draft); setEditOpen(false); }} style={{ background:"linear-gradient(135deg,#7b2ff7,#ff3ea5)", border:"none", borderRadius:12, padding:"8px 18px", color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer" }}>Saxla</button>
               </div>
 
               {/* Avatar */}
