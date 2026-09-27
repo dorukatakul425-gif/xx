@@ -749,7 +749,7 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
         .p-ibtn{width:36px;height:36px;border-radius:12px;background:rgba(100,80,160,.15);border:1px solid rgba(100,80,160,.14);display:flex;align-items:center;justify-content:center;cursor:pointer}
         .p-upload{position:absolute;bottom:12px;right:14px;z-index:8;display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.55);border:1px solid rgba(100,80,160,.18);border-radius:20px;padding:6px 11px;cursor:pointer}
         .p-av-outer{width:78px;height:78px;border-radius:50%;background:conic-gradient(#ffd700,#ff8c00,#c084fc,#7b2ff7,#ffd700);padding:2.5px;animation:vglow 3s ease-in-out infinite;flex-shrink:0}
-        .p-av-inner{width:100%;height:100%;border-radius:50%;background:#e8e0f5;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:#fff;overflow:hidden}
+        .p-av-inner{width:100%;height:100%;border-radius:50%;background:#e8e0f5;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:#1a1a2e;overflow:hidden}
         .p-crown{position:absolute;top:-12px;left:50%;transform:translateX(-50%)}
         .p-status{position:absolute;bottom:2px;right:2px;width:14px;height:14px;border-radius:50%;background:#00ff88;border:2.5px solid #07000f}
         .vip-rozet{display:inline-flex;align-items:center;margin:12px 18px 0}
@@ -760,11 +760,11 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
         .p-coin-shine{position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,220,100,.05) 50%,transparent 65%);background-size:200% 100%;animation:vshimmer 4s ease-in-out infinite;z-index:2}
         .gem{position:relative;width:56px;height:56px;flex-shrink:0;animation:vcoinPulse 2.5s ease-in-out infinite}
         .p-menu{margin:16px 18px 0}
-        .p-ms-title{font-size:10px;letter-spacing:3px;color:rgba(100,80,160,.15);text-transform:uppercase;margin-bottom:10px;padding-left:4px}
+        .p-ms-title{font-size:10px;letter-spacing:3px;color:rgba(80,60,140,.5);text-transform:uppercase;margin-bottom:10px;padding-left:4px}
         .p-mi{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:14px;cursor:pointer;background:rgba(255,255,255,.02);border:1px solid rgba(100,80,160,.07);margin-bottom:4px}
         .p-mi:active{background:rgba(100,80,160,.08)}
         .p-mi-l{width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-        .p-mi-lbl{flex:1;font-size:14px;font-weight:600;color:rgba(255,255,255,.8)}
+        .p-mi-lbl{flex:1;font-size:14px;font-weight:600;color:#1a1a2e}
         .p-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px}
       `}</style>
       <div className="p-scroll">
@@ -866,29 +866,29 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
             <div style={{ flex:1, paddingBottom:4 }}>
               <div style={{ fontSize:20, fontWeight:900, color:"#1a1a2e", marginBottom:4 }}>{profileData.username}</div>
               <div style={{ display:"flex", alignItems:"center", gap:5 }}>
-                <span style={{ fontSize:11, color:"rgba(60,40,120,.3)" }}>ID: {userId}</span>
+                <span style={{ fontSize:11, color:"rgba(40,20,80,.55)" }}>ID: {userId}</span>
                 <button onClick={() => { navigator.clipboard?.writeText(userId).then(() => { setCopyDone(true); setTimeout(() => setCopyDone(false), 1500); }); }}
                   style={{ background:"transparent", border:"none", cursor:"pointer", padding:2, display:"flex", alignItems:"center" }}>
                   {copyDone
                     ? <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#50c050" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-                    : <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(80,60,140,.25)" strokeWidth="2" strokeLinecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                    : <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(60,40,120,.5)" strokeWidth="2" strokeLinecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
                   }
                 </button>
               </div>
             </div>
           </div>
           {/* Bio */}
-          {profileData.bio ? <div style={{ fontSize:12, color:"rgba(60,40,120,.4)", marginBottom:10, lineHeight:1.5 }}>{profileData.bio}</div> : null}
+          {profileData.bio ? <div style={{ fontSize:12, color:"rgba(40,20,80,.65)", marginBottom:10, lineHeight:1.5 }}>{profileData.bio}</div> : null}
           {/* Meta pillər */}
           <div style={{ display:"flex", flexWrap:"wrap", gap:6, marginBottom:4 }}>
             {[
-              { icon:<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(60,40,120,.35)" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20"/></svg>, txt:profileData.country },
-              { icon:<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(60,40,120,.35)" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="2"/></svg>, txt:profileData.city },
-              { icon:<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(60,40,120,.35)" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>, txt:`${profileData.age} yaş` },
-              { icon:<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(60,40,120,.35)" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>, txt:`${joinedDate} gün` },
+              { icon:<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(80,60,140,.4)" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20"/></svg>, txt:profileData.country },
+              { icon:<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(80,60,140,.4)" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="2"/></svg>, txt:profileData.city },
+              { icon:<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(80,60,140,.4)" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>, txt:`${profileData.age} yaş` },
+              { icon:<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(80,60,140,.4)" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>, txt:`${joinedDate} gün` },
             ].map((m,i) => (
               <div key={i} style={{ display:"flex", alignItems:"center", gap:4, background:"rgba(100,80,160,.08)", borderRadius:8, padding:"3px 7px" }}>
-                {m.icon}<span style={{ fontSize:10, color:"rgba(60,40,120,.4)" }}>{m.txt}</span>
+                {m.icon}<span style={{ fontSize:10, color:"rgba(40,20,80,.65)" }}>{m.txt}</span>
               </div>
             ))}
           </div>
@@ -921,7 +921,7 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
               <div className="p-mi-l" style={{ background:"rgba(100,80,160,.07)", overflow:"hidden" }}>
                 <img src={`/images/images/${item.png}`} width="28" height="28" style={{ objectFit:"contain" }} alt={item.label}/>
               </div>
-              <span className="p-mi-lbl" style={item.muted ? { color:"rgba(60,40,120,.35)" } : {}}>{item.label}</span>
+              <span className="p-mi-lbl" style={item.muted ? { color:"rgba(40,20,80,.6)" } : {}}>{item.label}</span>
               <div style={{ display:"flex", alignItems:"center", gap:6 }}>
                 {item.badge && <span className="p-badge" style={{ background:item.badgeColor, color:item.badgeText, border:`1px solid ${item.badgeBorder}` }}>{item.badge}</span>}
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(100,80,160,.18)" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
@@ -1026,7 +1026,7 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
                     { key:"giris",   label:"Giriş Animasyonu", icon:<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> },
                   ] as const).map(t => (
                     <button key={t.key} onClick={() => setMagazaTab(t.key)}
-                      style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:6, padding:"9px 8px", borderRadius:11, border:"none", cursor:"pointer", fontSize:12, fontWeight:700, background: magazaTab===t.key ? "rgba(123,47,247,.3)" : "transparent", color: magazaTab===t.key ? "#c084fc" : "rgba(60,40,120,.3)", transition:".2s", borderBottom: magazaTab===t.key ? "1.5px solid #7b2ff7" : "1.5px solid transparent" }}>
+                      style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:6, padding:"9px 8px", borderRadius:11, border:"none", cursor:"pointer", fontSize:12, fontWeight:700, background: magazaTab===t.key ? "rgba(123,47,247,.3)" : "transparent", color: magazaTab===t.key ? "#c084fc" : "rgba(40,20,80,.55)", transition:".2s", borderBottom: magazaTab===t.key ? "1.5px solid #7b2ff7" : "1.5px solid transparent" }}>
                       {t.icon}{t.label}
                     </button>
                   ))}
@@ -1068,7 +1068,7 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
                     </div>
                     <div style={{ padding:"14px 16px" }}>
                       <div style={{ fontSize:14, fontWeight:700, color:"#1a1a2e", marginBottom:4 }}>Maşın Giriş Animasyonu v1</div>
-                      <div style={{ fontSize:11, color:"rgba(60,40,120,.35)", marginBottom:12 }}>Giriş ekranında fərqli arxa plan animasyonu</div>
+                      <div style={{ fontSize:11, color:"rgba(40,20,80,.6)", marginBottom:12 }}>Giriş ekranında fərqli arxa plan animasyonu</div>
                       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
                         <div style={{ display:"flex", alignItems:"center", gap:6 }}>
                           <JetonImg size={14}/>
@@ -1189,7 +1189,7 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
 
                 {/* Ad */}
                 <div style={{ textAlign:"center", marginBottom:20, padding:"0 20px" }}>
-                  <div style={{ fontSize:11, color:"rgba(80,60,140,.25)", letterSpacing:3, textTransform:"uppercase", marginBottom:6 }}>Avatar Çərçivəsi</div>
+                  <div style={{ fontSize:11, color:"rgba(60,40,120,.5)", letterSpacing:3, textTransform:"uppercase", marginBottom:6 }}>Avatar Çərçivəsi</div>
                   <div style={{ fontSize:20, fontWeight:900, color:popupFrame.color, filter:`drop-shadow(0 0 12px ${popupFrame.glow})` }}>{popupFrame.name}</div>
                 </div>
 
@@ -1204,7 +1204,7 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
                         <div key={d} onClick={() => setSelectedDuration(d)}
                           style={{ flex:1, borderRadius:16, padding:"12px 6px", textAlign:"center", cursor:"pointer", background: sel ? `${popupFrame.color}18` : "rgba(100,80,160,.06)", border:`1.5px solid ${sel ? popupFrame.color : "rgba(100,80,160,.1)"}`, transition:".2s", boxShadow: sel ? `0 0 12px ${popupFrame.glow}` : "none" }}>
                           <div style={{ fontSize:20, fontWeight:900, color: sel ? popupFrame.color : "#fff", marginBottom:2 }}>{d}</div>
-                          <div style={{ fontSize:9, color:"rgba(60,40,120,.3)", marginBottom:8 }}>GÜN</div>
+                          <div style={{ fontSize:9, color:"rgba(40,20,80,.55)", marginBottom:8 }}>GÜN</div>
                           <div style={{ height:1, background:"rgba(100,80,160,.09)", marginBottom:8 }}/>
                           <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:4 }}>
                             <img src="/images/images/jeton.PNG" width={13} height={13} style={{objectFit:"contain"}} alt=""/>
@@ -1225,7 +1225,7 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
                   </button>
                   <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:6, marginTop:12 }}>
                     <img src="/images/images/jeton.PNG" width={12} height={12} style={{objectFit:"contain"}} alt=""/>
-                    <span style={{ fontSize:11, color:"rgba(80,60,140,.25)" }}>Balans: {jeton.toLocaleString()} jeton</span>
+                    <span style={{ fontSize:11, color:"rgba(60,40,120,.5)" }}>Balans: {jeton.toLocaleString()} jeton</span>
                   </div>
                 </div>
               </div>
@@ -1265,7 +1265,7 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
             <div style={{ padding:"14px 20px 12px", display:"flex", alignItems:"center", justifyContent:"space-between", flexShrink:0 }}>
               <div>
                 <div style={{ fontSize:16, fontWeight:700, color:"#1a1a2e" }}>Profil Ziyarətçiləri</div>
-                <div style={{ fontSize:11, color:"rgba(60,40,120,.3)", marginTop:2 }}>Son 7 günün statistikası</div>
+                <div style={{ fontSize:11, color:"rgba(40,20,80,.55)", marginTop:2 }}>Son 7 günün statistikası</div>
               </div>
               <div style={{ textAlign:"right" }}>
                 <div style={{ fontSize:26, fontWeight:900, background:"linear-gradient(135deg,#c084fc,#ff3ea5)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>143</div>
@@ -1284,9 +1284,9 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
                       <div style={{ flex:1, minWidth:0 }}>
                         <div style={{ fontSize:14, fontWeight:700, color:"#1a1a2e", marginBottom:2 }}>{v.name}</div>
                         <div style={{ display:"flex", alignItems:"center", gap:6, flexWrap:"wrap" }}>
-                          <span style={{ fontSize:10, color:"rgba(60,40,120,.35)" }}>{v.country}</span>
+                          <span style={{ fontSize:10, color:"rgba(40,20,80,.6)" }}>{v.country}</span>
                           <span style={{ width:3, height:3, borderRadius:"50%", background:"rgba(80,60,140,.2)", display:"inline-block" }}/>
-                          <span style={{ fontSize:10, color:"rgba(60,40,120,.35)" }}>{v.time}</span>
+                          <span style={{ fontSize:10, color:"rgba(40,20,80,.6)" }}>{v.time}</span>
                           <span style={{ width:3, height:3, borderRadius:"50%", background:"rgba(80,60,140,.2)", display:"inline-block" }}/>
                           <span style={{ fontSize:10, color:"rgba(192,132,252,.6)" }}>{v.visits}× ziyarət</span>
                         </div>
@@ -1299,7 +1299,7 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
                     {/* Blur overlay */}
                     {isBlurred && (
                       <div style={{ position:"absolute", inset:0, borderRadius:16, display:"flex", alignItems:"center", justifyContent:"center", background:"rgba(100,80,160,.3)" }}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(60,40,120,.3)" strokeWidth="2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(40,20,80,.55)" strokeWidth="2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
                       </div>
                     )}
                   </div>
@@ -1325,17 +1325,17 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
       {/* EDIT MODAL */}
       {editOpen && (() => {
         const cities = COUNTRY_CITIES[draft.country] || COUNTRY_CITIES["default"];
-        const IcUser = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(60,40,120,.4)" strokeWidth="2" strokeLinecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
-        const IcGender = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(60,40,120,.4)" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="8" r="4"/><path d="M20 21v-1a8 8 0 00-16 0v1"/></svg>;
-        const IcAge = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(60,40,120,.4)" strokeWidth="2" strokeLinecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>;
-        const IcGlobe = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(60,40,120,.4)" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>;
-        const IcMap = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(60,40,120,.4)" strokeWidth="2" strokeLinecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>;
-        const IcBio = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(60,40,120,.4)" strokeWidth="2" strokeLinecap="round"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg>;
-        const IcImg = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(60,40,120,.4)" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>;
+        const IcUser = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(40,20,80,.65)" strokeWidth="2" strokeLinecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
+        const IcGender = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(40,20,80,.65)" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="8" r="4"/><path d="M20 21v-1a8 8 0 00-16 0v1"/></svg>;
+        const IcAge = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(40,20,80,.65)" strokeWidth="2" strokeLinecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>;
+        const IcGlobe = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(40,20,80,.65)" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>;
+        const IcMap = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(40,20,80,.65)" strokeWidth="2" strokeLinecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>;
+        const IcBio = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(40,20,80,.65)" strokeWidth="2" strokeLinecap="round"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg>;
+        const IcImg = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(40,20,80,.65)" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>;
         const row = (icon: JSX.Element, label: string, right: JSX.Element) => (
           <div style={{ background:"rgba(100,80,160,.06)", border:"1px solid rgba(100,80,160,.09)", borderRadius:16, margin:"0 18px 8px", padding:"14px 18px", display:"flex", alignItems:"center", gap:12 }}>
             {icon}
-            <span style={{ fontSize:13, color:"rgba(40,20,100,.45)", flexShrink:0, minWidth:100 }}>{label}</span>
+            <span style={{ fontSize:13, color:"rgba(40,20,80,.65)", flexShrink:0, minWidth:100 }}>{label}</span>
             <div style={{ flex:1, display:"flex", justifyContent:"flex-end" }}>{right}</div>
           </div>
         );
@@ -1399,7 +1399,7 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
                     {v:"Qadın", icon:<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="8" r="6"/><line x1="12" y1="14" x2="12" y2="21"/><line x1="9" y1="18" x2="15" y2="18"/></svg>},
                     {v:"Digər", icon:<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="9"/><line x1="12" y1="15" x2="12" y2="22"/><line x1="2" y1="12" x2="9" y2="12"/><line x1="15" y1="12" x2="22" y2="12"/></svg>},
                   ].map(({v, icon}) => (
-                    <button key={v} onClick={() => setDraft({...draft, gender:v})} style={{ display:"flex", alignItems:"center", gap:4, padding:"5px 10px", borderRadius:9, border:`1px solid ${draft.gender===v ? "#7b2ff7" : "rgba(100,80,160,.14)"}`, background:draft.gender===v ? "rgba(123,47,247,.25)" : "transparent", color:draft.gender===v ? "#c084fc" : "rgba(60,40,120,.35)", fontSize:11, cursor:"pointer" }}>
+                    <button key={v} onClick={() => setDraft({...draft, gender:v})} style={{ display:"flex", alignItems:"center", gap:4, padding:"5px 10px", borderRadius:9, border:`1px solid ${draft.gender===v ? "#7b2ff7" : "rgba(100,80,160,.14)"}`, background:draft.gender===v ? "rgba(123,47,247,.25)" : "transparent", color:draft.gender===v ? "#c084fc" : "rgba(80,60,140,.4)", fontSize:11, cursor:"pointer" }}>
                       {icon}{v}
                     </button>
                   ))}
@@ -1444,7 +1444,7 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
               <div style={{ background:"rgba(100,80,160,.06)", border:"1px solid rgba(100,80,160,.09)", borderRadius:16, margin:"0 18px 8px", padding:"14px 18px" }}>
                 <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
                   {IcBio}
-                  <span style={{ fontSize:13, color:"rgba(40,20,100,.45)" }}>Haqqında</span>
+                  <span style={{ fontSize:13, color:"rgba(40,20,80,.65)" }}>Haqqında</span>
                 </div>
                 <textarea value={draft.bio} onChange={e => setDraft({...draft, bio:e.target.value})}
                   rows={3} placeholder="Özün haqqında yaz..."
@@ -1660,8 +1660,8 @@ function VipShieldLogo({ size = 58 }: { size?: number }) {
 function VipLevelIcon({ n, state }: { n: number; state: "done" | "active" | "locked" }) {
   const c = state === "done" ? "rgba(80,200,80,.8)" : state === "active" ? "#ffd700" : "rgba(80,60,140,.2)";
   const icons: Record<number, JSX.Element> = {
-    0: <svg width="20" height="20" viewBox="0 0 52 52"><defs><radialGradient id={`ig0`} cx="40%" cy="30%" r="70%"><stop offset="0%" stopColor={state==="done"?"#a0e0ff":state==="active"?"#ffe080":"#888"}/><stop offset="100%" stopColor={state==="done"?"#2060b0":state==="active"?"#a06000":"#444"}/></radialGradient></defs><ellipse cx="26" cy="28" rx="14" ry="17" fill={`url(#ig0)`}/><ellipse cx="20" cy="22" rx="4" ry="2.5" fill="rgba(60,40,120,.4)" transform="rotate(-30,20,22)"/><path d="M22 20 L24 24 L21 27 L25 32" stroke="rgba(40,20,100,.5)" strokeWidth="1.2" fill="none" strokeLinecap="round"/></svg>,
-    1: <svg width="20" height="20" viewBox="0 0 52 52"><defs><linearGradient id={`ig1`} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor={state==="done"?"#e8a060":state==="active"?"#ffe080":"#888"}/><stop offset="100%" stopColor={state==="done"?"#7a3a10":state==="active"?"#a06000":"#333"}/></linearGradient></defs><path d="M26 8 L40 14 L40 26 C40 34 33 40 26 44 C19 40 12 34 12 26 L12 14 Z" fill={`url(#ig1)`}/><ellipse cx="20" cy="18" rx="5" ry="2.5" fill="rgba(80,60,140,.25)" transform="rotate(-30,20,18)"/><text x="26" y="30" textAnchor="middle" fontSize="13" fontWeight="900" fill="rgba(255,255,200,.8)" fontFamily="Arial">I</text></svg>,
+    0: <svg width="20" height="20" viewBox="0 0 52 52"><defs><radialGradient id={`ig0`} cx="40%" cy="30%" r="70%"><stop offset="0%" stopColor={state==="done"?"#a0e0ff":state==="active"?"#ffe080":"#888"}/><stop offset="100%" stopColor={state==="done"?"#2060b0":state==="active"?"#a06000":"#444"}/></radialGradient></defs><ellipse cx="26" cy="28" rx="14" ry="17" fill={`url(#ig0)`}/><ellipse cx="20" cy="22" rx="4" ry="2.5" fill="rgba(40,20,80,.65)" transform="rotate(-30,20,22)"/><path d="M22 20 L24 24 L21 27 L25 32" stroke="rgba(40,20,100,.5)" strokeWidth="1.2" fill="none" strokeLinecap="round"/></svg>,
+    1: <svg width="20" height="20" viewBox="0 0 52 52"><defs><linearGradient id={`ig1`} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor={state==="done"?"#e8a060":state==="active"?"#ffe080":"#888"}/><stop offset="100%" stopColor={state==="done"?"#7a3a10":state==="active"?"#a06000":"#333"}/></linearGradient></defs><path d="M26 8 L40 14 L40 26 C40 34 33 40 26 44 C19 40 12 34 12 26 L12 14 Z" fill={`url(#ig1)`}/><ellipse cx="20" cy="18" rx="5" ry="2.5" fill="rgba(60,40,120,.5)" transform="rotate(-30,20,18)"/><text x="26" y="30" textAnchor="middle" fontSize="13" fontWeight="900" fill="rgba(255,255,200,.8)" fontFamily="Arial">I</text></svg>,
     2: <svg width="20" height="20" viewBox="0 0 52 52"><defs><linearGradient id={`ig2`} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#ffe566"/><stop offset="100%" stopColor={state==="done"?"#cc4400":"#886600"}/></linearGradient></defs><path d="M30 8 L18 26 L24 26 L22 44 L34 22 L28 22 Z" fill={`url(#ig2)`}/><path d="M28 12 L20 26 L25 26 L23 38 L31 24 L26 24 Z" fill="rgba(255,240,180,.4)"/></svg>,
     3: <svg width="20" height="20" viewBox="0 0 52 52"><defs><linearGradient id={`ig3`} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#c0e8ff"/><stop offset="100%" stopColor="#2060b0"/></linearGradient></defs><polygon points="26,9 38,17 14,17" fill={c} opacity=".9"/><polygon points="38,17 32,43 14,17 20,43" fill={`url(#ig3)`}/><polygon points="26,11 35,17 26,17" fill="rgba(40,20,100,.5)"/></svg>,
     4: <svg width="20" height="20" viewBox="0 0 52 52"><defs><radialGradient id={`ig4`} cx="50%" cy="60%" r="50%"><stop offset="0%" stopColor="#fff060"/><stop offset="60%" stopColor="#ff8000"/><stop offset="100%" stopColor="#660000"/></radialGradient></defs><path d="M26 44 C16 38 10 28 14 18 C16 24 20 22 20 16 C22 22 18 28 22 32 C22 26 26 20 24 12 C28 18 30 26 28 32 C30 28 34 24 32 18 C36 26 36 34 30 40 C28 42 26 44 26 44Z" fill={`url(#ig4)`}/><ellipse cx="26" cy="28" rx="5" ry="6" fill="rgba(255,255,200,.25)"/></svg>,
@@ -1669,7 +1669,7 @@ function VipLevelIcon({ n, state }: { n: number; state: "done" | "active" | "loc
     6: <svg width="20" height="20" viewBox="0 0 52 52"><defs><radialGradient id={`ig6`} cx="35%" cy="30%" r="70%"><stop offset="0%" stopColor="#a060ff"/><stop offset="100%" stopColor="#200060"/></radialGradient></defs><ellipse cx="26" cy="28" rx="14" ry="18" fill={`url(#ig6)`}/><path d="M18 22 Q21 18 24 22 Q21 26 18 22Z" fill="rgba(180,100,255,.6)"/><path d="M24 18 Q27 14 30 18 Q27 22 24 18Z" fill="rgba(180,100,255,.6)"/><path d="M30 22 Q33 18 36 22 Q33 26 30 22Z" fill="rgba(180,100,255,.6)"/><ellipse cx="22" cy="26" rx="2" ry="2.5" fill="rgba(0,200,255,.9)"/><ellipse cx="30" cy="26" rx="2" ry="2.5" fill="rgba(0,200,255,.9)"/></svg>,
     7: <svg width="20" height="20" viewBox="0 0 52 52"><defs><linearGradient id={`ig7`} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#fff0a0"/><stop offset="50%" stopColor="#ffd700"/><stop offset="100%" stopColor="#886600"/></linearGradient></defs><path d="M8 38 L8 24 L16 30 L26 12 L36 30 L44 24 L44 38 Z" fill={`url(#ig7)`}/><rect x="8" y="36" width="36" height="5" rx="2" fill={`url(#ig7)`}/><circle cx="26" cy="36.5" r="3" fill="#ff3060"/><circle cx="16" cy="36.5" r="2.5" fill="#4080ff"/><circle cx="36" cy="36.5" r="2.5" fill="#40c060"/><ellipse cx="16" cy="26" rx="4" ry="2" fill="rgba(255,255,200,.25)" transform="rotate(-30,16,26)"/></svg>,
     8: <svg width="20" height="20" viewBox="0 0 52 52"><defs><radialGradient id={`ig8`} cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="#60ffff"/><stop offset="70%" stopColor="#0060a0"/><stop offset="100%" stopColor="#001840"/></radialGradient></defs><path d="M6 26 Q16 10 26 10 Q36 10 46 26 Q36 42 26 42 Q16 42 6 26Z" fill="#001840"/><circle cx="26" cy="26" r="12" fill={`url(#ig8)`}/><circle cx="26" cy="26" r="5" fill="rgba(0,10,30,.95)"/><circle cx="22" cy="22" r="3" fill="rgba(200,255,255,.5)"/><line x1="26" y1="26" x2="44" y2="16" stroke="rgba(0,255,255,.7)" strokeWidth="1.5" strokeLinecap="round"/></svg>,
-    9: <svg width="20" height="20" viewBox="0 0 52 52"><defs><linearGradient id={`ig9a`} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#e8f8ff"/><stop offset="100%" stopColor="#2060b8"/></linearGradient><linearGradient id={`ig9b`} x1="100%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stopColor="#c0e8ff"/><stop offset="100%" stopColor="#1040a0"/></linearGradient></defs><polygon points="14,18 26,9 38,18" fill={`url(#ig9a)`}/><polygon points="14,18 9,30 26,44" fill={`url(#ig9b)`}/><polygon points="38,18 43,30 26,44" fill={`url(#ig9a)`} opacity=".7"/><polygon points="14,18 26,9 26,18" fill="rgba(60,40,120,.4)"/></svg>,
+    9: <svg width="20" height="20" viewBox="0 0 52 52"><defs><linearGradient id={`ig9a`} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#e8f8ff"/><stop offset="100%" stopColor="#2060b8"/></linearGradient><linearGradient id={`ig9b`} x1="100%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stopColor="#c0e8ff"/><stop offset="100%" stopColor="#1040a0"/></linearGradient></defs><polygon points="14,18 26,9 38,18" fill={`url(#ig9a)`}/><polygon points="14,18 9,30 26,44" fill={`url(#ig9b)`}/><polygon points="38,18 43,30 26,44" fill={`url(#ig9a)`} opacity=".7"/><polygon points="14,18 26,9 26,18" fill="rgba(40,20,80,.65)"/></svg>,
     10: <svg width="20" height="20" viewBox="0 0 52 52"><defs><linearGradient id={`ig10`} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#e8eef4"/><stop offset="60%" stopColor="#7090a8"/><stop offset="100%" stopColor="#304050"/></linearGradient></defs><path d="M26 7 L42 13 L42 27 C42 36 35 42 26 46 C17 42 10 36 10 27 L10 13 Z" fill={`url(#ig10)`}/><circle cx="26" cy="20" r="4" fill="#60d0ff"/><text x="26" y="35" textAnchor="middle" fontSize="11" fontWeight="900" fill="rgba(220,240,255,.9)" fontFamily="Arial">X</text></svg>,
     11: <svg width="20" height="20" viewBox="0 0 52 52"><defs><linearGradient id={`ig11`} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#ff8040"/><stop offset="100%" stopColor="#600800"/></linearGradient></defs><path d="M26 7 L42 13 L42 27 C42 36 35 42 26 46 C17 42 10 36 10 27 L10 13 Z" fill={`url(#ig11)`}/><path d="M20 32 C18 28 20 22 22 18 C22 22 24 20 24 16 C26 20 25 26 26 28 C26 24 28 20 28 16 C30 20 30 26 28 30 C30 28 32 24 30 20 C32 26 30 32 26 36 C24 38 20 36 20 32Z" fill="rgba(255,200,60,.5)"/></svg>,
     12: <svg width="20" height="20" viewBox="0 0 52 52"><defs><linearGradient id={`ig12a`} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#e8c0ff"/><stop offset="100%" stopColor="#400080"/></linearGradient><linearGradient id={`ig12b`} x1="100%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stopColor="#c080ff"/><stop offset="100%" stopColor="#200060"/></linearGradient></defs><polygon points="14,18 26,9 38,18" fill={`url(#ig12a)`}/><polygon points="14,18 9,30 26,44" fill={`url(#ig12b)`}/><polygon points="38,18 43,30 26,44" fill={`url(#ig12a)`} opacity=".7"/><polygon points="14,18 26,9 26,18" fill="rgba(255,220,255,.4)"/></svg>,
@@ -1778,7 +1778,7 @@ function VipScreen({ onBack }: { onBack: () => void }) {
           </div>
           <span style={{ fontSize:17, fontWeight:700, color:"#1a1a2e" }}>Mənim VIP-im</span>
           <div className="vs-nav-btn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(60,40,120,.3)" strokeWidth="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(40,20,80,.55)" strokeWidth="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
           </div>
         </div>
 
@@ -1933,7 +1933,7 @@ function VipScreen({ onBack }: { onBack: () => void }) {
                   <div className="vs-info">
                     <div className={`vs-name ${st}`}>
                       VIP {lv.n}
-                      {lv.n === 0 && <span style={{ fontSize:10, fontWeight:400, color:"rgba(60,40,120,.3)" }}>· Başlanğıc</span>}
+                      {lv.n === 0 && <span style={{ fontSize:10, fontWeight:400, color:"rgba(40,20,80,.55)" }}>· Başlanğıc</span>}
                       {st === "active" && <span className="vs-cur-tag">CARİ</span>}
                     </div>
                     <div className="vs-bar-t"><div className="vs-bar-f" style={{ width:`${pct}%`, background:barC }}/></div>
