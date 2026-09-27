@@ -1,253 +1,3 @@
-
-// ===================== DOSYA: vercel.json =====================
-
-{
-  "installCommand": "bun install --frozen-lockfile",
-  "buildCommand": "bun run build"
-}
-
-// ===================== DOSYA: package.json =====================
-
-{
-  "name": "tanstack_start_ts",
-  "private": true,
-  "sideEffects": false,
-  "type": "module",
-  "scripts": {
-    "dev": "vite dev",
-    "build": "vite build",
-    "build:dev": "vite build --mode development",
-    "preview": "vite preview",
-    "lint": "eslint .",
-    "format": "prettier --write ."
-  },
-  "overrides": {
-    "rolldown": "1.2.1"
-  },
-  "dependencies": {
-    "@hookform/resolvers": "^5.2.2",
-    "@radix-ui/react-accordion": "^1.2.12",
-    "@radix-ui/react-alert-dialog": "^1.1.15",
-    "@radix-ui/react-aspect-ratio": "^1.1.8",
-    "@radix-ui/react-avatar": "^1.1.11",
-    "@radix-ui/react-checkbox": "^1.3.3",
-    "@radix-ui/react-collapsible": "^1.1.12",
-    "@radix-ui/react-context-menu": "^2.2.16",
-    "@radix-ui/react-dialog": "^1.1.15",
-    "@radix-ui/react-dropdown-menu": "^2.1.16",
-    "@radix-ui/react-hover-card": "^1.1.15",
-    "@radix-ui/react-label": "^2.1.8",
-    "@radix-ui/react-menubar": "^1.1.16",
-    "@radix-ui/react-navigation-menu": "^1.2.14",
-    "@radix-ui/react-popover": "^1.1.15",
-    "@radix-ui/react-progress": "^1.1.8",
-    "@radix-ui/react-radio-group": "^1.3.8",
-    "@radix-ui/react-scroll-area": "^1.2.10",
-    "@radix-ui/react-select": "^2.2.6",
-    "@radix-ui/react-separator": "^1.1.8",
-    "@radix-ui/react-slider": "^1.3.6",
-    "@radix-ui/react-slot": "^1.2.4",
-    "@radix-ui/react-switch": "^1.2.6",
-    "@radix-ui/react-tabs": "^1.1.13",
-    "@radix-ui/react-toggle": "^1.1.10",
-    "@radix-ui/react-toggle-group": "^1.1.11",
-    "@radix-ui/react-tooltip": "^1.2.8",
-    "@tailwindcss/vite": "^4.2.1",
-    "@tanstack/react-query": "^5.101.1",
-    "@tanstack/react-router": "1.170.18",
-    "@tanstack/react-start": "1.168.32",
-    "@tanstack/router-plugin": "1.168.23",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "cmdk": "^1.1.1",
-    "date-fns": "^4.1.0",
-    "embla-carousel-react": "^8.6.0",
-    "input-otp": "^1.4.2",
-    "lucide-react": "^0.575.0",
-    "react": "^19.2.0",
-    "react-day-picker": "^9.14.0",
-    "react-dom": "^19.2.0",
-    "react-hook-form": "^7.71.2",
-    "react-resizable-panels": "^4.6.5",
-    "recharts": "^2.15.4",
-    "sonner": "^2.0.7",
-    "tailwind-merge": "^3.5.0",
-    "tailwindcss": "^4.2.1",
-    "tw-animate-css": "^1.3.4",
-    "vaul": "^1.1.2",
-    "vite-tsconfig-paths": "^6.0.2",
-    "zod": "^3.25.76"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.32.0",
-    "@lovable.dev/vite-tanstack-config": "^2.24.0",
-    "@types/node": "^22.16.5",
-    "@types/react": "^19.2.0",
-    "@types/react-dom": "^19.2.0",
-    "@vitejs/plugin-react": "^5.2.0",
-    "eslint": "^9.32.0",
-    "eslint-config-prettier": "^10.1.1",
-    "eslint-plugin-prettier": "^5.2.6",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.20",
-    "globals": "^15.15.0",
-    "nitro": "3.0.260603-beta",
-    "prettier": "^3.7.3",
-    "typescript": "^5.8.3",
-    "typescript-eslint": "^8.56.1",
-    "vite": "8.1.5"
-  }
-}
-
-// ===================== DOSYA: vite.config.ts =====================
-
-// @lovable.dev/vite-tanstack-config already includes the following — do NOT add them manually
-// or the app will break with duplicate plugins:
-//   - TanStack devtools (dev-only, first), tanstackStart, viteReact, tailwindcss, tsConfigPaths,
-//     nitro (build-only using cloudflare as a default target), VITE_* env injection, @ path alias,
-//     React/TanStack dedupe, error logger plugins, and sandbox detection (port/host/strictPort).
-// You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
-import { defineConfig } from "@lovable.dev/vite-tanstack-config";
-
-export default defineConfig({
-  tanstackStart: {
-    // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
-    // nitro/vite builds from this
-    server: { entry: "server" },
-  },
-});
-
-// ===================== DOSYA: src/routes/__root.tsx =====================
-
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  Outlet,
-  Link,
-  createRootRouteWithContext,
-  useRouter,
-  HeadContent,
-  Scripts,
-} from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
-
-import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
-
-function NotFoundComponent() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
-        </p>
-        <div className="mt-6">
-          <Link
-            to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            Go home
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
-  console.error(error);
-  const router = useRouter();
-  useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
-  }, [error]);
-
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
-        </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
-          <button
-            onClick={() => {
-              router.invalidate();
-              reset();
-            }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            Try again
-          </button>
-          <a
-            href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
-          >
-            Go home
-          </a>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
-    ],
-    links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
-    ],
-  }),
-  shellComponent: RootShell,
-  component: RootComponent,
-  notFoundComponent: NotFoundComponent,
-  errorComponent: ErrorComponent,
-});
-
-function RootShell({ children }: { children: ReactNode }) {
-  return (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  );
-}
-
-function RootComponent() {
-  const { queryClient } = Route.useRouteContext();
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
-    </QueryClientProvider>
-  );
-}
-
-// ===================== DOSYA: src/routes/index.tsx =====================
-
 // @ts-nocheck — imported prototype contains intentionally loose backend response shapes.
 import { ClientOnly, createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
@@ -409,89 +159,41 @@ function VelvetApp() {
     <>
       <style>{GLOBAL_CSS}{`
         @keyframes splashFade{from{opacity:0}to{opacity:1}}
+        @keyframes splashOut{from{opacity:1}to{opacity:0}}
         @keyframes barShine{0%{background-position:-200% 0}100%{background-position:200% 0}}
-        @keyframes brandShine{0%{background-position:0% 50%}100%{background-position:200% 50%}}
-        @keyframes logoFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-10px) scale(1.04)}}
+        @keyframes logoFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-8px) scale(1.03)}}
         @keyframes dotBlink{0%,80%,100%{opacity:.2}40%{opacity:1}}
-        @keyframes haloPulse{0%,100%{opacity:.45;transform:translate(-50%,-50%) scale(1)}50%{opacity:.8;transform:translate(-50%,-50%) scale(1.15)}}
-        @keyframes ringSpin{from{transform:translate(-50%,-50%) rotate(0deg)}to{transform:translate(-50%,-50%) rotate(360deg)}}
-        @keyframes sparkUp{0%{opacity:0;transform:translateY(0) scale(.6)}30%{opacity:.9}100%{opacity:0;transform:translateY(-90px) scale(1.1)}}
-        @keyframes bgDrift{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:.75;transform:scale(1.08)}}
-        .splash-wrap{position:fixed;inset:0;z-index:9999;background:radial-gradient(ellipse 120% 90% at 50% -10%,#2a0854 0%,#16032e 45%,#08010f 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;animation:splashFade .4s ease;overflow:hidden}
-        .splash-safe-top{position:absolute;top:0;left:0;right:0;height:env(safe-area-inset-top,0px)}
-        .splash-status{position:absolute;top:calc(env(safe-area-inset-top,0px) + 14px);left:0;right:0;display:flex;justify-content:center}
-        .splash-status-pill{font-size:9px;font-weight:700;letter-spacing:3px;color:rgba(230,200,255,.5);text-transform:uppercase;padding:5px 14px;border-radius:99px;background:rgba(255,255,255,.04);border:1px solid rgba(192,132,252,.15);backdrop-filter:blur(8px)}
-        .splash-logo{position:relative;z-index:3;animation:logoFloat 3.2s ease-in-out infinite;filter:drop-shadow(0 18px 40px rgba(123,47,247,.45))}
-        .splash-halo{position:absolute;top:50%;left:50%;width:230px;height:230px;border-radius:50%;background:radial-gradient(circle,rgba(123,47,247,.4) 0%,rgba(255,62,165,.15) 45%,transparent 70%);transform:translate(-50%,-50%);animation:haloPulse 3s ease-in-out infinite;pointer-events:none}
-        .splash-ring{position:absolute;top:50%;left:50%;width:190px;height:190px;border-radius:50%;border:1px dashed rgba(192,132,252,.25);transform:translate(-50%,-50%);animation:ringSpin 14s linear infinite;pointer-events:none}
-        .splash-ring::after{content:"";position:absolute;top:-3px;left:50%;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:#ff3ea5;box-shadow:0 0 10px 2px rgba(255,62,165,.7)}
-        .splash-brand{position:relative;z-index:3;font-size:44px;font-weight:900;letter-spacing:10px;margin-top:26px;padding-left:10px;background:linear-gradient(90deg,#fff,#e0c3fc,#ff3ea5,#e0c3fc,#fff);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:brandShine 4s linear infinite}
-        .splash-tagline{position:relative;z-index:3;font-size:10px;font-weight:600;letter-spacing:4px;color:rgba(210,180,255,.45);text-transform:uppercase;margin-top:8px}
-        .splash-bar-wrap{position:relative;z-index:3;margin-top:52px;display:flex;flex-direction:column;align-items:center}
-        .splash-bar-track{width:216px;height:6px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,.5),0 0 0 1px rgba(192,132,252,.12)}
-        .splash-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#7b2ff7,#c084fc,#ff3ea5,#c084fc,#7b2ff7);background-size:200% 100%;animation:barShine 1.4s linear infinite;transition:width .15s ease;box-shadow:0 0 14px rgba(192,132,252,.7),0 0 30px rgba(255,62,165,.3)}
-        .splash-bar-glow{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);height:12px;border-radius:50%;background:radial-gradient(ellipse,rgba(192,132,252,.5),transparent 70%);filter:blur(4px);transition:width .15s ease}
-        .splash-meta{position:relative;z-index:3;margin-top:18px;display:flex;align-items:center;gap:10px}
-        .splash-pct{font-size:13px;font-weight:800;color:#fff;letter-spacing:1px;min-width:42px;text-align:center;font-variant-numeric:tabular-nums}
-        .splash-pct small{font-size:9px;font-weight:700;color:rgba(210,180,255,.5);margin-left:1px}
-        .splash-sep{width:3px;height:3px;border-radius:50%;background:rgba(210,180,255,.35)}
-        .splash-text{font-size:10px;font-weight:600;color:rgba(210,180,255,.55);letter-spacing:3px;text-transform:uppercase}
-        .splash-dots span{display:inline-block;animation:dotBlink 1.4s ease-in-out infinite}
+        .splash-wrap{position:fixed;inset:0;z-index:9999;background:#ffffff;display:flex;flex-direction:column;align-items:center;justify-content:center;animation:splashFade .4s ease}
+        .splash-logo{animation:logoFloat 3s ease-in-out infinite}
+        .splash-bar-track{width:200px;height:4px;background:rgba(100,80,160,.09);border-radius:2px;overflow:hidden;margin-top:48px}
+        .splash-bar-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,#7b2ff7,#c084fc,#ff3ea5,#c084fc,#7b2ff7);background-size:200% 100%;animation:barShine 1.5s linear infinite;transition:width .12s ease}
+        .splash-text{font-size:11px;color:rgba(60,40,120,.3);letter-spacing:3px;margin-top:16px;text-transform:uppercase}
+        .splash-dots span{animation:dotBlink 1.4s ease-in-out infinite}
         .splash-dots span:nth-child(2){animation-delay:.2s}
         .splash-dots span:nth-child(3){animation-delay:.4s}
-        .splash-version{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 22px);left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:6px;z-index:3}
-        .splash-version-pill{font-size:9px;font-weight:700;letter-spacing:2px;color:rgba(210,180,255,.35);padding:4px 12px;border-radius:99px;border:1px solid rgba(192,132,252,.12)}
-        .splash-spark{position:absolute;bottom:34%;width:5px;height:5px;border-radius:50%;pointer-events:none}
-        .splash-bg-orb{position:absolute;border-radius:50%;filter:blur(60px);pointer-events:none;animation:bgDrift 5s ease-in-out infinite}
+        .splash-brand{font-size:42px;font-weight:900;letter-spacing:8px;margin-top:20px;background:linear-gradient(135deg,#fff,#c084fc,#ff3ea5);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
       `}</style>
       <div className="splash-wrap" style={{ opacity: splashProgress >= 100 ? 0 : 1, transition:"opacity .4s ease" }}>
-        <div className="splash-safe-top"/>
-        {/* Arxa plan işıq effektləri */}
-        <div className="splash-bg-orb" style={{ width:320, height:320, top:"-8%", left:"-15%", background:"rgba(123,47,247,.28)" }}/>
-        <div className="splash-bg-orb" style={{ width:280, height:280, bottom:"-6%", right:"-12%", background:"rgba(255,62,165,.18)", animationDelay:"1.6s" }}/>
-        <div className="splash-bg-orb" style={{ width:180, height:180, top:"40%", right:"8%", background:"rgba(0,212,255,.1)", animationDelay:"3s" }}/>
-        {/* Vinyet */}
-        <div style={{ position:"absolute", inset:0, background:"radial-gradient(ellipse at center,transparent 40%,rgba(5,0,12,.55) 100%)", pointerEvents:"none" }}/>
-
-        <div className="splash-status"><span className="splash-status-pill">Velvet Room</span></div>
+        {/* Arxa plan efektləri */}
+        <div style={{ position:"absolute", inset:0, background:"radial-gradient(ellipse at 30% 30%,rgba(123,47,247,.15) 0%,transparent 60%),radial-gradient(ellipse at 70% 70%,rgba(255,62,165,.1) 0%,transparent 60%)" }}/>
+        <div style={{ position:"absolute", width:300, height:300, borderRadius:"50%", border:"1px solid rgba(123,47,247,.08)", top:"50%", left:"50%", transform:"translate(-50%,-50%)", animation:"vrp 4s ease-in-out infinite" }}/>
+        <div style={{ position:"absolute", width:200, height:200, borderRadius:"50%", border:"1px dashed rgba(192,132,252,.06)", top:"50%", left:"50%", transform:"translate(-50%,-50%)", animation:"vrp 3s ease-in-out infinite .5s" }}/>
 
         <div style={{ position:"relative", zIndex:2, display:"flex", flexDirection:"column", alignItems:"center" }}>
-          {/* Logo/Maskot + işıq haləsi */}
-          <div style={{ position:"relative", display:"flex", alignItems:"center", justifyContent:"center" }}>
-            <div className="splash-halo"/>
-            <div className="splash-ring"/>
-            <div className="splash-logo">
-              <VelvetMascot size={118}/>
-            </div>
+          {/* Logo/Maskot */}
+          <div className="splash-logo">
+            <VelvetMascot size={120}/>
           </div>
-          {/* Brand adı + slogan */}
+          {/* Brand adı */}
           <div className="splash-brand">VELVET</div>
-          <div className="splash-tagline">Sosial səsli söhbət</div>
-
-          {/* Premium loading bar */}
-          <div className="splash-bar-wrap">
-            <div className="splash-bar-track">
-              <div className="splash-bar-fill" style={{ width:`${splashProgress}%` }}/>
-            </div>
-            <div className="splash-bar-glow" style={{ width: Math.max(40, splashProgress * 1.4) }}/>
-            <div className="splash-meta">
-              <div className="splash-pct">{Math.round(splashProgress)}<small>%</small></div>
-              <div className="splash-sep"/>
-              <div className="splash-text">
-                Yüklənir<span className="splash-dots"><span>.</span><span>.</span><span>.</span></span>
-              </div>
-            </div>
+          {/* Loading bar */}
+          <div className="splash-bar-track">
+            <div className="splash-bar-fill" style={{ width:`${splashProgress}%` }}/>
           </div>
-        </div>
-
-        {/* Qalxan narın işıq zərrələri */}
-        <div className="splash-spark" style={{ left:"22%", background:"#ff3ea5", boxShadow:"0 0 8px rgba(255,62,165,.8)", animation:"sparkUp 3.2s ease-in infinite" }}/>
-        <div className="splash-spark" style={{ left:"50%", background:"#c084fc", boxShadow:"0 0 8px rgba(192,132,252,.8)", animation:"sparkUp 3.8s ease-in infinite 1.2s" }}/>
-        <div className="splash-spark" style={{ left:"76%", background:"#00d4ff", boxShadow:"0 0 8px rgba(0,212,255,.8)", animation:"sparkUp 3.5s ease-in infinite 2.1s" }}/>
-
-        {/* Alt versiya nişanı */}
-        <div className="splash-version">
-          <span className="splash-version-pill">v1.0 • Premium</span>
+          {/* Yüklənir yazısı */}
+          <div className="splash-text">
+            Yüklənir<span className="splash-dots"><span>.</span><span>.</span><span>.</span></span>
+          </div>
         </div>
       </div>
     </>
@@ -746,34 +448,107 @@ function LoginScreen({ signIn, loading, error, demoLogin }: { signIn: (p: "googl
 /* ─── NAV BAR ─── */
 function BottomNav({ active, onHome, onRoom, onProfile }: { active: Screen; onHome: () => void; onRoom: () => void; onProfile: () => void }) {
   const items = [
-    { key:"home", label:"Ana Səhifə", onTap:onHome, icon:"home" },
-    { key:"games", label:"Oyunlar", onTap:onHome, icon:"games" },
-    { key:"room", label:"Otaq", onTap:onRoom, icon:"room" },
-    { key:"messages", label:"Mesajlar", onTap:onHome, icon:"messages", badge:"18" },
-    { key:"profile", label:"Profil", onTap:onProfile, icon:"profile" },
+    { key:"home", label:"Ana Səhifə", onTap: onHome,
+      icon: (on: boolean) => (
+        <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+          <defs>
+            <linearGradient id="nh1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={on?"#c084fc":"#b0a8c8"}/><stop offset="100%" stopColor={on?"#7b2ff7":"#8880a0"}/></linearGradient>
+            <linearGradient id="nh2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={on?"#e0b0ff":"#d8d0e8"}/><stop offset="100%" stopColor={on?"#c084fc":"#b0a8c8"}/></linearGradient>
+            <filter id="nhf"><feDropShadow dx="0" dy="2" stdDeviation="1.5" floodColor={on?"rgba(123,47,247,.4)":"rgba(0,0,0,.15)"}/></filter>
+          </defs>
+          <g filter="url(#nhf)">
+            <path d="M4 14L16 4l12 10v14a2 2 0 01-2 2H6a2 2 0 01-2-2V14z" fill="url(#nh1)"/>
+            <path d="M4 14L16 4l12 10" fill="url(#nh2)" opacity=".9"/>
+            <rect x="11" y="18" width="10" height="10" rx="1.5" fill={on?"rgba(255,255,255,.25)":"rgba(255,255,255,.15)"}/>
+            <rect x="13" y="22" width="6" height="6" rx="1" fill={on?"rgba(255,255,255,.35)":"rgba(255,255,255,.2)"}/>
+            <path d="M4 14L16 4l12 10" fill="none" stroke={on?"rgba(255,255,255,.4)":"rgba(255,255,255,.2)"} strokeWidth="1"/>
+          </g>
+        </svg>
+      )
+    },
+    { key:"games", label:"Oyunlar", onTap: onHome,
+      icon: (on: boolean) => (
+        <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+          <defs>
+            <linearGradient id="ng1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={on?"#ff80c0":"#c0a0b8"}/><stop offset="100%" stopColor={on?"#ff3ea5":"#9080a0"}/></linearGradient>
+            <filter id="ngf"><feDropShadow dx="0" dy="2" stdDeviation="1.5" floodColor={on?"rgba(255,62,165,.4)":"rgba(0,0,0,.15)"}/></filter>
+          </defs>
+          <g filter="url(#ngf)">
+            <rect x="2" y="9" width="28" height="16" rx="8" fill="url(#ng1)"/>
+            <rect x="2" y="9" width="28" height="8" rx="8" fill={on?"rgba(255,255,255,.2)":"rgba(255,255,255,.1)"}/>
+            <line x1="9" y1="17" x2="13" y2="17" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+            <line x1="11" y1="15" x2="11" y2="19" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+            <circle cx="21" cy="15" r="1.5" fill="white"/>
+            <circle cx="24" cy="18" r="1.5" fill="white"/>
+          </g>
+        </svg>
+      )
+    },
+    { key:"room", label:"Otaq", onTap: onRoom,
+      icon: (on: boolean) => (
+        <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+          <defs>
+            <linearGradient id="nr1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={on?"#60e0ff":"#a0c8d8"}/><stop offset="100%" stopColor={on?"#00d4ff":"#60a0c0"}/></linearGradient>
+            <filter id="nrf"><feDropShadow dx="0" dy="2" stdDeviation="1.5" floodColor={on?"rgba(0,212,255,.4)":"rgba(0,0,0,.15)"}/></filter>
+          </defs>
+          <g filter="url(#nrf)">
+            <ellipse cx="16" cy="13" rx="7" ry="8" fill="url(#nr1)"/>
+            <ellipse cx="16" cy="11" rx="7" ry="5" fill={on?"rgba(255,255,255,.25)":"rgba(255,255,255,.15)"}/>
+            <rect x="15" y="21" width="2" height="6" rx="1" fill="url(#nr1)"/>
+            <ellipse cx="16" cy="27" rx="4" ry="1.5" fill={on?"rgba(0,212,255,.4)":"rgba(100,150,180,.3)"}/>
+          </g>
+        </svg>
+      )
+    },
+    { key:"messages", label:"Mesajlar", onTap: onHome, badge:"18",
+      icon: (on: boolean) => (
+        <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+          <defs>
+            <linearGradient id="nm1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={on?"#60ff90":"#90c8a0"}/><stop offset="100%" stopColor={on?"#00c050":"#508060"}/></linearGradient>
+            <filter id="nmf"><feDropShadow dx="0" dy="2" stdDeviation="1.5" floodColor={on?"rgba(0,192,80,.4)":"rgba(0,0,0,.15)"}/></filter>
+          </defs>
+          <g filter="url(#nmf)">
+            <path d="M3 5h26a2 2 0 012 2v14a2 2 0 01-2 2H9l-6 6V7a2 2 0 012-2z" fill="url(#nm1)"/>
+            <path d="M3 5h26a2 2 0 012 2v7H3V5z" fill={on?"rgba(255,255,255,.2)":"rgba(255,255,255,.1)"}/>
+            <line x1="9" y1="13" x2="23" y2="13" stroke="white" strokeWidth="1.5" strokeLinecap="round" opacity=".6"/>
+            <line x1="9" y1="17" x2="18" y2="17" stroke="white" strokeWidth="1.5" strokeLinecap="round" opacity=".4"/>
+          </g>
+        </svg>
+      )
+    },
+    { key:"profile", label:"Profil", onTap: onProfile,
+      icon: (on: boolean) => (
+        <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+          <defs>
+            <linearGradient id="np1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={on?"#ffd700":"#c8c0a0"}/><stop offset="100%" stopColor={on?"#ff9500":"#908070"}/></linearGradient>
+            <linearGradient id="np2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={on?"#c084fc":"#b0a0c8"}/><stop offset="100%" stopColor={on?"#7b2ff7":"#806090"}/></linearGradient>
+            <filter id="npf"><feDropShadow dx="0" dy="2" stdDeviation="1.5" floodColor={on?"rgba(255,150,0,.4)":"rgba(0,0,0,.15)"}/></filter>
+          </defs>
+          <g filter="url(#npf)">
+            <circle cx="16" cy="11" r="6" fill="url(#np1)"/>
+            <ellipse cx="16" cy="9" rx="6" ry="3.5" fill={on?"rgba(255,255,255,.3)":"rgba(255,255,255,.15)"}/>
+            <path d="M4 28a12 12 0 0124 0" fill="url(#np2)"/>
+            <path d="M4 28a12 12 0 0124 0" fill={on?"rgba(255,255,255,.15)":"rgba(255,255,255,.08)"} clipPath="inset(0 0 50% 0)"/>
+          </g>
+        </svg>
+      )
+    },
   ];
 
-  const navIcon = (kind: string, on: boolean) => {
-    const common = { width:24, height:24, viewBox:"0 0 24 24", fill:on ? "currentColor" : "none", stroke:"currentColor", strokeWidth:on ? 1.8 : 1.9, strokeLinecap:"round" as const, strokeLinejoin:"round" as const };
-    if (kind === "home") return <svg {...common}><path d="M3 10.8 12 3l9 7.8v9.1a1.6 1.6 0 0 1-1.6 1.6h-4.7v-6.2H9.3v6.2H4.6A1.6 1.6 0 0 1 3 19.9z"/><path d="M8.2 21.5v-7.7h7.6v7.7" fill="none"/></svg>;
-    if (kind === "games") return <svg {...common}><path d="M7.2 8.2h9.6a5.5 5.5 0 0 1 5.1 7.5l-1 2.4a2.7 2.7 0 0 1-4.4 1l-2-2H9.6l-2 2a2.7 2.7 0 0 1-4.4-1l-1-2.4a5.5 5.5 0 0 1 5-7.5Z"/><path d="M7.5 11.5v4M5.5 13.5h4M16.8 12.3h.1M19 14.7h.1" fill="none"/></svg>;
-    if (kind === "room") return <svg {...common}><rect x="8" y="3" width="8" height="13" rx="4"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M8.5 21h7" fill="none"/></svg>;
-    if (kind === "messages") return <svg {...common}><path d="M4.8 4.5h14.4A2.3 2.3 0 0 1 21.5 6.8v9.4a2.3 2.3 0 0 1-2.3 2.3H10l-5.5 3v-3.3a2.3 2.3 0 0 1-2-2.3V6.8a2.3 2.3 0 0 1 2.3-2.3Z"/><path d="M7 9h10M7 13h6" fill="none"/></svg>;
-    return <svg {...common}><circle cx="12" cy="8" r="4"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/></svg>;
-  };
-
   return (
-    <nav aria-label="Əsas naviqasiya" style={{ position:"fixed", bottom:0, left:0, right:0, background:"rgba(255,255,255,.94)", backdropFilter:"blur(24px)", borderTop:"1px solid rgba(88,70,122,.1)", display:"flex", padding:`7px 6px max(8px,env(safe-area-inset-bottom))`, zIndex:100, boxShadow:"0 -8px 28px rgba(55,38,90,.07)" }}>
+    <nav style={{ position:"fixed", bottom:0, left:0, right:0, background:"rgba(255,255,255,.97)", backdropFilter:"blur(20px)", borderTop:"1px solid rgba(100,80,160,.1)", display:"flex", paddingBottom:`max(8px,env(safe-area-inset-bottom))`, zIndex:100, boxShadow:"0 -4px 24px rgba(80,60,140,.08)" }}>
       {items.map(it => {
         const on = active === it.key;
         return (
-          <Button key={it.key} type="button" variant="ghost" aria-label={it.label} aria-current={on ? "page" : undefined} onClick={it.onTap} style={{ flex:1, height:55, minWidth:0, display:"flex", flexDirection:"column", alignItems:"center", gap:3, padding:"4px 2px", borderRadius:12, background:on ? "rgba(123,47,247,.09)" : "transparent", color:on ? "#7b2ff7" : "rgba(67,49,98,.48)", position:"relative", transition:"color .2s ease, background .2s ease, transform .2s ease" }}>
-            <span style={{ position:"relative", display:"grid", placeItems:"center", width:28, height:28, transform:on ? "translateY(-1px)" : "none", transition:"transform .2s ease" }}>
-              {navIcon(it.icon, on)}
-              {it.badge && <span style={{ position:"absolute", top:-3, right:-8, minWidth:16, height:16, borderRadius:8, background:"#ef3f74", border:"2px solid #fff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, lineHeight:1, color:"#fff", fontWeight:800, padding:"0 3px" }}>{it.badge}</span>}
-            </span>
-            <span style={{ fontSize:9, lineHeight:1, fontWeight:on ? 750 : 600, whiteSpace:"nowrap" }}>{it.label}</span>
-          </Button>
+          <button key={it.key} onClick={it.onTap} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:2, paddingTop:10, paddingBottom:4, background:"none", border:"none", cursor:"pointer", position:"relative", transition:".2s" }}>
+            {/* Aktiv indicator */}
+            {on && <div style={{ position:"absolute", top:0, left:"50%", transform:"translateX(-50%)", width:28, height:3, borderRadius:"0 0 3px 3px", background:"linear-gradient(90deg,#7b2ff7,#c084fc)" }}/>}
+            <div style={{ position:"relative", transform: on ? "scale(1.1)" : "scale(1)", transition:"transform .2s" }}>
+              {it.icon(on)}
+              {"badge" in it && it.badge && <span style={{ position:"absolute", top:-4, right:-8, minWidth:14, height:14, borderRadius:7, background:"#ff3ea5", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#fff", fontWeight:800, padding:"0 3px" }}>{it.badge}</span>}
+            </div>
+            <span style={{ fontSize:9, fontWeight: on ? 700 : 500, letterSpacing:.2, color: on ? "#7b2ff7" : "rgba(80,60,140,.35)" }}>{it.label}</span>
+          </button>
         );
       })}
     </nav>
@@ -790,21 +565,16 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
         .h-orb2{position:absolute;width:200px;height:200px;border-radius:50%;background:#ff3ea5;opacity:.06;top:-20px;right:-40px;pointer-events:none}
         .h-scroll{flex:1;overflow-y:auto;padding-bottom:80px}
         .h-scroll::-webkit-scrollbar{display:none}
-        .topbar{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;padding:max(14px,env(safe-area-inset-top)) 16px 12px;gap:10px;position:relative;z-index:10;background:rgba(245,245,247,.82);backdrop-filter:blur(20px);border-bottom:1px solid rgba(85,62,120,.07)}
-        .t-person{display:flex;align-items:center;gap:10px;min-width:0}
-        .t-av{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#7b2ff7,#ff3ea5);border:2px solid rgba(255,255,255,.9);box-shadow:0 5px 14px rgba(91,47,155,.22);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#fff;flex-shrink:0}
-        .t-copy{min-width:0;display:flex;flex-direction:column;gap:2px}
-        .t-kicker{font-size:10px;line-height:1.2;color:rgba(55,37,86,.48);font-weight:650}
-        .t-name{font-size:15px;line-height:1.2;color:#1a1a2e;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .t-actions{display:flex;align-items:center;gap:7px;flex-shrink:0}
-        .t-coins{height:38px;display:flex;align-items:center;gap:5px;background:#fff;border:1px solid rgba(121,89,162,.12);border-radius:12px;padding:4px 6px 4px 5px;box-shadow:0 4px 14px rgba(55,38,90,.06)}
+        .topbar{display:flex;align-items:center;padding:max(16px,env(safe-area-inset-top)) 16px 10px;gap:10px;position:relative;z-index:10}
+        .t-av{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#7b2ff7,#ff3ea5);border:2px solid rgba(192,132,252,.5);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#fff;flex-shrink:0}
+        .t-coins{display:flex;align-items:center;gap:6px;background:rgba(10,0,30,.6);border:1px solid rgba(255,180,0,.3);border-radius:24px;padding:5px 10px 5px 5px}
         .coin-hex{width:26px;height:26px;position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0}
         .coin-hex-bg{position:absolute;inset:0;background:linear-gradient(135deg,#ffd700,#ff8c00);clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%)}
         .coin-hex-v{position:relative;z-index:1;font-size:9px;font-weight:900;color:#5a2800;font-style:italic}
-        .t-coin-num{font-size:12px;font-weight:850;color:#735019}
-        .t-add{width:20px;height:20px;border-radius:7px;background:#7b2ff7;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-        .t-icon-btn{width:38px;height:38px;border-radius:12px;background:#fff!important;border:1px solid rgba(121,89,162,.12)!important;color:#513778!important;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0!important;box-shadow:0 4px 14px rgba(55,38,90,.06)}
-        .t-notif-dot{position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#ef3f74;border:2px solid #f5f5f7;color:#fff;font-size:8px;font-weight:850;display:flex;align-items:center;justify-content:center}
+        .t-coin-num{font-size:13px;font-weight:800;color:#ffd700}
+        .t-add{width:20px;height:20px;border-radius:50%;background:rgba(123,47,247,.5);border:1px solid rgba(192,132,252,.4);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .t-icon-btn{width:38px;height:38px;border-radius:50%;background:rgba(100,80,160,.09);border:1px solid rgba(100,80,160,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .t-notif-dot{position:absolute;top:1px;right:1px;width:9px;height:9px;border-radius:50%;background:#ff3ea5;border:2px solid #0a0018}
         .hero-box{margin:8px 16px 14px;border-radius:24px;overflow:hidden;position:relative;height:150px}
         .hero-bg2{position:absolute;inset:0;background:#0d0022}
         .hero-g1{position:absolute;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(123,47,247,.35) 0%,transparent 70%);top:-40px;left:-20px;animation:vpulse 3s ease-in-out infinite}
@@ -863,24 +633,18 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
 
       {/* TOPBAR */}
       <div className="topbar">
-        <div className="t-person" onClick={onProfile} role="button" tabIndex={0} aria-label="Profilə keç">
-          <div className="t-av">{name.trim().charAt(0).toUpperCase() || "V"}</div>
-          <div className="t-copy">
-            <span className="t-kicker">Xoş gəldin</span>
-            <span className="t-name">{name}</span>
-          </div>
+        <div className="t-av">D</div>
+        <div className="t-coins">
+          <div className="coin-hex"><div className="coin-hex-bg"/><span className="coin-hex-v">V</span></div>
+          <span className="t-coin-num">210</span>
+          <div className="t-add"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="3.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
         </div>
-        <div className="t-actions">
-          <div className="t-coins" aria-label="210 Velvet jetonu">
-            <div className="coin-hex"><div className="coin-hex-bg"/><span className="coin-hex-v">V</span></div>
-            <span className="t-coin-num">210</span>
-            <span className="t-add"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
-          </div>
+        <div style={{ marginLeft:"auto", display:"flex", gap:8 }}>
           <div style={{ position:"relative" }}>
-            <Button type="button" variant="ghost" size="icon" className="t-icon-btn" aria-label="Bildirişlər"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></Button>
-            <span className="t-notif-dot">3</span>
+            <div className="t-icon-btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a3a7a" strokeWidth="2" strokeLinecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+            <div className="t-notif-dot"/>
           </div>
-          <Button type="button" variant="ghost" size="icon" className="t-icon-btn" aria-label="Axtar"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></Button>
+          <div className="t-icon-btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a3a7a" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
         </div>
       </div>
 
@@ -1171,17 +935,43 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
           />
           <div className="p-mesh"/><div className="p-ring1"/><div className="p-ring2"/><div className="p-fade"/>
           <div className="p-top">
-            <Button type="button" variant="ghost" size="icon" className="p-ibtn" aria-label="Geri" onClick={onBack}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
-            </Button>
+            {/* Geri — 3D mavi ox */}
+            <button className="p-ibtn" onClick={onBack} style={{background:"linear-gradient(145deg,#e8e0f8,#d0c8ee)",boxShadow:"0 3px 8px rgba(80,60,140,.2),inset 0 1px 0 rgba(255,255,255,.6)"}}>
+              <svg width="18" height="18" viewBox="0 0 32 32" fill="none">
+                <defs><linearGradient id="bk1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#a080e0"/><stop offset="100%" stopColor="#6040b0"/></linearGradient><filter id="bkf"><feDropShadow dx="0" dy="1" stdDeviation="1" floodColor="rgba(60,20,120,.4)"/></filter></defs>
+                <g filter="url(#bkf)">
+                  <path d="M20 8L12 16l8 8" stroke="url(#bk1)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M20 8L12 16l8 8" stroke="rgba(255,255,255,.35)" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+                </g>
+              </svg>
+            </button>
             <span style={{ fontSize:13, fontWeight:700, color:"#4a2880", letterSpacing:3, textTransform:"uppercase" }}>Profil</span>
             <div style={{ display:"flex", gap:8 }}>
-              <Button type="button" variant="ghost" size="icon" className="p-ibtn" aria-label="Profil ziyarətçiləri" onClick={() => setVisitorOpen(true)}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.8"/></svg>
-              </Button>
-              <Button type="button" variant="ghost" size="icon" className="p-ibtn" aria-label="Profili düzəlt" onClick={() => { setDraft(profileData); setEditOpen(true); }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/><path d="m15 5 3 3"/></svg>
-              </Button>
+              {/* Göz — 3D bənövşəyi */}
+              <button className="p-ibtn" onClick={() => setVisitorOpen(true)} style={{background:"linear-gradient(145deg,#e0d8f8,#c8c0ee)",boxShadow:"0 3px 8px rgba(123,47,247,.25),inset 0 1px 0 rgba(255,255,255,.6)"}}>
+                <svg width="18" height="18" viewBox="0 0 32 32" fill="none">
+                  <defs><linearGradient id="ey1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#c084fc"/><stop offset="100%" stopColor="#7b2ff7"/></linearGradient><linearGradient id="ey2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#1a0050"/><stop offset="100%" stopColor="#3a00a0"/></linearGradient><filter id="eyf"><feDropShadow dx="0" dy="1" stdDeviation="1" floodColor="rgba(123,47,247,.5)"/></filter></defs>
+                  <g filter="url(#eyf)">
+                    <path d="M3 16s5-10 13-10 13 10 13 10-5 10-13 10S3 16 3 16z" fill="url(#ey1)"/>
+                    <path d="M3 16s5-6 13-6 13 6 13 6" fill="rgba(255,255,255,.2)"/>
+                    <circle cx="16" cy="16" r="5" fill="url(#ey2)"/>
+                    <circle cx="16" cy="16" r="3" fill="#1a0050"/>
+                    <circle cx="14.5" cy="14.5" r="1.2" fill="rgba(255,255,255,.7)"/>
+                  </g>
+                </svg>
+              </button>
+              {/* Kalem — 3D qızıl */}
+              <button className="p-ibtn" onClick={() => { setDraft(profileData); setEditOpen(true); }} style={{background:"linear-gradient(145deg,#fff8e0,#ffedb0)",boxShadow:"0 3px 8px rgba(255,150,0,.25),inset 0 1px 0 rgba(255,255,255,.8)"}}>
+                <svg width="18" height="18" viewBox="0 0 32 32" fill="none">
+                  <defs><linearGradient id="pe1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#ffd700"/><stop offset="100%" stopColor="#ff9500"/></linearGradient><linearGradient id="pe2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#ff6000"/><stop offset="100%" stopColor="#cc4000"/></linearGradient><filter id="pef"><feDropShadow dx="0" dy="1" stdDeviation="1" floodColor="rgba(255,150,0,.5)"/></filter></defs>
+                  <g filter="url(#pef)">
+                    <path d="M22 5l5 5L12 25l-6 1 1-6L22 5z" fill="url(#pe1)"/>
+                    <path d="M22 5l5 5-3 3-5-5 3-3z" fill="url(#pe2)"/>
+                    <path d="M22 5l5 5" stroke="rgba(255,255,255,.5)" strokeWidth="1" strokeLinecap="round"/>
+                    <path d="M6 26l1-6" stroke="rgba(255,200,0,.6)" strokeWidth="1.5" strokeLinecap="round"/>
+                  </g>
+                </svg>
+              </button>
             </div>
           </div>
         </div>
@@ -2361,318 +2151,3 @@ function VipEntrance({ name }: { name: string }) {
     </div>
   );
 }
-
-// ===================== DOSYA: src/styles.css =====================
-
-@import "tailwindcss" source(none);
-@source "../src";
-@import "tw-animate-css";
-
-@custom-variant dark (&:is(.dark *));
-
-/*
- * Design system definition.
- *
- * The @theme inline block maps CSS custom properties to Tailwind utility
- * classes (e.g. --color-primary -> bg-primary, text-primary).
- *
- * The :root and .dark blocks define the actual color values using oklch.
- * All colors MUST use oklch format.
- *
- * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
- * 2. Register it in @theme inline as --color-<name>: var(--<name>)
- */
-
-@theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-  --radius-4xl: calc(var(--radius) + 16px);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-ring-offset-background: var(--background);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-}
-
-:root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.984 0.003 247.858);
-  --sidebar-foreground: oklch(0.129 0.042 264.695);
-  --sidebar-primary: oklch(0.208 0.042 265.755);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.968 0.007 247.896);
-  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
-  --sidebar-border: oklch(0.929 0.013 255.508);
-  --sidebar-ring: oklch(0.704 0.04 256.788);
-}
-
-.dark {
-  --background: oklch(0.129 0.042 264.695);
-  --foreground: oklch(0.984 0.003 247.858);
-  --card: oklch(0.208 0.042 265.755);
-  --card-foreground: oklch(0.984 0.003 247.858);
-  --popover: oklch(0.208 0.042 265.755);
-  --popover-foreground: oklch(0.984 0.003 247.858);
-  --primary: oklch(0.929 0.013 255.508);
-  --primary-foreground: oklch(0.208 0.042 265.755);
-  --secondary: oklch(0.279 0.041 260.031);
-  --secondary-foreground: oklch(0.984 0.003 247.858);
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.704 0.04 256.788);
-  --accent: oklch(0.279 0.041 260.031);
-  --accent-foreground: oklch(0.984 0.003 247.858);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.551 0.027 264.364);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.208 0.042 265.755);
-  --sidebar-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.279 0.041 260.031);
-  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.551 0.027 264.364);
-}
-
-@layer base {
-  * {
-    border-color: var(--color-border);
-  }
-
-  body {
-    background-color: var(--color-background);
-    color: var(--color-foreground);
-  }
-}
-
-// ===================== DOSYA: src/integrations/supabase/client.ts =====================
-
-type QueryResult = { data: unknown[]; error: null };
-
-function createQuery() {
-  const result: QueryResult = { data: [], error: null };
-  const query: Record<string, unknown> = {};
-  const chain = () => query;
-
-  Object.assign(query, {
-    select: chain,
-    eq: chain,
-    order: chain,
-    limit: chain,
-    upsert: chain,
-    update: chain,
-    delete: chain,
-    insert: chain,
-    then: (resolve: (value: QueryResult) => unknown) => Promise.resolve(result).then(resolve),
-  });
-
-  return query;
-}
-
-export const supabase = {
-  auth: {
-    getSession: async () => ({ data: { session: null } }),
-    onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => undefined } } }),
-    signInWithOAuth: async () => ({ error: new Error("Cloud bağlantısı yapılandırılmadı") }),
-    signInWithPassword: async () => ({ error: new Error("Cloud bağlantısı yapılandırılmadı") }),
-    signUp: async () => ({ error: new Error("Cloud bağlantısı yapılandırılmadı") }),
-    signOut: async () => ({ error: null }),
-  },
-  from: () => createQuery(),
-  channel: () => ({
-    on() { return this; },
-    subscribe() { return this; },
-  }),
-  removeChannel: () => undefined,
-};
-// ===================== DOSYA: src/hooks/use-voice-room.ts =====================
-
-import { useState } from "react";
-
-export function useVoiceRoom(_roomId: string, _session: unknown, _active: boolean) {
-  const [muted, setMuted] = useState(true);
-
-  return {
-    muted,
-    error: "",
-    toggleMic: () => setMuted((current) => !current),
-  };
-}
-// ===================== DOSYA: src/router.tsx =====================
-
-import { QueryClient } from "@tanstack/react-query";
-import { createRouter } from "@tanstack/react-router";
-import { routeTree } from "./routeTree.gen";
-
-export const getRouter = () => {
-  const queryClient = new QueryClient();
-
-  const router = createRouter({
-    routeTree,
-    context: { queryClient },
-    scrollRestoration: true,
-    defaultPreloadStaleTime: 0,
-  });
-
-  return router;
-};
-
-// ===================== DOSYA: src/start.ts =====================
-
-import { createStart, createCsrfMiddleware, createMiddleware } from "@tanstack/react-start";
-
-import { renderErrorPage } from "./lib/error-page";
-
-const errorMiddleware = createMiddleware().server(async ({ next }) => {
-  try {
-    return await next();
-  } catch (error) {
-    if (error != null && typeof error === "object" && "statusCode" in error) {
-      throw error;
-    }
-    console.error(error);
-    return new Response(renderErrorPage(), {
-      status: 500,
-      headers: { "content-type": "text/html; charset=utf-8" },
-    });
-  }
-});
-
-// Start installs this automatically when src/start.ts is absent; defining the
-// file opts out, so re-add it explicitly to keep server functions protected
-// from cross-site requests.
-const csrfMiddleware = createCsrfMiddleware({
-  filter: (ctx) => ctx.handlerType === "serverFn",
-});
-
-export const startInstance = createStart(() => ({
-  requestMiddleware: [errorMiddleware, csrfMiddleware],
-}));
-
-// ===================== DOSYA: src/server.ts =====================
-
-import "./lib/error-capture";
-
-import { consumeLastCapturedError } from "./lib/error-capture";
-import { renderErrorPage } from "./lib/error-page";
-
-type ServerEntry = {
-  fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
-};
-
-let serverEntryPromise: Promise<ServerEntry> | undefined;
-
-async function getServerEntry(): Promise<ServerEntry> {
-  if (!serverEntryPromise) {
-    serverEntryPromise = import("@tanstack/react-start/server-entry").then(
-      (m) => (m.default ?? m) as ServerEntry,
-    );
-  }
-  return serverEntryPromise;
-}
-
-// h3 swallows in-handler throws into a normal 500 Response with body
-// {"unhandled":true,"message":"HTTPError"} — try/catch alone never fires for those.
-async function normalizeCatastrophicSsrResponse(response: Response): Promise<Response> {
-  if (response.status < 500) return response;
-  const contentType = response.headers.get("content-type") ?? "";
-  if (!contentType.includes("application/json")) return response;
-
-  const body = await response.clone().text();
-  if (!isH3SwallowedErrorBody(body)) return response;
-
-  console.error(consumeLastCapturedError() ?? new Error(`h3 swallowed SSR error: ${body}`));
-  return new Response(renderErrorPage(), {
-    status: 500,
-    headers: { "content-type": "text/html; charset=utf-8" },
-  });
-}
-
-function isH3SwallowedErrorBody(body: string): boolean {
-  try {
-    const payload = JSON.parse(body) as { unhandled?: unknown; message?: unknown };
-    return payload.unhandled === true && payload.message === "HTTPError";
-  } catch {
-    return false;
-  }
-}
-
-export default {
-  async fetch(request: Request, env: unknown, ctx: unknown) {
-    try {
-      const handler = await getServerEntry();
-      const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
-    } catch (error) {
-      console.error(error);
-      return new Response(renderErrorPage(), {
-        status: 500,
-        headers: { "content-type": "text/html; charset=utf-8" },
-      });
-    }
-  },
-};
