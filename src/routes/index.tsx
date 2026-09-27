@@ -565,21 +565,28 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
         .h-orb2{position:absolute;width:200px;height:200px;border-radius:50%;background:#ff3ea5;opacity:.06;top:-20px;right:-40px;pointer-events:none}
         .h-scroll{flex:1;overflow-y:auto;padding-bottom:80px}
         .h-scroll::-webkit-scrollbar{display:none}
-        .topbar{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;padding:max(14px,env(safe-area-inset-top)) 16px 12px;gap:10px;position:relative;z-index:10;background:rgba(245,245,247,.82);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(85,62,120,.07)}
-        .t-person{display:flex;align-items:center;gap:10px;min-width:0;cursor:pointer}
-        .t-av{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#7b2ff7,#ff3ea5);border:2px solid rgba(255,255,255,.9);box-shadow:0 5px 14px rgba(91,47,155,.22);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#fff;flex-shrink:0}
-        .t-copy{min-width:0;display:flex;flex-direction:column;gap:2px}
-        .t-kicker{font-size:10px;line-height:1.2;color:rgba(55,37,86,.48);font-weight:650}
-        .t-name{font-size:15px;line-height:1.2;color:#1a1a2e;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .t-actions{display:flex;align-items:center;gap:7px;flex-shrink:0}
-        .t-coins{height:38px;display:flex;align-items:center;gap:5px;background:#fff;border:1px solid rgba(121,89,162,.12);border-radius:12px;padding:4px 6px 4px 5px;box-shadow:0 4px 14px rgba(55,38,90,.06)}
-        .coin-hex{width:26px;height:26px;position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-        .coin-hex-bg{position:absolute;inset:0;background:linear-gradient(135deg,#ffd700,#ff8c00);clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%)}
-        .coin-hex-v{position:relative;z-index:1;font-size:9px;font-weight:900;color:#5a2800;font-style:italic}
-        .t-coin-num{font-size:12px;font-weight:850;color:#735019}
-        .t-add{width:20px;height:20px;border-radius:7px;background:#7b2ff7;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-        .t-icon-btn{width:38px;height:38px;border-radius:12px;background:#fff!important;border:1px solid rgba(121,89,162,.12)!important;color:#513778!important;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0!important;box-shadow:0 4px 14px rgba(55,38,90,.06)}
-        .t-notif-dot{position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#ef3f74;border:2px solid #f5f5f7;color:#fff;font-size:8px;font-weight:850;display:flex;align-items:center;justify-content:center}
+        .topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.88);backdrop-filter:saturate(1.8) blur(20px);-webkit-backdrop-filter:saturate(1.8) blur(20px);border-bottom:.5px solid rgba(20,10,40,.08);padding:max(10px,env(safe-area-inset-top)) 16px 12px}
+        .tb-row{display:flex;align-items:center;gap:10px;height:44px}
+        .tb-user{display:flex;align-items:center;gap:10px;min-width:0;flex:1;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+        .tb-user:active{opacity:.7}
+        .tb-av{position:relative;width:40px;height:40px;border-radius:50%;padding:2px;background:linear-gradient(135deg,#7b2ff7,#ff3ea5);flex-shrink:0}
+        .tb-av-in{width:100%;height:100%;border-radius:50%;background:#fff;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#7b2ff7;overflow:hidden}
+        .tb-av-in img{width:100%;height:100%;object-fit:cover}
+        .tb-dot{position:absolute;right:0;bottom:0;width:11px;height:11px;border-radius:50%;background:#22c55e;border:2px solid #fff}
+        .tb-txt{display:flex;flex-direction:column;min-width:0}
+        .tb-hi{font-size:12px;color:#8e8e93;font-weight:500;line-height:1.2}
+        .tb-name{font-size:17px;color:#111;font-weight:700;letter-spacing:-.3px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .tb-coin{display:flex;align-items:center;gap:6px;height:34px;padding:0 4px 0 8px;border-radius:17px;background:#f4f2f8;border:0;cursor:pointer;flex-shrink:0}
+        .tb-coin:active{transform:scale(.96)}
+        .tb-coin img{width:18px;height:18px;object-fit:contain}
+        .tb-coin b{font-size:14px;font-weight:700;color:#111;font-variant-numeric:tabular-nums}
+        .tb-plus{width:26px;height:26px;border-radius:50%;background:#7b2ff7;display:flex;align-items:center;justify-content:center}
+        .tb-btn{position:relative;width:36px;height:36px;border-radius:50%;background:#f4f2f8;border:0;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:#1c1c1e}
+        .tb-btn:active{transform:scale(.92);background:#ebe8f2}
+        .tb-badge{position:absolute;top:-2px;right:-3px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:#ff3b30;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+        .tb-search{margin-top:10px;height:38px;border-radius:12px;background:#f4f2f8;display:flex;align-items:center;gap:8px;padding:0 12px;color:#8e8e93;font-size:15px}
+        .tb-search input{flex:1;border:0;background:none;outline:none;font-size:15px;color:#111;min-width:0}
+        .tb-search input::placeholder{color:#8e8e93}
         .hero-box{margin:8px 16px 14px;border-radius:24px;overflow:hidden;position:relative;height:150px}
         .hero-bg2{position:absolute;inset:0;background:#0d0022}
         .hero-g1{position:absolute;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(123,47,247,.35) 0%,transparent 70%);top:-40px;left:-20px;animation:vpulse 3s ease-in-out infinite}
@@ -637,27 +644,33 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
       <div className="h-orb1"/><div className="h-orb2"/>
 
       {/* TOPBAR */}
-      <div className="topbar">
-        <div className="t-person" onClick={onProfile} role="button" tabIndex={0} aria-label="Profilə keç">
-          <div className="t-av">{name.trim().charAt(0).toUpperCase() || "V"}</div>
-          <div className="t-copy">
-            <span className="t-kicker">Xoş gəldin</span>
-            <span className="t-name">{name}</span>
-          </div>
+      <header className="topbar">
+        <div className="tb-row">
+          <button type="button" className="tb-user" onClick={onProfile} aria-label="Profil">
+            <div className="tb-av">
+              <div className="tb-av-in">{(() => { try { const a = localStorage.getItem("profile_avatar"); return a ? <img src={a} alt=""/> : (name.trim()[0]?.toUpperCase() || "V"); } catch { return "V"; } })()}</div>
+              <span className="tb-dot"/>
+            </div>
+            <div className="tb-txt">
+              <span className="tb-hi">Xoş gəldin</span>
+              <span className="tb-name">{name}</span>
+            </div>
+          </button>
+          <button type="button" className="tb-coin" aria-label="Jeton">
+            <img src="/images/images/jeton.PNG" alt=""/>
+            <b>{(() => { try { return parseInt(localStorage.getItem("velvet_jeton") || "10000").toLocaleString(); } catch { return "0"; } })()}</b>
+            <span className="tb-plus"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
+          </button>
+          <button type="button" className="tb-btn" aria-label="Bildirişlər">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span className="tb-badge">3</span>
+          </button>
         </div>
-        <div className="t-actions">
-          <div className="t-coins" aria-label="210 Velvet jetonu">
-            <div className="coin-hex"><div className="coin-hex-bg"/><span className="coin-hex-v">V</span></div>
-            <span className="t-coin-num">210</span>
-            <span className="t-add"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
-          </div>
-          <div style={{ position:"relative" }}>
-            <button type="button" className="t-icon-btn" aria-label="Bildirişlər"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></button>
-            <span className="t-notif-dot">3</span>
-          </div>
-          <button type="button" className="t-icon-btn" aria-label="Axtar"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></button>
-        </div>
-      </div>
+        <label className="tb-search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input type="search" placeholder="Otaq və ya istifadəçi axtar"/>
+        </label>
+      </header>
 
       <div className="h-scroll">
         {/* HERO */}
@@ -864,7 +877,8 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
         .p-ring1{position:absolute;width:320px;height:320px;top:-100px;left:-80px;border-radius:50%;border:1px solid rgba(192,132,252,.06);animation:vrotate 20s linear infinite;z-index:2}
         .p-ring2{position:absolute;width:240px;height:240px;top:-60px;left:-40px;border-radius:50%;border:1px dashed rgba(255,62,165,.05);animation:vrotate 14s linear infinite reverse;z-index:2}
         .p-top{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:max(16px,env(safe-area-inset-top)) 18px 0;z-index:8}
-        .p-ibtn{width:36px;height:36px;border-radius:12px;background:rgba(100,80,160,.15);border:1px solid rgba(100,80,160,.14);display:flex;align-items:center;justify-content:center;cursor:pointer}
+        .p-ibtn{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;transition:transform .14s ease,filter .14s ease;-webkit-tap-highlight-color:transparent}
+        .p-ibtn:active{transform:scale(.88);filter:brightness(.92)}
         .p-upload{position:absolute;bottom:12px;right:14px;z-index:8;display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.55);border:1px solid rgba(100,80,160,.18);border-radius:20px;padding:6px 11px;cursor:pointer}
         .p-av-outer{width:78px;height:78px;border-radius:50%;background:conic-gradient(#ffd700,#ff8c00,#c084fc,#7b2ff7,#ffd700);padding:2.5px;animation:vglow 3s ease-in-out infinite;flex-shrink:0}
         .p-av-inner{width:100%;height:100%;border-radius:50%;background:#e8e0f5;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:#1a1a2e;overflow:hidden}
@@ -946,41 +960,67 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
           />
           <div className="p-mesh"/><div className="p-ring1"/><div className="p-ring2"/><div className="p-fade"/>
           <div className="p-top">
-            {/* Geri — 3D mavi ox */}
-            <button className="p-ibtn" onClick={onBack} style={{background:"linear-gradient(145deg,#e8e0f8,#d0c8ee)",boxShadow:"0 3px 8px rgba(80,60,140,.2),inset 0 1px 0 rgba(255,255,255,.6)"}}>
-              <svg width="18" height="18" viewBox="0 0 32 32" fill="none">
-                <defs><linearGradient id="bk1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#a080e0"/><stop offset="100%" stopColor="#6040b0"/></linearGradient><filter id="bkf"><feDropShadow dx="0" dy="1" stdDeviation="1" floodColor="rgba(60,20,120,.4)"/></filter></defs>
-                <g filter="url(#bkf)">
-                  <path d="M20 8L12 16l8 8" stroke="url(#bk1)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M20 8L12 16l8 8" stroke="rgba(255,255,255,.35)" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
-                </g>
+            {/* ── GERİ DÜYMƏSİ ── */}
+            <button className="p-ibtn" onClick={onBack}
+              style={{
+                background:"rgba(0,0,0,.32)",
+                backdropFilter:"blur(12px)",
+                WebkitBackdropFilter:"blur(12px)",
+                boxShadow:"0 2px 12px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.14), inset 0 -1px 0 rgba(0,0,0,.2)",
+                border:"1px solid rgba(255,255,255,.18)",
+              }}>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.92)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6"/>
               </svg>
             </button>
-            <span style={{ fontSize:13, fontWeight:700, color:"#4a2880", letterSpacing:3, textTransform:"uppercase" }}>Profil</span>
+
+            {/* Başlıq */}
+            <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:1 }}>
+              <span style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,.95)", letterSpacing:2.5, textTransform:"uppercase", textShadow:"0 1px 4px rgba(0,0,0,.4)" }}>Profil</span>
+            </div>
+
+            {/* ── SAĞ DÜYMƏLƏR ── */}
             <div style={{ display:"flex", gap:8 }}>
-              {/* Göz — 3D bənövşəyi */}
-              <button className="p-ibtn" onClick={() => setVisitorOpen(true)} style={{background:"linear-gradient(145deg,#e0d8f8,#c8c0ee)",boxShadow:"0 3px 8px rgba(123,47,247,.25),inset 0 1px 0 rgba(255,255,255,.6)"}}>
-                <svg width="18" height="18" viewBox="0 0 32 32" fill="none">
-                  <defs><linearGradient id="ey1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#c084fc"/><stop offset="100%" stopColor="#7b2ff7"/></linearGradient><linearGradient id="ey2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#1a0050"/><stop offset="100%" stopColor="#3a00a0"/></linearGradient><filter id="eyf"><feDropShadow dx="0" dy="1" stdDeviation="1" floodColor="rgba(123,47,247,.5)"/></filter></defs>
-                  <g filter="url(#eyf)">
-                    <path d="M3 16s5-10 13-10 13 10 13 10-5 10-13 10S3 16 3 16z" fill="url(#ey1)"/>
-                    <path d="M3 16s5-6 13-6 13 6 13 6" fill="rgba(255,255,255,.2)"/>
-                    <circle cx="16" cy="16" r="5" fill="url(#ey2)"/>
-                    <circle cx="16" cy="16" r="3" fill="#1a0050"/>
-                    <circle cx="14.5" cy="14.5" r="1.2" fill="rgba(255,255,255,.7)"/>
-                  </g>
+              {/* Göz */}
+              <button className="p-ibtn" onClick={() => setVisitorOpen(true)}
+                style={{
+                  background:"linear-gradient(145deg,rgba(123,47,247,.75),rgba(88,28,220,.9))",
+                  backdropFilter:"blur(8px)",
+                  WebkitBackdropFilter:"blur(8px)",
+                  boxShadow:"0 4px 14px rgba(123,47,247,.45), inset 0 1px 0 rgba(255,255,255,.22), inset 0 -1px 0 rgba(0,0,0,.15)",
+                  border:"1px solid rgba(192,132,252,.35)",
+                }}>
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <defs>
+                    <linearGradient id="eyeG" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#f0d0ff"/>
+                      <stop offset="100%" stopColor="#c084fc"/>
+                    </linearGradient>
+                  </defs>
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="url(#eyeG)"/>
+                  <circle cx="12" cy="12" r="3" stroke="url(#eyeG)"/>
+                  <circle cx="10.8" cy="10.8" r="1" fill="rgba(255,255,255,.7)" stroke="none"/>
                 </svg>
               </button>
-              {/* Kalem — 3D qızıl */}
-              <button className="p-ibtn" onClick={() => { setDraft(profileData); setEditOpen(true); }} style={{background:"linear-gradient(145deg,#fff8e0,#ffedb0)",boxShadow:"0 3px 8px rgba(255,150,0,.25),inset 0 1px 0 rgba(255,255,255,.8)"}}>
-                <svg width="18" height="18" viewBox="0 0 32 32" fill="none">
-                  <defs><linearGradient id="pe1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#ffd700"/><stop offset="100%" stopColor="#ff9500"/></linearGradient><linearGradient id="pe2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#ff6000"/><stop offset="100%" stopColor="#cc4000"/></linearGradient><filter id="pef"><feDropShadow dx="0" dy="1" stdDeviation="1" floodColor="rgba(255,150,0,.5)"/></filter></defs>
-                  <g filter="url(#pef)">
-                    <path d="M22 5l5 5L12 25l-6 1 1-6L22 5z" fill="url(#pe1)"/>
-                    <path d="M22 5l5 5-3 3-5-5 3-3z" fill="url(#pe2)"/>
-                    <path d="M22 5l5 5" stroke="rgba(255,255,255,.5)" strokeWidth="1" strokeLinecap="round"/>
-                    <path d="M6 26l1-6" stroke="rgba(255,200,0,.6)" strokeWidth="1.5" strokeLinecap="round"/>
-                  </g>
+
+              {/* Qalem */}
+              <button className="p-ibtn" onClick={() => { setDraft(profileData); setEditOpen(true); }}
+                style={{
+                  background:"linear-gradient(145deg,rgba(255,180,0,.8),rgba(220,100,0,.9))",
+                  backdropFilter:"blur(8px)",
+                  WebkitBackdropFilter:"blur(8px)",
+                  boxShadow:"0 4px 14px rgba(220,120,0,.4), inset 0 1px 0 rgba(255,255,220,.35), inset 0 -1px 0 rgba(0,0,0,.15)",
+                  border:"1px solid rgba(255,210,80,.35)",
+                }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <defs>
+                    <linearGradient id="penG" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stopColor="#fff8c0"/>
+                      <stop offset="100%" stopColor="#ffe066"/>
+                    </linearGradient>
+                  </defs>
+                  <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" stroke="url(#penG)"/>
+                  <path d="M15 5l4 4" stroke="rgba(255,255,200,.5)" strokeWidth="1"/>
                 </svg>
               </button>
             </div>
