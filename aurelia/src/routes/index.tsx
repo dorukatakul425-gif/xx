@@ -251,82 +251,150 @@ function VelvetMascot({ size = 160 }: { size?: number }) {
 
 /* ─── LOGIN ─── */
 function LoginScreen({ signIn, loading, error }: { signIn: (p: "google" | "apple") => void; loading: string | null; error: string }) {
+  const [mode, setMode] = useState<"main"|"login"|"register">("main");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [age, setAge] = useState("");
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState("");
+  const [authSuccess, setAuthSuccess] = useState("");
+
+  const doLogin = async () => {
+    if (!email || !password) { setAuthError("Email və şifrə daxil edin"); return; }
+    setAuthLoading(true); setAuthError("");
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) setAuthError("Email və ya şifrə yanlışdır");
+    setAuthLoading(false);
+  };
+
+  const doRegister = async () => {
+    if (!email || !password || !username) { setAuthError("Bütün xanaları doldurun"); return; }
+    if (password.length < 6) { setAuthError("Şifrə ən az 6 simvol olmalıdır"); return; }
+    setAuthLoading(true); setAuthError("");
+    const { error } = await supabase.auth.signUp({
+      email, password,
+      options: { data: { full_name: username, age: age || "18" } }
+    });
+    if (error) setAuthError(error.message);
+    else { setAuthSuccess("Hesab yaradıldı! Email-i yoxlayın."); setTimeout(() => setMode("login"), 2000); }
+    setAuthLoading(false);
+  };
+
   return (
-    <main style={{ background: "#f8f8ff", minHeight: "100dvh", display: "flex", flexDirection: "column", alignItems: "center", padding: `max(32px, env(safe-area-inset-top)) 24px 0`, position: "relative", overflow: "hidden" }}>
-      {/* Video arxa plan */}
-      <video autoPlay muted loop playsInline
-        style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"cover", opacity:.25, zIndex:0, pointerEvents:"none" }}>
+    <main style={{ background:"#07000f", minHeight:"100dvh", display:"flex", flexDirection:"column", alignItems:"center", padding:`max(32px,env(safe-area-inset-top)) 24px 0`, position:"relative", overflow:"hidden" }}>
+      <video autoPlay muted loop playsInline style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"cover", opacity:.25, zIndex:0, pointerEvents:"none" }}>
         <source src="/images/images/giris.mp4" type="video/mp4"/>
       </video>
-      {/* Video üzərinə qaranlıq overlay */}
-      <div style={{ position:"absolute", inset:0, background:"linear-gradient(180deg,rgba(10,0,24,.7) 0%,rgba(10,0,24,.4) 50%,rgba(10,0,24,.85) 100%)", zIndex:1, pointerEvents:"none" }}/>
+      <div style={{ position:"absolute", inset:0, background:"linear-gradient(180deg,rgba(7,0,15,.6) 0%,rgba(7,0,15,.3) 50%,rgba(7,0,15,.9) 100%)", zIndex:1, pointerEvents:"none" }}/>
       <style>{`
-        .v-orb1{position:absolute;width:280px;height:280px;border-radius:50%;background:#7b2ff7;opacity:.09;top:-70px;left:-70px;pointer-events:none;z-index:2}
-        .v-orb2{position:absolute;width:220px;height:220px;border-radius:50%;background:#c084fc;opacity:.06;top:50px;right:-60px;pointer-events:none;z-index:2}
-        .v-help{position:absolute;top:max(20px,env(safe-area-inset-top));right:16px;display:flex;align-items:center;gap:6px;background:rgba(100,80,160,.09);border:1px solid rgba(192,132,252,.25);border-radius:50px;padding:8px 12px;cursor:pointer;z-index:10}
-        .v-help span{font-size:11px;color:#c084fc;font-weight:500;white-space:nowrap}
+        .v-orb1{position:absolute;width:280px;height:280px;border-radius:50%;background:#7b2ff7;opacity:.12;top:-70px;left:-70px;pointer-events:none;z-index:2}
+        .v-orb2{position:absolute;width:220px;height:220px;border-radius:50%;background:#c084fc;opacity:.08;top:50px;right:-60px;pointer-events:none;z-index:2}
         .v-brand{font-size:clamp(38px,11vw,56px);font-weight:900;letter-spacing:6px;color:#fff;margin-top:10px;line-height:1}
         .v-feats{display:flex;gap:10px;margin-top:18px;margin-bottom:4px;width:100%;justify-content:center}
         .v-feat{display:flex;flex-direction:column;align-items:center;gap:7px}
         .v-feat-icon{width:clamp(44px,12vw,52px);height:clamp(44px,12vw,52px);border-radius:14px;background:rgba(123,47,247,.2);border:1px solid rgba(123,47,247,.35);display:flex;align-items:center;justify-content:center}
-        .v-feat-label{font-size:9px;letter-spacing:2px;color:#5a3a7a;text-transform:uppercase;font-weight:600}
+        .v-feat-label{font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.5);text-transform:uppercase;font-weight:600}
         .v-bottom{width:calc(100% + 48px);margin-top:24px;padding:22px 24px max(32px,env(safe-area-inset-bottom));position:relative;overflow:hidden;border-radius:28px 28px 0 0;flex-shrink:0}
         .v-bottom-bg{position:absolute;inset:0;background:linear-gradient(135deg,#16003a,#2a0a55,#1a003a,#0e0025,#250845);background-size:400% 400%;animation:vwave 5s ease infinite}
         .v-rp1{position:absolute;width:220px;height:220px;top:-70px;left:-50px;border-radius:50%;background:radial-gradient(ellipse,rgba(123,47,247,.28) 0%,transparent 65%);animation:vrp 3.5s ease-in-out infinite}
         .v-rp2b{position:absolute;width:180px;height:180px;bottom:-50px;right:-40px;border-radius:50%;background:radial-gradient(ellipse,rgba(255,62,165,.16) 0%,transparent 65%);animation:vrp 3.5s ease-in-out infinite .8s}
         .v-bc{position:relative;z-index:2}
-        .v-div{display:flex;align-items:center;gap:12px;width:100%;margin-bottom:14px}
-        .v-dl{flex:1;height:1px;background:rgba(192,132,252,.18)}
-        .v-dt{font-size:10px;color:#6b3a90;letter-spacing:4px;font-weight:600}
+        .v-inp{width:100%;height:50px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.07);color:#fff;font-size:15px;padding:0 16px;outline:none;margin-bottom:10px;-webkit-appearance:none}
+        .v-inp::placeholder{color:rgba(255,255,255,.3)}
+        .v-inp:focus{border-color:rgba(123,47,247,.6);background:rgba(123,47,247,.08)}
         .v-btn{width:100%;height:52px;border-radius:16px;border:none;display:flex;align-items:center;justify-content:center;gap:10px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;-webkit-appearance:none;appearance:none}
         .v-btn:active{opacity:.85;transform:scale(.98)}
-        .v-ba{background:#fff;color:#000}
-        .v-bg{background:rgba(100,80,160,.09);border:1px solid rgba(100,80,160,.15);color:#fff}
-        .v-bp{background:rgba(123,47,247,.22);border:1px solid rgba(123,47,247,.45);color:#c084fc}
-        .v-terms{font-size:10px;color:#3e2060;text-align:center;margin-top:12px;line-height:1.8}
-        .v-terms a{color:#7b2ff7;text-decoration:none}
+        .v-btn-main{background:linear-gradient(135deg,#7b2ff7,#ff3ea5);color:#fff}
+        .v-btn-sec{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.7)}
+        .v-btn-back{background:transparent;border:none;color:rgba(255,255,255,.4);font-size:13px;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+        .v-terms{font-size:10px;color:rgba(255,255,255,.3);text-align:center;margin-top:12px;line-height:1.8}
+        .v-terms a{color:#c084fc;text-decoration:none}
+        .v-div{display:flex;align-items:center;gap:12px;width:100%;margin-bottom:14px}
+        .v-dl{flex:1;height:1px;background:rgba(255,255,255,.1)}
+        .v-dt{font-size:10px;color:rgba(255,255,255,.3);letter-spacing:3px;font-weight:600}
       `}</style>
       <div className="v-orb1"/><div className="v-orb2"/>
       <div style={{ position:"relative", zIndex:2, display:"contents" }}>
-      <div className="v-help">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><circle cx="12" cy="17" r=".5" fill="#c084fc"/></svg>
-        <span>Girişdə çətinlik çəkirsiniz?</span>
-      </div>
-      <VelvetMascot size={150}/>
-      <div className="v-brand">VELVET</div>
-      <div className="v-feats">
-        {[
-          { label:"Oyunlar", icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="6" width="20" height="12" rx="6"/><path d="M8 12h4M10 10v4"/><circle cx="16" cy="11" r="1" fill="#c084fc"/><circle cx="18" cy="13" r="1" fill="#c084fc"/></svg> },
-          { label:"Səs", icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10a7 7 0 0 1-14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="9" y1="22" x2="15" y2="22"/></svg> },
-          { label:"VIP", icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M2 8l4 8h12l4-8-5 3-5-7-5 7-5-3z"/></svg> },
-          { label:"Söhbət", icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> },
-        ].map(f => (
-          <div key={f.label} className="v-feat">
-            <div className="v-feat-icon">{f.icon}</div>
-            <div className="v-feat-label">{f.label}</div>
+        <VelvetMascot size={mode==="main" ? 150 : 90}/>
+        <div className="v-brand">VELVET</div>
+
+        {mode === "main" && (
+          <>
+            <div className="v-feats">
+              {[
+                { label:"Oyunlar", icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="1.8" strokeLinecap="round"><rect x="2" y="6" width="20" height="12" rx="6"/><path d="M8 12h4M10 10v4"/><circle cx="16" cy="11" r="1" fill="#c084fc"/><circle cx="18" cy="13" r="1" fill="#c084fc"/></svg> },
+                { label:"Səs", icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="1.8" strokeLinecap="round"><path d="M12 2a3 3 0 013 3v7a3 3 0 01-6 0V5a3 3 0 013-3z"/><path d="M19 10a7 7 0 01-14 0"/><line x1="12" y1="19" x2="12" y2="22"/></svg> },
+                { label:"VIP", icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="1.8" strokeLinecap="round"><path d="M2 8l4 8h12l4-8-5 3-5-7-5 7-5-3z"/></svg> },
+                { label:"Söhbət", icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="1.8" strokeLinecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> },
+              ].map(f => (
+                <div key={f.label} className="v-feat">
+                  <div className="v-feat-icon">{f.icon}</div>
+                  <div className="v-feat-label">{f.label}</div>
+                </div>
+              ))}
+            </div>
+            <div className="v-bottom">
+              <div className="v-bottom-bg"/><div className="v-rp1"/><div className="v-rp2b"/>
+              <div className="v-bc">
+                <button className="v-btn v-btn-main" onClick={() => setMode("register")}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                  Qeydiyyatdan keç
+                </button>
+                <button className="v-btn v-btn-sec" onClick={() => setMode("login")}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                  Daxil ol
+                </button>
+                <div className="v-terms">Davam etməklə <a href="#">İstifadə Şərtlərini</a> qəbul edirsiniz</div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {mode === "login" && (
+          <div className="v-bottom" style={{ marginTop:16 }}>
+            <div className="v-bottom-bg"/><div className="v-rp1"/><div className="v-rp2b"/>
+            <div className="v-bc">
+              <button className="v-btn-back" onClick={() => { setMode("main"); setAuthError(""); }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+                Geri
+              </button>
+              <div className="v-div"><div className="v-dl"/><div className="v-dt">DAXİL OL</div><div className="v-dl"/></div>
+              <input className="v-inp" type="email" placeholder="Email ünvanı" value={email} onChange={e=>setEmail(e.target.value)} autoComplete="email"/>
+              <input className="v-inp" type="password" placeholder="Şifrə" value={password} onChange={e=>setPassword(e.target.value)} autoComplete="current-password" onKeyDown={e=>e.key==="Enter"&&doLogin()}/>
+              {authError && <div style={{color:"#ff6090",fontSize:12,textAlign:"center",marginBottom:10}}>{authError}</div>}
+              <button className="v-btn v-btn-main" onClick={doLogin} disabled={authLoading}>
+                {authLoading ? "Yüklənir..." : "Daxil ol"}
+              </button>
+              <button className="v-btn v-btn-sec" onClick={()=>{setMode("register");setAuthError("");}}>Hesabım yoxdur → Qeydiyyat</button>
+              <div className="v-terms"><a href="#">Şifrəni unutdum?</a></div>
+            </div>
           </div>
-        ))}
-      </div>
-      <div className="v-bottom">
-        <div className="v-bottom-bg"/><div className="v-rp1"/><div className="v-rp2b"/>
-        <div className="v-bc">
-          <div className="v-div"><div className="v-dl"/><div className="v-dt">DAXİL OL</div><div className="v-dl"/></div>
-          <button className="v-btn v-ba" onClick={() => signIn("apple")} disabled={!!loading}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-            {loading === "apple" ? "Yüklənir…" : "Apple ilə daxil ol"}
-          </button>
-          <button className="v-btn v-bg" onClick={() => signIn("google")} disabled={!!loading}>
-            <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#EA4335" d="M5.27 9.76A7.08 7.08 0 0 1 12 4.9c1.69 0 3.22.6 4.41 1.57l3.3-3.3A11.95 11.95 0 0 0 12 1C8.41 1 5.24 2.97 3.44 5.88l3.83 2.88z"/><path fill="#34A853" d="M16.04 18.01A7.07 7.07 0 0 1 12 19.1c-2.94 0-5.47-1.79-6.61-4.37l-3.83 2.88A11.97 11.97 0 0 0 12 23c3.05 0 5.88-1.14 8.01-3l-3.97-1.99z"/><path fill="#4A90D9" d="M20.01 12c0-.69-.07-1.36-.18-2H12v3.79h4.51a4 4 0 0 1-1.67 2.56l3.97 1.99C20.45 16.59 21 14.42 21 12z"/><path fill="#FBBC05" d="M5.39 14.73A7.06 7.06 0 0 1 4.9 12c0-.95.17-1.87.49-2.73L1.56 6.39A11.97 11.97 0 0 0 1 12c0 1.93.46 3.75 1.27 5.38l3.12-2.65z"/></svg>
-            {loading === "google" ? "Yüklənir…" : "Google ilə daxil ol"}
-          </button>
-          <button className="v-btn v-bp">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="17" r="1" fill="#c084fc"/></svg>
-            Telefon nömrəsi
-          </button>
-          {error && <p style={{ color:"#ff3ea5", fontSize:12, textAlign:"center", marginTop:8 }}>{error}</p>}
-          <div className="v-terms">Davam etməklə <a href="#">İstifadə Şərtlərini</a> və <a href="#">Gizlilik Siyasətini</a> qəbul edirsiniz</div>
-        </div>
-      </div>
+        )}
+
+        {mode === "register" && (
+          <div className="v-bottom" style={{ marginTop:16 }}>
+            <div className="v-bottom-bg"/><div className="v-rp1"/><div className="v-rp2b"/>
+            <div className="v-bc">
+              <button className="v-btn-back" onClick={() => { setMode("main"); setAuthError(""); }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+                Geri
+              </button>
+              <div className="v-div"><div className="v-dl"/><div className="v-dt">QEYDİYYAT</div><div className="v-dl"/></div>
+              <input className="v-inp" type="text" placeholder="İstifadəçi adı" value={username} onChange={e=>setUsername(e.target.value)} autoComplete="username"/>
+              <input className="v-inp" type="email" placeholder="Email ünvanı" value={email} onChange={e=>setEmail(e.target.value)} autoComplete="email"/>
+              <input className="v-inp" type="password" placeholder="Şifrə (min. 6 simvol)" value={password} onChange={e=>setPassword(e.target.value)} autoComplete="new-password"/>
+              <input className="v-inp" type="number" placeholder="Yaş" value={age} onChange={e=>setAge(e.target.value)} style={{marginBottom:14}}/>
+              {authError && <div style={{color:"#ff6090",fontSize:12,textAlign:"center",marginBottom:10}}>{authError}</div>}
+              {authSuccess && <div style={{color:"#50c050",fontSize:12,textAlign:"center",marginBottom:10}}>{authSuccess}</div>}
+              <button className="v-btn v-btn-main" onClick={doRegister} disabled={authLoading}>
+                {authLoading ? "Yüklənir..." : "Hesab yarat"}
+              </button>
+              <button className="v-btn v-btn-sec" onClick={()=>{setMode("login");setAuthError("");}}>Artıq hesabım var → Daxil ol</button>
+              <div className="v-terms">Qeydiyyatla <a href="#">İstifadə Şərtlərini</a> qəbul edirsiniz</div>
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );
