@@ -565,16 +565,21 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
         .h-orb2{position:absolute;width:200px;height:200px;border-radius:50%;background:#ff3ea5;opacity:.06;top:-20px;right:-40px;pointer-events:none}
         .h-scroll{flex:1;overflow-y:auto;padding-bottom:80px}
         .h-scroll::-webkit-scrollbar{display:none}
-        .topbar{display:flex;align-items:center;padding:max(16px,env(safe-area-inset-top)) 16px 10px;gap:10px;position:relative;z-index:10}
-        .t-av{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#7b2ff7,#ff3ea5);border:2px solid rgba(192,132,252,.5);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#fff;flex-shrink:0}
-        .t-coins{display:flex;align-items:center;gap:6px;background:rgba(10,0,30,.6);border:1px solid rgba(255,180,0,.3);border-radius:24px;padding:5px 10px 5px 5px}
+        .topbar{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;padding:max(14px,env(safe-area-inset-top)) 16px 12px;gap:10px;position:relative;z-index:10;background:rgba(245,245,247,.82);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(85,62,120,.07)}
+        .t-person{display:flex;align-items:center;gap:10px;min-width:0;cursor:pointer}
+        .t-av{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#7b2ff7,#ff3ea5);border:2px solid rgba(255,255,255,.9);box-shadow:0 5px 14px rgba(91,47,155,.22);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#fff;flex-shrink:0}
+        .t-copy{min-width:0;display:flex;flex-direction:column;gap:2px}
+        .t-kicker{font-size:10px;line-height:1.2;color:rgba(55,37,86,.48);font-weight:650}
+        .t-name{font-size:15px;line-height:1.2;color:#1a1a2e;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .t-actions{display:flex;align-items:center;gap:7px;flex-shrink:0}
+        .t-coins{height:38px;display:flex;align-items:center;gap:5px;background:#fff;border:1px solid rgba(121,89,162,.12);border-radius:12px;padding:4px 6px 4px 5px;box-shadow:0 4px 14px rgba(55,38,90,.06)}
         .coin-hex{width:26px;height:26px;position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0}
         .coin-hex-bg{position:absolute;inset:0;background:linear-gradient(135deg,#ffd700,#ff8c00);clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%)}
         .coin-hex-v{position:relative;z-index:1;font-size:9px;font-weight:900;color:#5a2800;font-style:italic}
-        .t-coin-num{font-size:13px;font-weight:800;color:#ffd700}
-        .t-add{width:20px;height:20px;border-radius:50%;background:rgba(123,47,247,.5);border:1px solid rgba(192,132,252,.4);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-        .t-icon-btn{width:38px;height:38px;border-radius:50%;background:rgba(100,80,160,.09);border:1px solid rgba(100,80,160,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-        .t-notif-dot{position:absolute;top:1px;right:1px;width:9px;height:9px;border-radius:50%;background:#ff3ea5;border:2px solid #0a0018}
+        .t-coin-num{font-size:12px;font-weight:850;color:#735019}
+        .t-add{width:20px;height:20px;border-radius:7px;background:#7b2ff7;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .t-icon-btn{width:38px;height:38px;border-radius:12px;background:#fff!important;border:1px solid rgba(121,89,162,.12)!important;color:#513778!important;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0!important;box-shadow:0 4px 14px rgba(55,38,90,.06)}
+        .t-notif-dot{position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#ef3f74;border:2px solid #f5f5f7;color:#fff;font-size:8px;font-weight:850;display:flex;align-items:center;justify-content:center}
         .hero-box{margin:8px 16px 14px;border-radius:24px;overflow:hidden;position:relative;height:150px}
         .hero-bg2{position:absolute;inset:0;background:#0d0022}
         .hero-g1{position:absolute;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(123,47,247,.35) 0%,transparent 70%);top:-40px;left:-20px;animation:vpulse 3s ease-in-out infinite}
@@ -633,18 +638,24 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
 
       {/* TOPBAR */}
       <div className="topbar">
-        <div className="t-av">D</div>
-        <div className="t-coins">
-          <div className="coin-hex"><div className="coin-hex-bg"/><span className="coin-hex-v">V</span></div>
-          <span className="t-coin-num">210</span>
-          <div className="t-add"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="3.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
-        </div>
-        <div style={{ marginLeft:"auto", display:"flex", gap:8 }}>
-          <div style={{ position:"relative" }}>
-            <div className="t-icon-btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a3a7a" strokeWidth="2" strokeLinecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
-            <div className="t-notif-dot"/>
+        <div className="t-person" onClick={onProfile} role="button" tabIndex={0} aria-label="Profilə keç">
+          <div className="t-av">{name.trim().charAt(0).toUpperCase() || "V"}</div>
+          <div className="t-copy">
+            <span className="t-kicker">Xoş gəldin</span>
+            <span className="t-name">{name}</span>
           </div>
-          <div className="t-icon-btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5a3a7a" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+        </div>
+        <div className="t-actions">
+          <div className="t-coins" aria-label="210 Velvet jetonu">
+            <div className="coin-hex"><div className="coin-hex-bg"/><span className="coin-hex-v">V</span></div>
+            <span className="t-coin-num">210</span>
+            <span className="t-add"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
+          </div>
+          <div style={{ position:"relative" }}>
+            <button type="button" className="t-icon-btn" aria-label="Bildirişlər"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></button>
+            <span className="t-notif-dot">3</span>
+          </div>
+          <button type="button" className="t-icon-btn" aria-label="Axtar"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></button>
         </div>
       </div>
 
