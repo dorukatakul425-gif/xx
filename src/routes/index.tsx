@@ -438,23 +438,109 @@ function LoginScreen({ signIn, loading, error, demoLogin }: { signIn: (p: "googl
 /* ─── NAV BAR ─── */
 function BottomNav({ active, onHome, onRoom, onProfile }: { active: Screen; onHome: () => void; onRoom: () => void; onProfile: () => void }) {
   const items = [
-    { key:"home", label:"Ana səhifə", onTap: onHome, icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> },
-    { key:"games", label:"Oyunlar", onTap: onHome, icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="2" y="6" width="20" height="12" rx="6"/><path d="M8 12h4M10 10v4"/><circle cx="16" cy="11" r="1" fill="currentColor"/><circle cx="18" cy="13" r="1" fill="currentColor"/></svg> },
-    { key:"room", label:"Otaq", onTap: onRoom, icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 2a3 3 0 013 3v7a3 3 0 01-6 0V5a3 3 0 013-3z"/><path d="M19 10a7 7 0 01-14 0"/><line x1="12" y1="19" x2="12" y2="23"/></svg> },
-    { key:"messages", label:"Mesajlar", onTap: onHome, badge:"18", icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> },
-    { key:"profile", label:"Profil", onTap: onProfile, icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> },
-  ] as const;
+    { key:"home", label:"Ana Səhifə", onTap: onHome,
+      icon: (on: boolean) => (
+        <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+          <defs>
+            <linearGradient id="nh1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={on?"#c084fc":"#b0a8c8"}/><stop offset="100%" stopColor={on?"#7b2ff7":"#8880a0"}/></linearGradient>
+            <linearGradient id="nh2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={on?"#e0b0ff":"#d8d0e8"}/><stop offset="100%" stopColor={on?"#c084fc":"#b0a8c8"}/></linearGradient>
+            <filter id="nhf"><feDropShadow dx="0" dy="2" stdDeviation="1.5" floodColor={on?"rgba(123,47,247,.4)":"rgba(0,0,0,.15)"}/></filter>
+          </defs>
+          <g filter="url(#nhf)">
+            <path d="M4 14L16 4l12 10v14a2 2 0 01-2 2H6a2 2 0 01-2-2V14z" fill="url(#nh1)"/>
+            <path d="M4 14L16 4l12 10" fill="url(#nh2)" opacity=".9"/>
+            <rect x="11" y="18" width="10" height="10" rx="1.5" fill={on?"rgba(255,255,255,.25)":"rgba(255,255,255,.15)"}/>
+            <rect x="13" y="22" width="6" height="6" rx="1" fill={on?"rgba(255,255,255,.35)":"rgba(255,255,255,.2)"}/>
+            <path d="M4 14L16 4l12 10" fill="none" stroke={on?"rgba(255,255,255,.4)":"rgba(255,255,255,.2)"} strokeWidth="1"/>
+          </g>
+        </svg>
+      )
+    },
+    { key:"games", label:"Oyunlar", onTap: onHome,
+      icon: (on: boolean) => (
+        <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+          <defs>
+            <linearGradient id="ng1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={on?"#ff80c0":"#c0a0b8"}/><stop offset="100%" stopColor={on?"#ff3ea5":"#9080a0"}/></linearGradient>
+            <filter id="ngf"><feDropShadow dx="0" dy="2" stdDeviation="1.5" floodColor={on?"rgba(255,62,165,.4)":"rgba(0,0,0,.15)"}/></filter>
+          </defs>
+          <g filter="url(#ngf)">
+            <rect x="2" y="9" width="28" height="16" rx="8" fill="url(#ng1)"/>
+            <rect x="2" y="9" width="28" height="8" rx="8" fill={on?"rgba(255,255,255,.2)":"rgba(255,255,255,.1)"}/>
+            <line x1="9" y1="17" x2="13" y2="17" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+            <line x1="11" y1="15" x2="11" y2="19" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+            <circle cx="21" cy="15" r="1.5" fill="white"/>
+            <circle cx="24" cy="18" r="1.5" fill="white"/>
+          </g>
+        </svg>
+      )
+    },
+    { key:"room", label:"Otaq", onTap: onRoom,
+      icon: (on: boolean) => (
+        <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+          <defs>
+            <linearGradient id="nr1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={on?"#60e0ff":"#a0c8d8"}/><stop offset="100%" stopColor={on?"#00d4ff":"#60a0c0"}/></linearGradient>
+            <filter id="nrf"><feDropShadow dx="0" dy="2" stdDeviation="1.5" floodColor={on?"rgba(0,212,255,.4)":"rgba(0,0,0,.15)"}/></filter>
+          </defs>
+          <g filter="url(#nrf)">
+            <ellipse cx="16" cy="13" rx="7" ry="8" fill="url(#nr1)"/>
+            <ellipse cx="16" cy="11" rx="7" ry="5" fill={on?"rgba(255,255,255,.25)":"rgba(255,255,255,.15)"}/>
+            <rect x="15" y="21" width="2" height="6" rx="1" fill="url(#nr1)"/>
+            <ellipse cx="16" cy="27" rx="4" ry="1.5" fill={on?"rgba(0,212,255,.4)":"rgba(100,150,180,.3)"}/>
+          </g>
+        </svg>
+      )
+    },
+    { key:"messages", label:"Mesajlar", onTap: onHome, badge:"18",
+      icon: (on: boolean) => (
+        <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+          <defs>
+            <linearGradient id="nm1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={on?"#60ff90":"#90c8a0"}/><stop offset="100%" stopColor={on?"#00c050":"#508060"}/></linearGradient>
+            <filter id="nmf"><feDropShadow dx="0" dy="2" stdDeviation="1.5" floodColor={on?"rgba(0,192,80,.4)":"rgba(0,0,0,.15)"}/></filter>
+          </defs>
+          <g filter="url(#nmf)">
+            <path d="M3 5h26a2 2 0 012 2v14a2 2 0 01-2 2H9l-6 6V7a2 2 0 012-2z" fill="url(#nm1)"/>
+            <path d="M3 5h26a2 2 0 012 2v7H3V5z" fill={on?"rgba(255,255,255,.2)":"rgba(255,255,255,.1)"}/>
+            <line x1="9" y1="13" x2="23" y2="13" stroke="white" strokeWidth="1.5" strokeLinecap="round" opacity=".6"/>
+            <line x1="9" y1="17" x2="18" y2="17" stroke="white" strokeWidth="1.5" strokeLinecap="round" opacity=".4"/>
+          </g>
+        </svg>
+      )
+    },
+    { key:"profile", label:"Profil", onTap: onProfile,
+      icon: (on: boolean) => (
+        <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+          <defs>
+            <linearGradient id="np1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={on?"#ffd700":"#c8c0a0"}/><stop offset="100%" stopColor={on?"#ff9500":"#908070"}/></linearGradient>
+            <linearGradient id="np2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={on?"#c084fc":"#b0a0c8"}/><stop offset="100%" stopColor={on?"#7b2ff7":"#806090"}/></linearGradient>
+            <filter id="npf"><feDropShadow dx="0" dy="2" stdDeviation="1.5" floodColor={on?"rgba(255,150,0,.4)":"rgba(0,0,0,.15)"}/></filter>
+          </defs>
+          <g filter="url(#npf)">
+            <circle cx="16" cy="11" r="6" fill="url(#np1)"/>
+            <ellipse cx="16" cy="9" rx="6" ry="3.5" fill={on?"rgba(255,255,255,.3)":"rgba(255,255,255,.15)"}/>
+            <path d="M4 28a12 12 0 0124 0" fill="url(#np2)"/>
+            <path d="M4 28a12 12 0 0124 0" fill={on?"rgba(255,255,255,.15)":"rgba(255,255,255,.08)"} clipPath="inset(0 0 50% 0)"/>
+          </g>
+        </svg>
+      )
+    },
+  ];
+
   return (
-    <nav style={{ position:"fixed", bottom:0, left:0, right:0, background:"rgba(7,0,15,.97)", borderTop:"1px solid rgba(123,47,247,.15)", display:"flex", paddingBottom:`max(8px,env(safe-area-inset-bottom))`, zIndex:100 }}>
-      {items.map(it => (
-        <button key={it.key} onClick={it.onTap} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:3, paddingTop:10, paddingBottom:4, background:"none", border:"none", cursor:"pointer", color: active === it.key ? "#c084fc" : "rgba(80,60,140,.2)", position:"relative" }}>
-          <div style={{ position:"relative" }}>
-            {it.icon}
-            {"badge" in it && it.badge && <span style={{ position:"absolute", top:-5, right:-7, minWidth:14, height:14, borderRadius:7, background:"#ff3ea5", border:"2px solid #07000f", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#1a1a2e", fontWeight:700, padding:"0 2px" }}>{it.badge}</span>}
-          </div>
-          <span style={{ fontSize:9, fontWeight:600, letterSpacing:.3 }}>{it.label}</span>
-        </button>
-      ))}
+    <nav style={{ position:"fixed", bottom:0, left:0, right:0, background:"rgba(255,255,255,.97)", backdropFilter:"blur(20px)", borderTop:"1px solid rgba(100,80,160,.1)", display:"flex", paddingBottom:`max(8px,env(safe-area-inset-bottom))`, zIndex:100, boxShadow:"0 -4px 24px rgba(80,60,140,.08)" }}>
+      {items.map(it => {
+        const on = active === it.key;
+        return (
+          <button key={it.key} onClick={it.onTap} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:2, paddingTop:10, paddingBottom:4, background:"none", border:"none", cursor:"pointer", position:"relative", transition:".2s" }}>
+            {/* Aktiv indicator */}
+            {on && <div style={{ position:"absolute", top:0, left:"50%", transform:"translateX(-50%)", width:28, height:3, borderRadius:"0 0 3px 3px", background:"linear-gradient(90deg,#7b2ff7,#c084fc)" }}/>}
+            <div style={{ position:"relative", transform: on ? "scale(1.1)" : "scale(1)", transition:"transform .2s" }}>
+              {it.icon(on)}
+              {"badge" in it && it.badge && <span style={{ position:"absolute", top:-4, right:-8, minWidth:14, height:14, borderRadius:7, background:"#ff3ea5", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#fff", fontWeight:800, padding:"0 3px" }}>{it.badge}</span>}
+            </div>
+            <span style={{ fontSize:9, fontWeight: on ? 700 : 500, letterSpacing:.2, color: on ? "#7b2ff7" : "rgba(80,60,140,.35)" }}>{it.label}</span>
+          </button>
+        );
+      })}
     </nav>
   );
 }
@@ -652,6 +738,17 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
 }
 
 /* ─── PROFILE ─── */
+const COUNTRY_FLAGS: Record<string,string> = {
+  "Azərbaycan":"🇦🇿","Türkiyə":"🇹🇷","Rusiya":"🇷🇺","ABŞ":"🇺🇸","Almaniya":"🇩🇪",
+  "Fransa":"🇫🇷","İngiltərə":"🇬🇧","İtaliya":"🇮🇹","İspaniya":"🇪🇸","Hollandiya":"🇳🇱",
+  "Belçika":"🇧🇪","Polşa":"🇵🇱","Ukrayna":"🇺🇦","Gürcüstan":"🇬🇪","Qazaxıstan":"🇰🇿",
+  "Özbəkistan":"🇺🇿","Türkmənistan":"🇹🇲","İsveçrə":"🇨🇭","Avstriya":"🇦🇹","İsveç":"🇸🇪",
+  "Norveç":"🇳🇴","Danimarka":"🇩🇰","Finlandiya":"🇫🇮","Kanada":"🇨🇦","Avstraliya":"🇦🇺",
+  "Yaponiya":"🇯🇵","Çin":"🇨🇳","Hindistan":"🇮🇳","Braziliya":"🇧🇷","Argentina":"🇦🇷",
+  "Meksika":"🇲🇽","Cənubi Koreya":"🇰🇷","İran":"🇮🇷","Ərəbistan":"🇸🇦","BƏƏ":"🇦🇪",
+  "Qatar":"🇶🇦","Küveyt":"🇰🇼","İordaniya":"🇯🇴","Misir":"🇪🇬","Cənubi Afrika":"🇿🇦",
+};
+
 const COUNTRY_CITIES: Record<string, string[]> = {
   "Azərbaycan": ["Bakı","Gəncə","Sumqayıt","Mingəçevir","Naxçıvan","Lənkəran","Şirvan","Yevlax","Şuşa","Ağdam","Bərdə","Goranboy","Göyçay","İmişli","Kürdəmir","Masallı","Saatlı","Salyan","Sabirabad","Şamaxı","Şəki","Şəmkir","Zaqatala","Balakən","Qax","Quba","Qusar","Lerik","Astara","Cəlilabad","Füzuli","Xocavənd","Laçın","Kəlbəcər","Ağcabədi","Ağdaş","Ağstafa","Ağsu","Biləsuvar","Daşkəsən","Gədəbəy","Gobustan","Hacıqabul","Xızı","İsmayıllı","Neftçala","Oğuz","Qazax","Qəbələ","Samux","Şahbuz","Şərur","Terter","Tovuz","Ucar"],
   "Türkiyə": ["İstanbul","Ankara","İzmir","Bursa","Antalya","Adana","Konya","Gaziantep","Şanlıurfa","Kayseri","Mersin","Eskişehir","Trabzon","Samsun","Diyarbakır","Van","Malatya","Erzurum","Kocaeli","Balıkesir"],
@@ -882,7 +979,7 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
           {/* Meta pillər */}
           <div style={{ display:"flex", flexWrap:"wrap", gap:6, marginBottom:4 }}>
             {[
-              { icon:<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(80,60,140,.4)" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20"/></svg>, txt:profileData.country },
+              { icon:<span style={{fontSize:13,lineHeight:1}}>{COUNTRY_FLAGS[profileData.country]||"🌍"}</span>, txt:profileData.country },
               { icon:<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(80,60,140,.4)" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="2"/></svg>, txt:profileData.city },
               { icon:<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(80,60,140,.4)" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>, txt:`${profileData.age} yaş` },
               { icon:<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(80,60,140,.4)" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>, txt:`${joinedDate} gün` },
@@ -1328,7 +1425,7 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
         const IcUser = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(40,20,80,.65)" strokeWidth="2" strokeLinecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
         const IcGender = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(40,20,80,.65)" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="8" r="4"/><path d="M20 21v-1a8 8 0 00-16 0v1"/></svg>;
         const IcAge = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(40,20,80,.65)" strokeWidth="2" strokeLinecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>;
-        const IcGlobe = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(40,20,80,.65)" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>;
+        const IcGlobe = <span style={{fontSize:18,lineHeight:1}}>{COUNTRY_FLAGS[draft.country]||"🌍"}</span>;
         const IcMap = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(40,20,80,.65)" strokeWidth="2" strokeLinecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>;
         const IcBio = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(40,20,80,.65)" strokeWidth="2" strokeLinecap="round"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg>;
         const IcImg = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(40,20,80,.65)" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>;
