@@ -1901,6 +1901,8 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
   const [msgs, setMsgs] = useState<Message[]>([]);
   const [draftMsg, setDraftMsg] = useState("");
   const [kb, setKb] = useState(0);
+  const [typing, setTyping] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
   const feedRef = useRef<HTMLDivElement>(null);
   const myId = session ? session.user.id : "demo";
 
@@ -2008,8 +2010,8 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
                       </span>
                     </>
                   ) : (
-                    <div style={{ width:46, height:46, borderRadius:"50%", background:"linear-gradient(160deg,#ffffff,#eeeaf6)", border:".5px solid rgba(20,10,40,.08)", boxShadow:"inset 0 1px 0 #fff, 0 2px 6px rgba(20,10,40,.06)", display:"flex", alignItems:"center", justifyContent:"center", color:"#b4aecb" }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M7 11V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v5"/><path d="M5 11h14v3H5z"/><path d="M7 14v6M17 14v6"/></svg>
+                    <div style={{ width:46, height:46, borderRadius:"50%", background:"linear-gradient(160deg,#ffffff,#f1edf8)", border:"1.5px dashed rgba(123,47,247,.28)", boxShadow:"0 2px 6px rgba(20,10,40,.05)", display:"flex", alignItems:"center", justifyContent:"center", color:"#7b2ff7" }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
                     </div>
                   )}
                 </div>
@@ -2019,8 +2021,27 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
           })}
         </div>
 
-        {/* Oturacaqlar ilə söhbət arası */}
-        <div style={{ height:22 }}/>
+        {/* İZLƏYİCİLƏR ZOLAĞI */}
+        {(() => {
+          const demoV = ["Aynur","Rauf","Sevinc","Tural","Nigar","Kənan","Leyla","Orxan","Aysel","Elvin"];
+          const cols = ["#7b2ff7","#ff3ea5","#00b4d8","#ff9f0a","#22c55e","#af52de","#ff375f","#0a84ff","#5856d6","#34c759"];
+          const viewers = session ? members.map((m: Member) => (m.user_id === session.user.id ? name : "Üzv")) : [name, ...demoV];
+          return (
+            <div style={{ display:"flex", alignItems:"center", gap:10, margin:"20px 0 12px" }}>
+              <div style={{ flex:1, minWidth:0, overflowX:"auto", WebkitOverflowScrolling:"touch", scrollbarWidth:"none", display:"flex", gap:6, paddingBottom:2 }}>
+                {viewers.map((v: string, i: number) => (
+                  <div key={i} title={v} style={{ width:30, height:30, borderRadius:"50%", flexShrink:0, background:cols[i % cols.length], border:"2px solid #fff", boxShadow:"0 1px 4px rgba(20,10,40,.12)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:12, fontWeight:700, overflow:"hidden" }}>
+                    {i === 0 && !session && avatarUrl ? <img src={avatarUrl} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }}/> : v[0]?.toUpperCase()}
+                  </div>
+                ))}
+              </div>
+              <div style={{ flexShrink:0, height:30, padding:"0 10px", borderRadius:15, background:"#fff", border:".5px solid rgba(20,10,40,.08)", boxShadow:"0 1px 4px rgba(20,10,40,.06)", display:"flex", alignItems:"center", gap:5, color:"#111", fontSize:13, fontWeight:600 }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c.8-3.7 3.7-5.7 7.5-5.7s6.7 2 7.5 5.7"/></svg>
+                {viewers.length}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* OTAQ SÖHBƏTİ */}
         <div ref={feedRef} style={{ marginTop:0, maxHeight:"30dvh", overflowY:"auto", overscrollBehavior:"contain", display:"flex", flexDirection:"column", gap:10 }}>
@@ -2044,19 +2065,50 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
         </div>
         {error ? <p style={{ color:"#ff3ea5", fontSize:11, textAlign:"center", marginTop:12 }}>{error}</p> : null}
       </div>
+      {/* YAZARKƏN: mesajlar ekranın ortasında, arxada otaq şəffaf görünür */}
+      {typing && (
+        <div onMouseDown={e => { e.preventDefault(); inputRef.current?.blur(); }} onTouchStart={() => inputRef.current?.blur()}
+          style={{ position:"fixed", left:0, right:0, top:0, bottom: kb + 58, zIndex:45, background:"rgba(245,245,247,.55)", backdropFilter:"blur(6px)", WebkitBackdropFilter:"blur(6px)", display:"flex", flexDirection:"column", justifyContent:"center", padding:"max(16px,env(safe-area-inset-top)) 14px 12px", animation:"vfadeIn .18s ease" }}>
+          <div onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()}
+            ref={el => { if (el) el.scrollTop = el.scrollHeight; }}
+            style={{ maxHeight:"100%", overflowY:"auto", display:"flex", flexDirection:"column", gap:10 }}>
+            {msgs.slice(-30).map(m => {
+              const me = m.user_id === myId;
+              return (
+                <div key={m.id} style={{ display:"flex", gap:8, alignItems:"flex-start" }}>
+                  <div style={{ width:34, height:34, borderRadius:"50%", flexShrink:0, overflow:"hidden", background:"linear-gradient(135deg,#7b2ff7,#ff3ea5)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:13, fontWeight:700, border:"2px solid #fff" }}>
+                    {m.avatar_url ? <img src={m.avatar_url} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }}/> : (m.display_name?.[0]?.toUpperCase() || "?")}
+                  </div>
+                  <div style={{ minWidth:0, maxWidth:"80%" }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:4, marginBottom:3 }}>
+                      <span style={{ fontSize:12, fontWeight:600, color: me ? "#7b2ff7" : "#3a3a3c" }}>{m.display_name}</span>
+                      <img src="/images/images/vlogo15.png" alt="" style={{ height:15, width:"auto" }}/>
+                    </div>
+                    <div style={{ display:"inline-block", background: me ? "rgba(239,231,255,.95)" : "rgba(255,255,255,.95)", border:".5px solid rgba(20,10,40,.08)", boxShadow:"0 2px 8px rgba(20,10,40,.08)", borderRadius:16, borderTopLeftRadius:5, padding:"7px 12px", fontSize:14, lineHeight:1.4, color:"#111", wordBreak:"break-word" }}>{m.content}</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* ALT PANEL — mesaj sahəsi + ikonlar */}
       <div style={{ position:"fixed", bottom:kb, left:0, right:0, zIndex:50, background:"rgba(255,255,255,.92)", backdropFilter:"saturate(1.8) blur(20px)", WebkitBackdropFilter:"saturate(1.8) blur(20px)", borderTop:".5px solid rgba(20,10,40,.1)", padding:"8px 12px max(8px,env(safe-area-inset-bottom))", display:"flex", alignItems:"center", gap:8 }}>
         <input
           value={draftMsg}
           onChange={e => setDraftMsg(e.target.value)}
           onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); sendMsg(); } }}
+          ref={inputRef}
+          onFocus={() => setTyping(true)}
+          onBlur={() => setTimeout(() => setTyping(false), 120)}
           placeholder="Mesaj yaz…"
           enterKeyHint="send"
           autoComplete="off"
           style={{ flex:1, minWidth:0, height:40, borderRadius:20, background:"#f4f2f8", border:0, outline:"none", padding:"0 16px", fontSize:16, color:"#111", fontFamily:"inherit" }}
         />
         {draftMsg.trim() && (
-          <button onClick={sendMsg} aria-label="Göndər" style={{ width:40, height:40, borderRadius:"50%", border:0, flexShrink:0, background:"#7b2ff7", color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}>
+          <button onMouseDown={e => e.preventDefault()} onClick={sendMsg} aria-label="Göndər" style={{ width:40, height:40, borderRadius:"50%", border:0, flexShrink:0, background:"#7b2ff7", color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
           </button>
         )}
