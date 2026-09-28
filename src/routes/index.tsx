@@ -447,107 +447,51 @@ function LoginScreen({ signIn, loading, error, demoLogin }: { signIn: (p: "googl
 
 /* ─── NAV BAR ─── */
 function BottomNav({ active, onHome, onRoom, onProfile }: { active: Screen; onHome: () => void; onRoom: () => void; onProfile: () => void }) {
+  const sw = 1.8;
   const items = [
-    { key:"home", label:"Ana Səhifə", onTap: onHome,
-      icon: (on: boolean) => (
-        <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
-          <defs>
-            <linearGradient id="nh1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={on?"#c084fc":"#b0a8c8"}/><stop offset="100%" stopColor={on?"#7b2ff7":"#8880a0"}/></linearGradient>
-            <linearGradient id="nh2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={on?"#e0b0ff":"#d8d0e8"}/><stop offset="100%" stopColor={on?"#c084fc":"#b0a8c8"}/></linearGradient>
-            <filter id="nhf"><feDropShadow dx="0" dy="2" stdDeviation="1.5" floodColor={on?"rgba(123,47,247,.4)":"rgba(0,0,0,.15)"}/></filter>
-          </defs>
-          <g filter="url(#nhf)">
-            <path d="M4 14L16 4l12 10v14a2 2 0 01-2 2H6a2 2 0 01-2-2V14z" fill="url(#nh1)"/>
-            <path d="M4 14L16 4l12 10" fill="url(#nh2)" opacity=".9"/>
-            <rect x="11" y="18" width="10" height="10" rx="1.5" fill={on?"rgba(255,255,255,.25)":"rgba(255,255,255,.15)"}/>
-            <rect x="13" y="22" width="6" height="6" rx="1" fill={on?"rgba(255,255,255,.35)":"rgba(255,255,255,.2)"}/>
-            <path d="M4 14L16 4l12 10" fill="none" stroke={on?"rgba(255,255,255,.4)":"rgba(255,255,255,.2)"} strokeWidth="1"/>
-          </g>
-        </svg>
-      )
-    },
-    { key:"games", label:"Oyunlar", onTap: onHome,
-      icon: (on: boolean) => (
-        <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
-          <defs>
-            <linearGradient id="ng1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={on?"#ff80c0":"#c0a0b8"}/><stop offset="100%" stopColor={on?"#ff3ea5":"#9080a0"}/></linearGradient>
-            <filter id="ngf"><feDropShadow dx="0" dy="2" stdDeviation="1.5" floodColor={on?"rgba(255,62,165,.4)":"rgba(0,0,0,.15)"}/></filter>
-          </defs>
-          <g filter="url(#ngf)">
-            <rect x="2" y="9" width="28" height="16" rx="8" fill="url(#ng1)"/>
-            <rect x="2" y="9" width="28" height="8" rx="8" fill={on?"rgba(255,255,255,.2)":"rgba(255,255,255,.1)"}/>
-            <line x1="9" y1="17" x2="13" y2="17" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-            <line x1="11" y1="15" x2="11" y2="19" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-            <circle cx="21" cy="15" r="1.5" fill="white"/>
-            <circle cx="24" cy="18" r="1.5" fill="white"/>
-          </g>
-        </svg>
-      )
-    },
-    { key:"room", label:"Otaq", onTap: onRoom,
-      icon: (on: boolean) => (
-        <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
-          <defs>
-            <linearGradient id="nr1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={on?"#60e0ff":"#a0c8d8"}/><stop offset="100%" stopColor={on?"#00d4ff":"#60a0c0"}/></linearGradient>
-            <filter id="nrf"><feDropShadow dx="0" dy="2" stdDeviation="1.5" floodColor={on?"rgba(0,212,255,.4)":"rgba(0,0,0,.15)"}/></filter>
-          </defs>
-          <g filter="url(#nrf)">
-            <ellipse cx="16" cy="13" rx="7" ry="8" fill="url(#nr1)"/>
-            <ellipse cx="16" cy="11" rx="7" ry="5" fill={on?"rgba(255,255,255,.25)":"rgba(255,255,255,.15)"}/>
-            <rect x="15" y="21" width="2" height="6" rx="1" fill="url(#nr1)"/>
-            <ellipse cx="16" cy="27" rx="4" ry="1.5" fill={on?"rgba(0,212,255,.4)":"rgba(100,150,180,.3)"}/>
-          </g>
-        </svg>
-      )
-    },
-    { key:"messages", label:"Mesajlar", onTap: onHome, badge:"18",
-      icon: (on: boolean) => (
-        <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
-          <defs>
-            <linearGradient id="nm1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={on?"#60ff90":"#90c8a0"}/><stop offset="100%" stopColor={on?"#00c050":"#508060"}/></linearGradient>
-            <filter id="nmf"><feDropShadow dx="0" dy="2" stdDeviation="1.5" floodColor={on?"rgba(0,192,80,.4)":"rgba(0,0,0,.15)"}/></filter>
-          </defs>
-          <g filter="url(#nmf)">
-            <path d="M3 5h26a2 2 0 012 2v14a2 2 0 01-2 2H9l-6 6V7a2 2 0 012-2z" fill="url(#nm1)"/>
-            <path d="M3 5h26a2 2 0 012 2v7H3V5z" fill={on?"rgba(255,255,255,.2)":"rgba(255,255,255,.1)"}/>
-            <line x1="9" y1="13" x2="23" y2="13" stroke="white" strokeWidth="1.5" strokeLinecap="round" opacity=".6"/>
-            <line x1="9" y1="17" x2="18" y2="17" stroke="white" strokeWidth="1.5" strokeLinecap="round" opacity=".4"/>
-          </g>
-        </svg>
-      )
-    },
-    { key:"profile", label:"Profil", onTap: onProfile,
-      icon: (on: boolean) => (
-        <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
-          <defs>
-            <linearGradient id="np1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={on?"#ffd700":"#c8c0a0"}/><stop offset="100%" stopColor={on?"#ff9500":"#908070"}/></linearGradient>
-            <linearGradient id="np2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={on?"#c084fc":"#b0a0c8"}/><stop offset="100%" stopColor={on?"#7b2ff7":"#806090"}/></linearGradient>
-            <filter id="npf"><feDropShadow dx="0" dy="2" stdDeviation="1.5" floodColor={on?"rgba(255,150,0,.4)":"rgba(0,0,0,.15)"}/></filter>
-          </defs>
-          <g filter="url(#npf)">
-            <circle cx="16" cy="11" r="6" fill="url(#np1)"/>
-            <ellipse cx="16" cy="9" rx="6" ry="3.5" fill={on?"rgba(255,255,255,.3)":"rgba(255,255,255,.15)"}/>
-            <path d="M4 28a12 12 0 0124 0" fill="url(#np2)"/>
-            <path d="M4 28a12 12 0 0124 0" fill={on?"rgba(255,255,255,.15)":"rgba(255,255,255,.08)"} clipPath="inset(0 0 50% 0)"/>
-          </g>
-        </svg>
-      )
-    },
+    { key:"home", label:"Ana səhifə", onTap:onHome, icon:(on:boolean) => (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill={on?"currentColor":"none"} stroke="currentColor" strokeWidth={sw} strokeLinejoin="round" strokeLinecap="round">
+        <path d="M3.5 10.2 12 3.5l8.5 6.7V19a1.5 1.5 0 0 1-1.5 1.5h-4v-6h-6v6H5A1.5 1.5 0 0 1 3.5 19z"/>
+      </svg>
+    )},
+    { key:"games", label:"Oyunlar", onTap:onHome, icon:(on:boolean) => (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M7 7h10a4.5 4.5 0 0 1 4.4 3.6l.9 4.9a2.6 2.6 0 0 1-4.5 2.2L15.6 16H8.4l-2.2 1.7a2.6 2.6 0 0 1-4.5-2.2l.9-4.9A4.5 4.5 0 0 1 7 7z" fill={on?"currentColor":"none"}/>
+        <path d="M8 10v3M6.5 11.5h3" stroke={on?"#fff":"currentColor"}/>
+        <circle cx="15.5" cy="10.8" r=".9" fill={on?"#fff":"currentColor"} stroke="none"/>
+        <circle cx="17.3" cy="12.6" r=".9" fill={on?"#fff":"currentColor"} stroke="none"/>
+      </svg>
+    )},
+    { key:"room", label:"Otaq", onTap:onRoom, icon:(on:boolean) => (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round">
+        <rect x="8.5" y="2.8" width="7" height="12" rx="3.5" fill={on?"currentColor":"none"}/>
+        <path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>
+      </svg>
+    )},
+    { key:"messages", label:"Mesajlar", onTap:onHome, badge:"18", icon:(on:boolean) => (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill={on?"currentColor":"none"} stroke="currentColor" strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20.5 11.6c0 4.3-3.8 7.7-8.5 7.7-1.1 0-2.2-.2-3.2-.6L4 20l1.2-3.6a7.3 7.3 0 0 1-1.7-4.8C3.5 7.3 7.3 3.9 12 3.9s8.5 3.4 8.5 7.7z"/>
+      </svg>
+    )},
+    { key:"profile", label:"Profil", onTap:onProfile, icon:(on:boolean) => (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill={on?"currentColor":"none"} stroke="currentColor" strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="8" r="4"/>
+        <path d="M4.5 20.5c.8-3.7 3.7-5.7 7.5-5.7s6.7 2 7.5 5.7z"/>
+      </svg>
+    )},
   ];
-
   return (
-    <nav style={{ position:"fixed", bottom:0, left:0, right:0, background:"rgba(255,255,255,.97)", backdropFilter:"blur(20px)", borderTop:"1px solid rgba(100,80,160,.1)", display:"flex", paddingBottom:`max(8px,env(safe-area-inset-bottom))`, zIndex:100, boxShadow:"0 -4px 24px rgba(80,60,140,.08)" }}>
+    <nav aria-label="Əsas menyu" style={{ position:"fixed", bottom:0, left:0, right:0, zIndex:100, background:"rgba(255,255,255,.9)", backdropFilter:"saturate(1.8) blur(20px)", WebkitBackdropFilter:"saturate(1.8) blur(20px)", borderTop:".5px solid rgba(20,10,40,.1)", display:"flex", paddingBottom:"max(6px,env(safe-area-inset-bottom))" }}>
+      <style>{`.bn-it{flex:1;min-width:0;height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:0;padding:0;cursor:pointer;font-family:inherit;transition:color .18s}.bn-it:active .bn-ic{transform:scale(.86)}.bn-ic{position:relative;display:flex;transition:transform .15s}`}</style>
       {items.map(it => {
         const on = active === it.key;
         return (
-          <button key={it.key} onClick={it.onTap} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:2, paddingTop:10, paddingBottom:4, background:"none", border:"none", cursor:"pointer", position:"relative", transition:".2s" }}>
-            {/* Aktiv indicator */}
-            {on && <div style={{ position:"absolute", top:0, left:"50%", transform:"translateX(-50%)", width:28, height:3, borderRadius:"0 0 3px 3px", background:"linear-gradient(90deg,#7b2ff7,#c084fc)" }}/>}
-            <div style={{ position:"relative", transform: on ? "scale(1.1)" : "scale(1)", transition:"transform .2s" }}>
+          <button type="button" key={it.key} className="bn-it" onClick={it.onTap} aria-label={it.label} aria-current={on ? "page" : undefined} style={{ color: on ? "#7b2ff7" : "#8e8e93" }}>
+            <span className="bn-ic">
               {it.icon(on)}
-              {"badge" in it && it.badge && <span style={{ position:"absolute", top:-4, right:-8, minWidth:14, height:14, borderRadius:7, background:"#ff3ea5", display:"flex", alignItems:"center", justifyContent:"center", fontSize:7, color:"#fff", fontWeight:800, padding:"0 3px" }}>{it.badge}</span>}
-            </div>
-            <span style={{ fontSize:9, fontWeight: on ? 700 : 500, letterSpacing:.2, color: on ? "#7b2ff7" : "rgba(80,60,140,.35)" }}>{it.label}</span>
+              {"badge" in it && it.badge && <span style={{ position:"absolute", top:-4, right:-9, minWidth:17, height:17, padding:"0 4px", borderRadius:9, background:"#ff3b30", color:"#fff", fontSize:10, fontWeight:700, display:"flex", alignItems:"center", justifyContent:"center", border:"2px solid #fff" }}>{it.badge}</span>}
+            </span>
+            <span style={{ fontSize:10, fontWeight: on ? 600 : 500, letterSpacing:.1, whiteSpace:"nowrap" }}>{it.label}</span>
           </button>
         );
       })}
@@ -646,30 +590,24 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
       {/* TOPBAR */}
       <header className="topbar">
         <div className="tb-row">
-          <button type="button" className="tb-user" onClick={onProfile} aria-label="Profil">
-            <div className="tb-av">
-              <div className="tb-av-in">{(() => { try { const a = localStorage.getItem("profile_avatar"); return a ? <img src={a} alt=""/> : (name.trim()[0]?.toUpperCase() || "V"); } catch { return "V"; } })()}</div>
-              <span className="tb-dot"/>
-            </div>
-            <div className="tb-txt">
-              <span className="tb-hi">Xoş gəldin</span>
-              <span className="tb-name">{name}</span>
-            </div>
+          <button type="button" className="tb-av" onClick={onProfile} aria-label="Profil" style={{ border:0, cursor:"pointer" }}>
+            <div className="tb-av-in">{(() => { try { const a = localStorage.getItem("profile_avatar"); return a ? <img src={a} alt=""/> : (name.trim()[0]?.toUpperCase() || "V"); } catch { return "V"; } })()}</div>
+            <span className="tb-dot"/>
           </button>
-          <button type="button" className="tb-coin" aria-label="Jeton">
+          <button type="button" className="tb-coin" aria-label="Jeton yüklə" style={{ marginLeft:6 }}>
             <img src="/images/images/jeton.PNG" alt=""/>
             <b>{(() => { try { return parseInt(localStorage.getItem("velvet_jeton") || "10000").toLocaleString(); } catch { return "0"; } })()}</b>
             <span className="tb-plus"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
           </button>
-          <button type="button" className="tb-btn" aria-label="Bildirişlər">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            <span className="tb-badge">3</span>
-          </button>
+          <div style={{ marginLeft:"auto", display:"flex", gap:8 }}>
+            <button type="button" className="tb-btn" aria-label="Axtar">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            </button>
+            <button type="button" aria-label="Gündəlik bonus" style={{ width:38, height:38, border:0, background:"none", padding:0, cursor:"pointer", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
+              <img src="/images/images/icon.gif" alt="" style={{ width:38, height:38, objectFit:"contain", display:"block" }}/>
+            </button>
+          </div>
         </div>
-        <label className="tb-search">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-          <input type="search" placeholder="Otaq və ya istifadəçi axtar"/>
-        </label>
       </header>
 
       <div className="h-scroll">
