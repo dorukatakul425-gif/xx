@@ -1,7 +1,7 @@
 // @ts-nocheck — imported prototype contains intentionally loose backend response shapes.
 import { ClientOnly, createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { BadgeHelp, ChevronRight, Crown, Gift, Grid2X2, Heart, Info, LogOut, Medal, MessageCircle, Mic, MicOff, MoreHorizontal, Plus, Radio, Send, Settings, ShieldCheck, ShoppingBag, Trophy, Users, WalletCards, X } from "lucide-react";
+import { BadgeHelp, ChevronRight, Crown, Gift, LogOut, Medal, MessageCircle, Mic, MicOff, MoreHorizontal, Radio, Send, Settings, ShieldCheck, ShoppingBag, Users, WalletCards, X } from "lucide-react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -1895,6 +1895,9 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
   );
 }
 
+/* ─── HƏDİYYƏ İKONLARI ─── */
+const LION = <svg viewBox="0 0 64 64" width="100%" height="100%"><defs><radialGradient id="lnMane" cx="50%" cy="50%" r="50%"><stop offset="0" stopColor="#ffb13b"/><stop offset="1" stopColor="#c8561b"/></radialGradient><linearGradient id="lnFace" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#ffe3a3"/><stop offset="1" stopColor="#f5b84f"/></linearGradient></defs><g fill="url(#lnMane)">{Array.from({length:12}).map((_,k)=><ellipse key={k} cx="32" cy="12" rx="7" ry="11" transform={`rotate(${k*30} 32 33)`}/>)}</g><circle cx="32" cy="33" r="17" fill="url(#lnFace)"/><circle cx="19" cy="20" r="4.5" fill="#f5b84f"/><circle cx="45" cy="20" r="4.5" fill="#f5b84f"/><circle cx="19" cy="20" r="2.2" fill="#d98a3a"/><circle cx="45" cy="20" r="2.2" fill="#d98a3a"/><ellipse cx="25.5" cy="30" rx="2.6" ry="3.2" fill="#2b1a10"/><ellipse cx="38.5" cy="30" rx="2.6" ry="3.2" fill="#2b1a10"/><circle cx="26.3" cy="29" r=".9" fill="#fff"/><circle cx="39.3" cy="29" r=".9" fill="#fff"/><ellipse cx="32" cy="40" rx="8" ry="6" fill="#fff3d6"/><path d="M29 36.5h6l-3 3.2z" fill="#6b3a1f"/><path d="M32 39.7v2.3M32 42c-1.5 1.6-3.5 1.6-4.5.4M32 42c1.5 1.6 3.5 1.6 4.5.4" stroke="#6b3a1f" strokeWidth="1.2" fill="none" strokeLinecap="round"/></svg>;
+
 /* ─── ROOM ─── */
 function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onToggleMic, onJoinSeat, onLeaveSeat, onLeave, onOpenChat, onHome, onProfile, error }: any) {
   const [following, setFollowing] = useState(false);
@@ -1902,6 +1905,15 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
   const [draftMsg, setDraftMsg] = useState("");
   const [kb, setKb] = useState(0);
   const [typing, setTyping] = useState(false);
+  const [giftOpen, setGiftOpen] = useState(false);
+  const [giftTab, setGiftTab] = useState("Hədiyyə");
+  const [giftSel, setGiftSel] = useState<string|null>("aslan");
+  const [giftQty, setGiftQty] = useState(1);
+  const [qtyOpen, setQtyOpen] = useState(false);
+  const [giftTo, setGiftTo] = useState<number>(-1);
+  const [giftPlay, setGiftPlay] = useState<string|null>(null);
+  const [giftWarn, setGiftWarn] = useState(false);
+  const [jetonBal, setJetonBal] = useState(() => { try { return parseInt(localStorage.getItem("velvet_jeton") || "10000"); } catch { return 10000; } });
   const inputRef = useRef<HTMLInputElement>(null);
   const feedRef = useRef<HTMLDivElement>(null);
   const myId = session ? session.user.id : "demo";
@@ -1954,15 +1966,8 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
   return (
     <main style={{ background:"#f5f5f7", minHeight:"100dvh", position:"relative", fontFamily:"'Helvetica Neue',Arial,sans-serif", color:"#1a1a2e" }}>
       <style>{`
-        .r-scroll{height:100dvh;overflow-y:auto;padding:max(16px,env(safe-area-inset-top)) 14px 104px;scrollbar-width:none}
+        .r-scroll{overflow-y:auto;padding:max(16px,env(safe-area-inset-top)) 16px 90px}
         .r-scroll::-webkit-scrollbar{display:none}
-        .room-native-btn{transition:transform .16s ease,background .2s ease,box-shadow .2s ease;-webkit-tap-highlight-color:transparent}
-        .room-native-btn:active{transform:scale(.9)}
-        .room-native-icon{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.9);border:.5px solid rgba(30,15,60,.1);box-shadow:0 4px 16px rgba(35,18,70,.08);display:flex;align-items:center;justify-content:center}
-        .room-seat{transition:transform .16s ease}.room-seat:active{transform:scale(.92)}
-        .room-dock{box-shadow:0 -8px 30px rgba(35,18,70,.07)}
-        @media(max-width:370px){.r-scroll{padding-left:10px;padding-right:10px}.room-dock-extra{display:none}}
-        @media(prefers-reduced-motion:reduce){.room-native-btn,.room-seat{transition:none!important}.voice-ring{animation:none!important}}
       `}</style>
       <div className="r-scroll">
         {/* OTAQ ÜST PANELİ */}
@@ -1983,9 +1988,15 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
             </button>
           </div>
           <div style={{ marginLeft:"auto", display:"flex", gap:6 }}>
-            <button className="room-native-btn room-native-icon" aria-label="Töhfə sıralaması" style={{ color:"#ff9f0a", cursor:"pointer", flexShrink:0 }}><Trophy size={19} strokeWidth={2}/></button>
-            <button className="room-native-btn room-native-icon" aria-label="Otaq haqqında" style={{ color:"#1c1c1e", cursor:"pointer", flexShrink:0 }}><Info size={19} strokeWidth={2}/></button>
-            <button className="room-native-btn room-native-icon" onClick={onLeave} aria-label="Otaqdan çıx" style={{ color:"#ff3b30", cursor:"pointer", flexShrink:0 }}><LogOut size={19} strokeWidth={2}/></button>
+            <button aria-label="Töhfə sıralaması" style={{ width:36, height:36, borderRadius:"50%", background:"#fff", border:".5px solid rgba(20,10,40,.08)", boxShadow:"0 2px 8px rgba(20,10,40,.06)", display:"flex", alignItems:"center", justifyContent:"center", color:"#1c1c1e", cursor:"pointer", flexShrink:0 }}>
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#FF9F0A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>
+            </button>
+            <button aria-label="Otaq haqqında" style={{ width:36, height:36, borderRadius:"50%", background:"#fff", border:".5px solid rgba(20,10,40,.08)", boxShadow:"0 2px 8px rgba(20,10,40,.06)", display:"flex", alignItems:"center", justifyContent:"center", color:"#1c1c1e", cursor:"pointer", flexShrink:0 }}>
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="7.8" r=".7" fill="currentColor"/></svg>
+            </button>
+            <button onClick={onLeave} aria-label="Otaqdan çıx" style={{ width:36, height:36, borderRadius:"50%", background:"#fff", border:".5px solid rgba(20,10,40,.08)", boxShadow:"0 2px 8px rgba(20,10,40,.06)", display:"flex", alignItems:"center", justifyContent:"center", color:"#1c1c1e", cursor:"pointer", flexShrink:0 }}>
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#ff3b30" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v9"/><path d="M6.3 6.8a8 8 0 1 0 11.4 0"/></svg>
+            </button>
           </div>
         </div>
 
@@ -1998,7 +2009,7 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
             return (
               <button key={i}
                 onClick={m ? (isMe ? onLeaveSeat : undefined) : (!iAmSpeaker ? onJoinSeat : undefined)}
-                className="room-seat" style={{ background:"none", border:0, padding:0, display:"flex", flexDirection:"column", alignItems:"center", gap:5, cursor:"pointer", minWidth:0 }}>
+                style={{ background:"none", border:0, padding:0, display:"flex", flexDirection:"column", alignItems:"center", gap:5, cursor:"pointer", minWidth:0 }}>
                 <div style={{ position:"relative", width:46, height:46 }}>
                   {m ? (
                     <>
@@ -2012,7 +2023,7 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
                     </>
                   ) : (
                     <div style={{ width:46, height:46, borderRadius:"50%", background:"linear-gradient(160deg,#ffffff,#f1edf8)", border:"1.5px dashed rgba(123,47,247,.28)", boxShadow:"0 2px 6px rgba(20,10,40,.05)", display:"flex", alignItems:"center", justifyContent:"center", color:"#7b2ff7" }}>
-                      <Plus size={18} strokeWidth={2.4}/>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
                     </div>
                   )}
                 </div>
@@ -2037,7 +2048,7 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
                 ))}
               </div>
               <div style={{ flexShrink:0, height:30, padding:"0 10px", borderRadius:15, background:"#fff", border:".5px solid rgba(20,10,40,.08)", boxShadow:"0 1px 4px rgba(20,10,40,.06)", display:"flex", alignItems:"center", gap:5, color:"#111", fontSize:13, fontWeight:600 }}>
-                <Users size={15} strokeWidth={2.1}/>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c.8-3.7 3.7-5.7 7.5-5.7s6.7 2 7.5 5.7"/></svg>
                 {viewers.length}
               </div>
             </div>
@@ -2094,8 +2105,106 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
         </div>
       )}
 
+      {/* HƏDİYYƏ ANİMASİYASI — mesaj sahəsinin üstündə */}
+      {giftPlay && (
+        <div style={{ position:"fixed", left:0, right:0, bottom: kb + 58, height:"42dvh", zIndex:60, pointerEvents:"none", display:"flex", alignItems:"center", justifyContent:"center" }}>
+          {giftPlay.endsWith(".mp4")
+            ? <video key={giftPlay} src={`/images/images/${giftPlay}`} autoPlay muted playsInline onEnded={() => setGiftPlay(null)} onError={() => setGiftPlay(null)} style={{ width:"100%", height:"100%", objectFit:"contain", background:"transparent" }}/>
+            : <img src={`/images/images/${giftPlay}`} alt="" style={{ width:"100%", height:"100%", objectFit:"contain" }}/>}
+        </div>
+      )}
+
+      {/* HƏDİYYƏ PANELİ */}
+      {giftOpen && (() => {
+        const GIFTS: Record<string, { id:string; name:string; price:number; gif:string; icon:any }[]> = {
+          "Çanta": [],
+          "Hədiyyə": [{ id:"aslan", name:"Aslan", price:99, gif:"sir.mp4", icon:LION }],
+          "Şanslı": [], "Tədbirlər": [], "İnteraktiv": [],
+        };
+        const list = GIFTS[giftTab] || [];
+        const all = [...list, ...Array.from({ length: Math.max(0, 8 - list.length) }).map(() => null)];
+        const people = session ? members.map((m: Member) => (m.user_id === session.user.id ? name : "Üzv")) : [name, "Aynur", "Rauf", "Sevinc", "Tural", "Nigar", "Kənan"];
+        const cols = ["#7b2ff7","#ff3ea5","#00b4d8","#ff9f0a","#22c55e","#af52de","#ff375f"];
+        const gift = list.find(g => g.id === giftSel) || null;
+        const send = () => {
+          if (!gift) return;
+          const cost = gift.price * giftQty;
+          if (jetonBal < cost) { setGiftWarn(true); setTimeout(() => setGiftWarn(false), 2200); return; }
+          const nb = jetonBal - cost; setJetonBal(nb);
+          try { localStorage.setItem("velvet_jeton", String(nb)); } catch {}
+          const toName = giftTo < 0 ? "hamıya" : people[giftTo];
+          setMsgs(prev => { const next = [...prev, { id: Date.now(), user_id: myId, display_name: name, avatar_url: avatarUrl, content: `🎁 ${toName} ${gift.name} ×${giftQty} göndərdi`, created_at: new Date().toISOString() }]; if (!session) { try { localStorage.setItem("velvet_demo_chat", JSON.stringify(next.slice(-100))); } catch {} } return next; });
+          setGiftOpen(false); setQtyOpen(false);
+          setGiftPlay(null); setTimeout(() => setGiftPlay(gift.gif), 30);
+          setTimeout(() => setGiftPlay(g => (g === gift.gif ? null : g)), 15000);
+        };
+        return (
+          <div onClick={() => setGiftOpen(false)} style={{ position:"fixed", inset:0, zIndex:70, background:"rgba(0,0,0,.35)", animation:"vfadeIn .2s ease" }}>
+            <style>{`@keyframes gsUp{from{transform:translateY(100%)}to{transform:translateY(0)}} .gs-tabs::-webkit-scrollbar,.gs-ppl::-webkit-scrollbar{display:none}`}</style>
+            <div onClick={e => { e.stopPropagation(); setQtyOpen(false); }} style={{ position:"absolute", left:0, right:0, bottom:0, height:"58dvh", maxWidth:520, margin:"0 auto", background:"#17141f", borderRadius:"22px 22px 0 0", boxShadow:"0 -10px 40px rgba(0,0,0,.35)", display:"flex", flexDirection:"column", animation:"gsUp .28s cubic-bezier(.2,.9,.3,1)", color:"#fff", paddingBottom:"env(safe-area-inset-bottom)" }}>
+              <div style={{ width:36, height:4, borderRadius:2, background:"rgba(255,255,255,.2)", margin:"8px auto 6px" }}/>
+
+              {/* Alıcılar */}
+              <div className="gs-ppl" style={{ display:"flex", gap:10, overflowX:"auto", padding:"4px 14px 10px", scrollbarWidth:"none", flexShrink:0 }}>
+                <button onClick={() => setGiftTo(-1)} style={{ flexShrink:0, height:38, padding:"0 12px", borderRadius:19, border: giftTo < 0 ? "1.5px solid #ff3ea5" : "1px solid rgba(255,255,255,.15)", background: giftTo < 0 ? "rgba(255,62,165,.15)" : "transparent", color:"#fff", fontSize:12, fontWeight:600, cursor:"pointer" }}>Hamı</button>
+                {people.map((p: string, k: number) => (
+                  <button key={k} onClick={() => setGiftTo(k)} title={p} style={{ flexShrink:0, width:38, height:38, borderRadius:"50%", padding:0, cursor:"pointer", border: giftTo === k ? "2px solid #ff3ea5" : "2px solid transparent", background:cols[k % cols.length], color:"#fff", fontSize:14, fontWeight:700, overflow:"hidden", boxShadow: giftTo === k ? "0 0 0 3px rgba(255,62,165,.25)" : "none" }}>
+                    {k === 0 && avatarUrl ? <img src={avatarUrl} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }}/> : p[0]?.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+
+              {/* Tablar */}
+              <div className="gs-tabs" style={{ display:"flex", gap:18, overflowX:"auto", padding:"0 14px", borderBottom:".5px solid rgba(255,255,255,.1)", scrollbarWidth:"none", flexShrink:0 }}>
+                {["Çanta","Hədiyyə","Şanslı","Tədbirlər","İnteraktiv"].map(t => (
+                  <button key={t} onClick={() => setGiftTab(t)} style={{ flexShrink:0, background:"none", border:0, padding:"9px 0", fontSize:13, fontWeight: giftTab === t ? 600 : 400, color: giftTab === t ? "#fff" : "rgba(255,255,255,.45)", borderBottom: giftTab === t ? "2px solid #ff3ea5" : "2px solid transparent", marginBottom:-.5, cursor:"pointer", fontFamily:"inherit" }}>{t}</button>
+                ))}
+              </div>
+
+              {/* Hədiyyələr — 4 sütun */}
+              <div style={{ flex:1, minHeight:0, overflowY:"auto", padding:"12px 10px", display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8, alignContent:"start" }}>
+                {list.length === 0 && <div style={{ gridColumn:"1/-1", textAlign:"center", color:"rgba(255,255,255,.4)", fontSize:13, padding:"30px 0" }}>Bu bölmədə hələ əşya yoxdur</div>}
+                {list.length > 0 && all.map((g, k) => g ? (
+                  <button key={g.id} onClick={() => setGiftSel(g.id)} style={{ background: giftSel === g.id ? "rgba(255,62,165,.12)" : "transparent", border: giftSel === g.id ? "1.5px solid #ff3ea5" : "1.5px solid transparent", borderRadius:14, padding:"8px 2px 7px", display:"flex", flexDirection:"column", alignItems:"center", gap:3, cursor:"pointer", color:"#fff" }}>
+                    <div style={{ width:48, height:48 }}>{g.icon}</div>
+                    <span style={{ fontSize:11, fontWeight:500 }}>{g.name}</span>
+                    <span style={{ display:"flex", alignItems:"center", gap:3, fontSize:11, color:"#ffcf5a", fontWeight:600 }}>
+                      <img src="/images/images/jeton.PNG" alt="" style={{ width:12, height:12, objectFit:"contain" }}/>{g.price}
+                    </span>
+                  </button>
+                ) : <div key={"e"+k}/>)}
+              </div>
+
+              {/* Alt: balans + göndər */}
+              <div style={{ flexShrink:0, display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 14px 12px", borderTop:".5px solid rgba(255,255,255,.08)", position:"relative" }}>
+                <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                  <img src="/images/images/jeton.PNG" alt="" style={{ width:20, height:20, objectFit:"contain" }}/>
+                  <span style={{ fontSize:15, fontWeight:700, color:"#ffcf5a", fontVariantNumeric:"tabular-nums" }}>{jetonBal.toLocaleString()}</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" strokeWidth="2.4" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
+                </div>
+                {giftWarn && <div style={{ position:"absolute", left:14, right:14, top:-40, background:"#ff9f0a", color:"#2a1400", fontSize:13, fontWeight:600, textAlign:"center", borderRadius:12, padding:"8px 10px" }}>Jeton kifayət etmir</div>}
+                <div style={{ display:"flex", alignItems:"stretch", height:38, borderRadius:19, overflow:"visible", border:"1.5px solid #ff3ea5", position:"relative" }}>
+                  <button onClick={e => { e.stopPropagation(); setQtyOpen(o => !o); }} style={{ display:"flex", alignItems:"center", gap:4, padding:"0 10px 0 14px", background:"transparent", border:0, color:"#fff", fontSize:14, fontWeight:600, cursor:"pointer" }}>
+                    {giftQty}
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" style={{ transform: qtyOpen ? "rotate(180deg)" : "none", transition:".2s" }}><path d="M6 15l6-6 6 6"/></svg>
+                  </button>
+                  <button onClick={send} disabled={!gift} style={{ padding:"0 20px", borderRadius:19, margin:-1.5, border:0, background: gift ? "linear-gradient(135deg,#ff5fa8,#ff2d7a)" : "#555", color:"#fff", fontSize:14, fontWeight:700, cursor: gift ? "pointer" : "default", boxShadow: gift ? "0 4px 14px rgba(255,45,122,.45)" : "none" }}>Göndər</button>
+                  {qtyOpen && (
+                    <div onClick={e => e.stopPropagation()} style={{ position:"absolute", bottom:46, left:0, width:74, background:"#241f2e", borderRadius:12, boxShadow:"0 8px 24px rgba(0,0,0,.4)", overflow:"hidden", border:".5px solid rgba(255,255,255,.1)" }}>
+                      {[100,30,10,5,1].map(q => (
+                        <button key={q} onClick={() => { setGiftQty(q); setQtyOpen(false); }} style={{ width:"100%", height:36, background: giftQty === q ? "rgba(255,62,165,.18)" : "transparent", border:0, color: giftQty === q ? "#ff5fa8" : "#fff", fontSize:14, fontWeight:600, cursor:"pointer" }}>{q}</button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* ALT PANEL — mesaj sahəsi + ikonlar */}
-      <div className="room-dock" style={{ position:"fixed", bottom:kb, left:0, right:0, zIndex:50, background:"rgba(255,255,255,.92)", backdropFilter:"saturate(1.8) blur(20px)", WebkitBackdropFilter:"saturate(1.8) blur(20px)", borderTop:".5px solid rgba(20,10,40,.1)", padding:"8px 12px max(8px,env(safe-area-inset-bottom))", display:"flex", alignItems:"center", gap:8 }}>
+      <div style={{ position:"fixed", bottom:kb, left:0, right:0, zIndex:50, background:"rgba(255,255,255,.92)", backdropFilter:"saturate(1.8) blur(20px)", WebkitBackdropFilter:"saturate(1.8) blur(20px)", borderTop:".5px solid rgba(20,10,40,.1)", padding:"8px 12px max(8px,env(safe-area-inset-bottom))", display:"flex", alignItems:"center", gap:8 }}>
         <input
           value={draftMsg}
           onChange={e => setDraftMsg(e.target.value)}
@@ -2110,17 +2219,17 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
         />
         {draftMsg.trim() && (
           <button onMouseDown={e => e.preventDefault()} onClick={sendMsg} aria-label="Göndər" style={{ width:40, height:40, borderRadius:"50%", border:0, flexShrink:0, background:"#7b2ff7", color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}>
-            <Send size={18} strokeWidth={2.3}/>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
           </button>
         )}
         <button aria-label="Mesajlar" style={{ width:40, height:40, borderRadius:"50%", background:"#f4f2f8", border:0, display:"flex", alignItems:"center", justifyContent:"center", color:"#1c1c1e", cursor:"pointer", flexShrink:0 }}>
-          <MessageCircle size={21} strokeWidth={1.9}/>
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M20.5 11.6c0 4.3-3.8 7.7-8.5 7.7-1.1 0-2.2-.2-3.2-.6L4 20l1.2-3.6a7.3 7.3 0 0 1-1.7-4.8C3.5 7.3 7.3 3.9 12 3.9s8.5 3.4 8.5 7.7z"/></svg>
         </button>
         <button aria-label="Kataloq" style={{ width:40, height:40, borderRadius:"50%", background:"#f4f2f8", border:0, display:"flex", alignItems:"center", justifyContent:"center", color:"#1c1c1e", cursor:"pointer", flexShrink:0 }}>
-          <Grid2X2 size={21} strokeWidth={1.9}/>
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg>
         </button>
-        <button aria-label="Hədiyyə göndər" style={{ width:40, height:40, borderRadius:"50%", background:"linear-gradient(135deg,#ff5f8f,#ff2d55)", border:0, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", cursor:"pointer", flexShrink:0, boxShadow:"0 3px 10px rgba(255,45,85,.35)" }}>
-          <Gift size={20} strokeWidth={2}/>
+        <button aria-label="Hədiyyə göndər" onClick={() => { setGiftOpen(true); setQtyOpen(false); }} style={{ width:40, height:40, borderRadius:"50%", background:"linear-gradient(135deg,#ff5f8f,#ff2d55)", border:0, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", cursor:"pointer", flexShrink:0, boxShadow:"0 3px 10px rgba(255,45,85,.35)" }}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v9H5v-9"/><path d="M12 8S10.5 3 8 3.5 7 8 12 8zM12 8s1.5-5 4-4.5S17 8 12 8z"/></svg>
         </button>
       </div>
     </main>
@@ -2235,7 +2344,7 @@ function ChatPanel({ session, displayName, avatarUrl, onClose }: { session: Sess
           style={{ flex:1, minWidth:0, height:40, borderRadius:20, background:"#f4f2f8", border:0, outline:"none", padding:"0 16px", fontSize:16, color:"#111", fontFamily:"inherit" }}
         />
         <button onClick={send} disabled={!text.trim()} aria-label="Göndər" style={{ width:40, height:40, borderRadius:"50%", border:0, flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", background: text.trim() ? "#7b2ff7" : "#e5e5ea", color:"#fff", cursor: text.trim() ? "pointer" : "default", transition:"background .15s" }}>
-          <Send size={18} strokeWidth={2.3}/>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
         </button>
       </div>
     </div>
