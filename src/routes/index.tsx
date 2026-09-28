@@ -502,6 +502,9 @@ function BottomNav({ active, onHome, onRoom, onProfile }: { active: Screen; onHo
 /* ─── HOME ─── */
 function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoom: () => void; onProfile: () => void }) {
   const [showModal, setShowModal] = useState(false);
+  const [slide, setSlide] = useState(0);
+  const [roomCat, setRoomCat] = useState(0);
+  useEffect(() => { const t = setInterval(() => setSlide(x => (x + 1) % 3), 3500); return () => clearInterval(t); }, []);
   return (
     <main style={{ background:"#07000f", minHeight:"100dvh", display:"flex", flexDirection:"column", fontFamily:"'Helvetica Neue',Arial,sans-serif", position:"relative", overflow:"hidden" }}>
       <style>{`
@@ -611,79 +614,131 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
       </header>
 
       <div className="h-scroll">
-        {/* HERO */}
-        <div className="hero-box">
-          <div className="hero-bg2"/><div className="hero-g1"/><div className="hero-g2"/>
-          <div className="hero-r1"/><div className="hero-r2"/>
-          <span className="h-star" style={{ top:14, right:30, color:"#ff3ea5", animationDuration:"2.2s" }}>✦</span>
-          <span className="h-star" style={{ top:38, right:58, color:"#c084fc", fontSize:7, animationDuration:"1.8s", animationDelay:".5s" }}>✦</span>
-          <span className="h-star" style={{ bottom:18, right:18, color:"#00d4ff", fontSize:8, animationDuration:"2.4s", animationDelay:".9s" }}>✦</span>
-          <div className="h-mascot">
-            <svg className="vf" width="62" height="62" viewBox="0 0 180 180">
-              <defs><linearGradient id="hf3" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stopColor="#fff0ff"/><stop offset="100%" stopColor="#e8d0ff"/></linearGradient></defs>
-              <ellipse cx="54" cy="50" rx="16" ry="20" fill="#ff3ea5"/><ellipse cx="54" cy="52" rx="9" ry="13" fill="#ffb3d9"/>
-              <ellipse cx="126" cy="50" rx="16" ry="20" fill="#ff3ea5"/><ellipse cx="126" cy="52" rx="9" ry="13" fill="#ffb3d9"/>
-              <ellipse cx="90" cy="100" rx="50" ry="48" fill="url(#hf3)"/>
-              <path d="M68 62 Q76 40 90 36 Q104 40 112 62" fill="#2a005a"/>
-              <ellipse cx="80" cy="44" rx="5" ry="10" fill="#ff3ea5" transform="rotate(-15,80,44)"/>
-              <ellipse cx="90" cy="38" rx="5" ry="10" fill="#c084fc"/>
-              <ellipse cx="100" cy="44" rx="5" ry="10" fill="#00d4ff" transform="rotate(15,100,44)"/>
-              <ellipse cx="76" cy="102" rx="13" ry="15" fill="#1a0030"/><ellipse cx="104" cy="102" rx="13" ry="15" fill="#1a0030"/>
-              <ellipse cx="76" cy="102" rx="9" ry="11" fill="#7b2ff7"/><ellipse cx="104" cy="102" rx="9" ry="11" fill="#7b2ff7"/>
-              <circle cx="81" cy="96" r="4" fill="white"/><circle cx="109" cy="96" r="4" fill="white"/>
-              <ellipse cx="60" cy="116" rx="10" ry="7" fill="#ff6b9d" opacity=".5"/><ellipse cx="120" cy="116" rx="10" ry="7" fill="#ff6b9d" opacity=".5"/>
-              <path d="M72 124 Q90 140 108 124" fill="none" stroke="#d4006e" strokeWidth="3" strokeLinecap="round"/>
-            </svg>
-          </div>
-          <div className="hero-center">
-            <div className="logo-wrap">
-              <div className="logo-ring-o"/><div className="logo-ring-m"/><div className="logo-ring-i"/>
-              <div className="od1"/><div className="od2"/><div className="od3"/>
-              <div className="logo-c"><span className="logo-v-txt">V</span></div>
+        <style>{`
+          .hp{transition:transform .14s ease}.hp:active{transform:scale(.96)}
+          @keyframes hpBar{0%,100%{transform:scaleY(.25)}50%{transform:scaleY(1)}}
+          @keyframes hpShine{0%{transform:translateX(-120%) skewX(-18deg)}100%{transform:translateX(260%) skewX(-18deg)}}
+          @keyframes hpFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+          @keyframes hpLive{0%,100%{opacity:1}50%{opacity:.35}}
+          .hp-h{display:flex;justify-content:space-between;align-items:center;margin:0 16px 12px}
+          .hp-h b{font-size:17px;font-weight:700;color:#fff}
+          .hp-h span{font-size:12px;color:rgba(255,255,255,.5)}
+          .hp-noscroll::-webkit-scrollbar{display:none}
+        `}</style>
+
+        {/* BANNER SLAYDER */}
+        {(() => {
+          const SL = [
+            { t:"Həftəlik Turnir", s:"Domino çempionatı • 50,000 jeton mükafat", b:"Qoşul", g:"linear-gradient(120deg,#3C3489 0%,#7b2ff7 55%,#ff3ea5 100%)", ic:<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/> },
+            { t:"VIP həftəsi", s:"İlk yükləmədə +30% bonus jeton", b:"Bax", g:"linear-gradient(120deg,#412402 0%,#BA7517 55%,#FAC775 100%)", ic:<path d="M3 8l4 4 5-7 5 7 4-4-2 11H5z"/> },
+            { t:"Yeni çərçivələr", s:"Obsidian Əjdaha mağazada", b:"Mağaza", g:"linear-gradient(120deg,#04342C 0%,#0F6E56 50%,#00d4ff 100%)", ic:<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/> },
+          ];
+          return (
+            <div style={{ margin:"-18px 16px 0", position:"relative", height:168, borderRadius:24, overflow:"hidden", zIndex:5 }}>
+              <div style={{ display:"flex", height:"100%", transform:`translateX(-${slide*100}%)`, transition:"transform .5s cubic-bezier(.2,.8,.2,1)" }}>
+                {SL.map((x, i) => (
+                  <div key={i} className="hp" style={{ flex:"0 0 100%", position:"relative", background:x.g, padding:18, overflow:"hidden", cursor:"pointer" }}>
+                    <div style={{ position:"absolute", right:-18, top:-10, width:170, height:170, borderRadius:"50%", background:"radial-gradient(circle,rgba(255,255,255,.22),transparent 65%)" }}/>
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{ position:"absolute", right:16, top:28, opacity:.9, animation:"hpFloat 3s ease-in-out infinite", filter:"drop-shadow(0 6px 14px rgba(0,0,0,.25))" }}>{x.ic}</svg>
+                    <div style={{ position:"absolute", inset:0, overflow:"hidden", pointerEvents:"none" }}>
+                      <div style={{ position:"absolute", top:0, bottom:0, width:"40%", background:"linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent)", animation:"hpShine 3.5s ease-in-out infinite" }}/>
+                    </div>
+                    <div style={{ position:"relative", maxWidth:"62%" }}>
+                      <div style={{ display:"inline-block", fontSize:10, letterSpacing:1.5, background:"rgba(0,0,0,.25)", padding:"3px 8px", borderRadius:10, marginBottom:10, color:"#fff" }}>YENİ</div>
+                      <div style={{ fontSize:21, fontWeight:800, lineHeight:1.15, color:"#fff" }}>{x.t}</div>
+                      <div style={{ fontSize:12, color:"rgba(255,255,255,.88)", margin:"6px 0 12px", lineHeight:1.4 }}>{x.s}</div>
+                      <span style={{ display:"inline-block", background:"#fff", color:"#1a0035", fontSize:12, fontWeight:700, padding:"7px 16px", borderRadius:16 }}>{x.b} →</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ position:"absolute", bottom:10, left:0, right:0, display:"flex", justifyContent:"center", gap:5 }}>
+                {SL.map((_, k) => <span key={k} onClick={() => setSlide(k)} style={{ height:6, width: k === slide ? 18 : 6, borderRadius:3, background: k === slide ? "#fff" : "rgba(255,255,255,.45)", transition:".3s", cursor:"pointer" }}/>)}
+              </div>
             </div>
-          </div>
-          <div className="h-bars">
-            <div className="hbar"/><div className="hbar"/><div className="hbar"/>
-            <div className="hbar"/><div className="hbar"/><div className="hbar"/>
-          </div>
+          );
+        })()}
+
+        {/* SÜRƏTLİ KEÇİD */}
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8, margin:"20px 16px 24px" }}>
+          {[
+            { l:"Bonus", c:"#ff375f", d:<><rect x="4" y="9" width="16" height="11" rx="2.5"/><path d="M3 9h18M12 9v11M12 9S10 4.5 8 5.5 8.5 9 12 9zM12 9s2-4.5 4-3.5S15.5 9 12 9z"/></> },
+            { l:"Mağaza", c:"#af52de", d:<><path d="M5 8h14l-1.2 11.5a1.5 1.5 0 0 1-1.5 1.5H7.7a1.5 1.5 0 0 1-1.5-1.5z"/><path d="M9 8V7a3 3 0 0 1 6 0v1"/></> },
+            { l:"Reytinq", c:"#ff9f0a", d:<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/> },
+            { l:"Tədbirlər", c:"#32ade6", d:<><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M8 14h3"/></> },
+          ].map(q => (
+            <button key={q.l} className="hp" onClick={q.l === "Mağaza" || q.l === "Bonus" ? onProfile : undefined} style={{ background:"none", border:0, padding:0, display:"flex", flexDirection:"column", alignItems:"center", gap:7, cursor:"pointer" }}>
+              <div style={{ width:54, height:54, borderRadius:18, background:`linear-gradient(145deg,${q.c}55,${q.c}18)`, border:`.5px solid ${q.c}77`, boxShadow:`0 6px 18px ${q.c}33`, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{q.d}</svg>
+              </div>
+              <span style={{ fontSize:12, color:"rgba(255,255,255,.82)", fontWeight:500 }}>{q.l}</span>
+            </button>
+          ))}
         </div>
 
-        {/* OYUNLAR */}
-        <div className="section">
-          <div className="section-header">
-            <span className="section-title">Oyunlar</span>
-            <div className="section-chip">Tezliklə daha çox <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
-          </div>
-          <div className="dom-card" onClick={() => setShowModal(true)}>
-            <div className="dom-felt"/><div className="dom-l1"/><div className="dom-l2"/>
-            <div className="dp" style={{ width:32, height:58, left:28, top:24, transform:"rotate(-10deg)" }}><div className="dp-line"/><div className="dot" style={{ top:7, left:7 }}/><div className="dot" style={{ top:7, right:7 }}/><div className="dot" style={{ bottom:7, left:"50%", transform:"translateX(-50%)" }}/></div>
-            <div className="dp" style={{ width:32, height:58, left:66, top:38, transform:"rotate(8deg)" }}><div className="dp-line"/><div className="dot" style={{ top:7, left:"50%", transform:"translateX(-50%)" }}/><div className="dot" style={{ bottom:7, left:7 }}/><div className="dot" style={{ bottom:7, right:7 }}/></div>
-            <div className="dp" style={{ width:32, height:58, right:48, top:18, transform:"rotate(-5deg)" }}><div className="dp-line"/><div className="dot" style={{ top:7, left:7 }}/><div className="dot" style={{ top:7, right:7 }}/><div className="dot" style={{ top:"50%", left:"50%", transform:"translate(-50%,-50%)" }}/><div className="dot" style={{ bottom:7, left:7 }}/><div className="dot" style={{ bottom:7, right:7 }}/></div>
-            <div className="dp" style={{ width:32, height:58, right:88, top:44, transform:"rotate(12deg)" }}><div className="dp-line"/><div className="dot" style={{ top:7, left:7 }}/><div className="dot" style={{ bottom:7, right:7 }}/></div>
-            <div className="dom-center"><div className="dp-line"/><div className="dot" style={{ top:10, left:9, width:7, height:7, background:"#7b2ff7" }}/><div className="dot" style={{ top:10, right:9, width:7, height:7, background:"#7b2ff7" }}/><div className="dot" style={{ top:22, left:"50%", transform:"translateX(-50%)", width:7, height:7, background:"#7b2ff7" }}/><div className="dot" style={{ bottom:10, left:9, width:7, height:7, background:"#ff3ea5" }}/><div className="dot" style={{ bottom:10, right:9, width:7, height:7, background:"#ff3ea5" }}/><div className="dot" style={{ bottom:22, left:"50%", transform:"translateX(-50%)", width:7, height:7, background:"#ff3ea5" }}/></div>
-            <div className="dom-online"><div style={{ width:6, height:6, borderRadius:"50%", background:"#00d4ff", animation:"vpulse 1.5s ease-in-out infinite" }}/> 1.2K</div>
-            <div className="dom-players"><div className="dom-av" style={{ background:"#ff3ea5" }}/><div className="dom-av" style={{ background:"#7b2ff7", marginLeft:-10 }}/><div className="dom-av" style={{ background:"#00d4ff", marginLeft:-10 }}/><span style={{ fontSize:10, color:"rgba(255,10,80,.6)", fontWeight:600, marginLeft:4 }}>+48</span></div>
-            <div className="dom-play"><svg width="16" height="16" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
-          </div>
+        {/* OYUNLAR 2x2 */}
+        <div className="hp-h"><b>Oyunlar</b><span>Hamısı ›</span></div>
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, margin:"0 16px 26px" }}>
+          {[
+            { n:"Domino", p:"1.2K", c1:"#7b2ff7", c2:"#3C3489", img:"/images/images/domino.PNG" },
+            { n:"Kart", p:"840", c1:"#ff3ea5", c2:"#72243E", img:null },
+            { n:"Zər", p:"563", c1:"#00b4d8", c2:"#0C447C", img:null },
+            { n:"Loto", p:"310", c1:"#EF9F27", c2:"#633806", img:null },
+          ].map(g => (
+            <div key={g.n} className="hp" onClick={() => setShowModal(true)} style={{ position:"relative", height:120, borderRadius:20, overflow:"hidden", background:`linear-gradient(150deg,${g.c1},${g.c2})`, padding:12, cursor:"pointer", boxShadow:`0 8px 20px ${g.c1}33` }}>
+              {g.img
+                ? <img src={g.img} alt="" style={{ position:"absolute", right:-4, bottom:-6, width:92, height:92, objectFit:"contain", opacity:.95, filter:"drop-shadow(0 6px 12px rgba(0,0,0,.35))" }}/>
+                : <div style={{ position:"absolute", right:-10, bottom:-18, width:96, height:96, borderRadius:"50%", background:"rgba(255,255,255,.14)" }}/>}
+              <span style={{ position:"absolute", right:10, top:10, fontSize:10, background:"rgba(0,0,0,.28)", padding:"3px 7px", borderRadius:9, color:"#fff" }}>Tezliklə</span>
+              <div style={{ position:"absolute", left:12, bottom:12 }}>
+                <div style={{ fontSize:16, fontWeight:800, color:"#fff" }}>{g.n}</div>
+                <div style={{ fontSize:11, color:"rgba(255,255,255,.88)", display:"flex", alignItems:"center", gap:4 }}>
+                  <span style={{ width:6, height:6, borderRadius:"50%", background:"#5DCAA5", animation:"hpLive 1.4s infinite" }}/>{g.p} oynayır
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* CANLI OTAQLAR */}
-        <div className="section">
-          <div className="section-header">
-            <span className="section-title">Canlı otaqlar</span>
-            <div className="section-chip">Hamısı <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
-          </div>
-          <div className="rooms-row">
-            {[{name:"Qızıl Saatlar",count:"128",colors:["#ff3ea5","#7b2ff7","#00d4ff"]},{name:"Gecə Partisi",count:"64",colors:["#c084fc","#ff6b35","#ff3ea5"]},{name:"VIP Lounge",count:"256",colors:["#ff3ea5","#7b2ff7","#c084fc"]}].map(r => (
-              <div key={r.name} className="room-card" onClick={onEnterRoom}>
-                <div className="rc-live"><div className="rc-dot"/><span style={{ fontSize:8, color:"#00d4ff", fontWeight:700, letterSpacing:1.5 }}>CANLI</span></div>
-                <div className="rc-avs">{r.colors.map((c,i) => <div key={i} className="rc-av" style={{ background:c }}/>)}</div>
-                <div style={{ fontSize:12, fontWeight:700, color:"#fff", marginBottom:2 }}>{r.name}</div>
-                <div style={{ fontSize:9, color:"#d9c6ff", marginBottom:8 }}>{r.count} dinləyici</div>
-                <div style={{ background:"rgba(123,47,247,.3)", border:"1px solid rgba(123,47,247,.5)", borderRadius:8, padding:5, textAlign:"center", fontSize:9, color:"#c084fc", fontWeight:700 }}>Qoşul →</div>
+        <div className="hp-h"><b>Canlı otaqlar</b><span>Hamısı ›</span></div>
+        <div className="hp-noscroll" style={{ display:"flex", gap:8, overflowX:"auto", scrollbarWidth:"none", padding:"0 16px 12px" }}>
+          {["Hamısı","🔥 Populyar","🎵 Musiqi","💬 Söhbət","🎮 Oyun"].map((c, k) => (
+            <button key={c} onClick={() => setRoomCat(k)} style={{ flexShrink:0, height:32, padding:"0 14px", borderRadius:16, border: k === roomCat ? "0" : ".5px solid rgba(255,255,255,.14)", background: k === roomCat ? "#fff" : "rgba(255,255,255,.05)", color: k === roomCat ? "#1a0035" : "rgba(255,255,255,.78)", fontSize:12, fontWeight: k === roomCat ? 700 : 500, cursor:"pointer" }}>{c}</button>
+          ))}
+        </div>
+        <div style={{ display:"flex", flexDirection:"column", gap:10, margin:"0 16px 10px" }}>
+          {[
+            { n:"Qızıl Saatlar", h:"Aynur", c:"128", tag:"Söhbət", g1:"#7b2ff7", g2:"#ff3ea5" },
+            { n:"Gecə Partisi", h:"Rauf", c:"64", tag:"Musiqi", g1:"#0F6E56", g2:"#00d4ff" },
+            { n:"VIP Lounge", h:"Sevinc", c:"256", tag:"VIP", g1:"#BA7517", g2:"#FAC775" },
+          ].map(r => (
+            <div key={r.n} className="hp" onClick={onEnterRoom} style={{ display:"flex", gap:12, padding:10, borderRadius:20, background:"rgba(255,255,255,.045)", border:".5px solid rgba(255,255,255,.08)", cursor:"pointer" }}>
+              <div style={{ position:"relative", width:78, height:78, borderRadius:16, flexShrink:0, background:`linear-gradient(140deg,${r.g1},${r.g2})`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:26, fontWeight:800, color:"#fff" }}>
+                {r.h[0]}
+                <span style={{ position:"absolute", left:6, top:6, fontSize:9, fontWeight:700, background:"#ff3b30", padding:"2px 6px", borderRadius:7, letterSpacing:.5 }}>CANLI</span>
+                <span style={{ position:"absolute", bottom:7, left:"50%", transform:"translateX(-50%)", display:"flex", alignItems:"flex-end", gap:2, height:14 }}>
+                  {[0,1,2,3].map(k => <span key={k} style={{ width:3, height:14, borderRadius:2, background:"#fff", transformOrigin:"bottom", animation:`hpBar .8s ease-in-out infinite ${k*.15}s` }}/>)}
+                </span>
               </div>
-            ))}
-          </div>
+              <div style={{ flex:1, minWidth:0, display:"flex", flexDirection:"column", justifyContent:"center" }}>
+                <div style={{ fontSize:15, fontWeight:700, color:"#fff", marginBottom:3 }}>{r.n}</div>
+                <div style={{ fontSize:12, color:"rgba(255,255,255,.55)", marginBottom:8 }}>Aparıcı: {r.h} • #{r.tag}</div>
+                <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                  <div style={{ display:"flex" }}>
+                    {["#D4537E","#378ADD","#1D9E75"].map((c, k) => <span key={k} style={{ width:22, height:22, borderRadius:"50%", border:"2px solid #0d0620", marginLeft: k ? -7 : 0, background:c }}/>)}
+                  </div>
+                  <span style={{ fontSize:12, color:"rgba(255,255,255,.72)", display:"flex", alignItems:"center", gap:3 }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="13" width="4" height="6" rx="1.5"/><rect x="17" y="13" width="4" height="6" rx="1.5"/></svg>
+                    {r.c}
+                  </span>
+                </div>
+              </div>
+              <div style={{ alignSelf:"center", width:36, height:36, borderRadius:"50%", background:"linear-gradient(135deg,#7b2ff7,#ff3ea5)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, boxShadow:"0 4px 12px rgba(123,47,247,.4)" }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M7 4.5v15l12-7.5z"/></svg>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
