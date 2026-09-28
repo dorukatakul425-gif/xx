@@ -509,7 +509,7 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
         .h-orb2{position:absolute;width:200px;height:200px;border-radius:50%;background:#ff3ea5;opacity:.06;top:-20px;right:-40px;pointer-events:none}
         .h-scroll{flex:1;overflow-y:auto;padding-bottom:80px}
         .h-scroll::-webkit-scrollbar{display:none}
-        .topbar{position:relative;z-index:20;background:transparent;padding:max(10px,env(safe-area-inset-top)) 16px 12px}
+        .topbar{position:relative;z-index:20;background:#f5f5f7 url(/images/images/arxaplan.PNG) center top/cover no-repeat;padding-bottom:26px!important;padding:max(10px,env(safe-area-inset-top)) 16px 12px}
         .tb-row{display:flex;align-items:center;gap:10px;height:44px}
         .tb-user{display:flex;align-items:center;gap:10px;min-width:0;flex:1;background:none;border:0;padding:0;cursor:pointer;text-align:left}
         .tb-user:active{opacity:.7}
@@ -586,9 +586,6 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
         .modal-box{background:linear-gradient(145deg,#1a0035,#0d001e);border:1px solid rgba(123,47,247,.5);border-radius:28px;padding:32px 24px 24px;width:min(300px,85vw);text-align:center;animation:vpopIn .3s ease;position:relative}
       `}</style>
       <div className="h-orb1"/><div className="h-orb2"/>
-
-      {/* ÜST ARXA PLAN ŞƏKLİ */}
-      <div aria-hidden="true" style={{ position:"absolute", top:0, left:0, right:0, height:"calc(env(safe-area-inset-top) + 96px)", zIndex:1, pointerEvents:"none", backgroundImage:"url(/images/images/arxaplan.png)", backgroundSize:"cover", backgroundPosition:"center top", WebkitMaskImage:"linear-gradient(to bottom,#000 70%,transparent)", maskImage:"linear-gradient(to bottom,#000 70%,transparent)" }}/>
 
       {/* TOPBAR */}
       <header className="topbar">
@@ -1326,7 +1323,7 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
               ].map(p => (
                 <div key={p.img} style={{ background:"#fff", border:".5px solid rgba(20,10,40,.08)", borderRadius:16, padding:"8px 6px 10px", display:"flex", flexDirection:"column", alignItems:"center", textAlign:"center", boxShadow:"0 2px 10px rgba(20,10,40,.04)" }}>
                   <div style={{ width:"100%", background:"#e8f8ee", color:"#15803d", borderRadius:8, padding:"4px 4px", fontSize:9, fontWeight:600, lineHeight:1.25 }}>15% tokenin geri qaytarılması</div>
-                  <img src={`/images/images/v${p.img}.png`} alt="" style={{ width:72, height:72, objectFit:"contain", margin:"6px 0 4px" }}/>
+                  <img src={`/images/images/v${p.img}.PNG`} alt="" style={{ width:72, height:72, objectFit:"contain", margin:"6px 0 4px" }}/>
                   <div style={{ fontSize:15, fontWeight:700, color:"#111", letterSpacing:-.3, fontVariantNumeric:"tabular-nums" }}>{p.amt.toLocaleString("en-US")}</div>
                   <div style={{ fontSize:11, fontWeight:600, color:"#e0102d", marginTop:1 }}>+{p.bonus.toLocaleString("en-US")}</div>
                   <div style={{ fontSize:10, fontWeight:500, color:"#8e8e93", marginTop:2 }}>{p.exp} VİP EXP</div>
