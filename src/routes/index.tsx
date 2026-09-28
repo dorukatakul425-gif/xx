@@ -1898,6 +1898,53 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
 /* ─── ROOM ─── */
 function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onToggleMic, onJoinSeat, onLeaveSeat, onLeave, onOpenChat, onHome, onProfile, error }: any) {
   const [following, setFollowing] = useState(false);
+  const [msgs, setMsgs] = useState<Message[]>([]);
+  const [draftMsg, setDraftMsg] = useState("");
+  const [kb, setKb] = useState(0);
+  const feedRef = useRef<HTMLDivElement>(null);
+  const myId = session ? session.user.id : "demo";
+
+  // Mesajları yüklə (demo → cihaz, real → Supabase)
+  useEffect(() => {
+    if (!session) {
+      try { const d = localStorage.getItem("velvet_demo_chat"); setMsgs(d ? JSON.parse(d) : [
+        { id:1, user_id:"bot1", display_name:"Aynur", avatar_url:null, content:"Salam, xoş gəldin! 👋", created_at:new Date().toISOString() },
+        { id:2, user_id:"bot2", display_name:"Rauf", avatar_url:null, content:"Otaq çox gözəldir 🔥", created_at:new Date().toISOString() },
+      ]); } catch {}
+      return;
+    }
+    supabase.from("messages").select("*").eq("room_id", ROOM_ID).order("created_at", { ascending: true }).limit(50).then(({ data }) => { if (data) setMsgs(data as Message[]); });
+    const ch = supabase.channel(`room-feed-${ROOM_ID}`).on("postgres_changes", { event:"INSERT", schema:"public", table:"messages", filter:`room_id=eq.${ROOM_ID}` }, pl => setMsgs(prev => [...prev, pl.new as Message])).subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [session]);
+
+  // Klaviatura açılanda alt panel klaviaturanın üstünə qalxsın, səhifə sürüşməsin
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const on = () => { setKb(Math.max(0, window.innerHeight - vv.height - vv.offsetTop)); window.scrollTo(0, 0); };
+    vv.addEventListener("resize", on); vv.addEventListener("scroll", on);
+    return () => { vv.removeEventListener("resize", on); vv.removeEventListener("scroll", on); };
+  }, []);
+
+  useEffect(() => { const el = feedRef.current; if (el) el.scrollTop = el.scrollHeight; }, [msgs, kb]);
+
+  const sendMsg = async () => {
+    const t = draftMsg.trim();
+    if (!t) return;
+    setDraftMsg("");
+    if (!session) {
+      let av: string | null = avatarUrl;
+      try { av = av || localStorage.getItem("profile_avatar"); } catch {}
+      setMsgs(prev => {
+        const next = [...prev, { id: Date.now(), user_id:"demo", display_name: name, avatar_url: av, content: t, created_at: new Date().toISOString() }].slice(-100);
+        try { localStorage.setItem("velvet_demo_chat", JSON.stringify(next)); } catch {}
+        return next;
+      });
+      return;
+    }
+    await supabase.from("messages").insert({ room_id: ROOM_ID, user_id: session.user.id, display_name: name, avatar_url: avatarUrl, content: t });
+  };
   const speakers = members.filter((m: Member) => !m.is_muted);
   const listeners = members.filter((m: Member) => m.is_muted);
   const emptySeatCount = Math.max(0, 3 - speakers.length);
@@ -1939,51 +1986,81 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
           </div>
         </div>
 
-        <div style={{ background:"rgba(100,80,160,.07)", border:"1px solid rgba(100,80,160,.12)", borderRadius:16, padding:16, marginBottom:16 }}>
-          <div style={{ display:"flex", justifyContent:"space-between", marginBottom:14 }}>
-            <span style={{ fontSize:9, letterSpacing:"0.2em", color:"#5a3a7a", textTransform:"uppercase" }}>Danışan koltuklar</span>
-            <span style={{ fontSize:9, color:"#5a3a7a" }}>{speakers.length} / 6</span>
-          </div>
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:12 }}>
-            {speakers.map((m: Member) => (
-              <div key={m.user_id} style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:6 }}>
-                <div style={{ position:"relative", cursor:"pointer" }} onClick={m.user_id === session?.user.id ? onLeaveSeat : undefined}>
-                  <div style={{ width:56, height:56, borderRadius:"50%", border:"2px solid rgba(123,47,247,.6)", background:"rgba(123,47,247,.2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, fontWeight:900, color:"#c084fc" }}>{(m.user_id === session?.user.id ? name : "Üzv")[0]}</div>
-                  <span style={{ position:"absolute", bottom:-2, right:-2, width:18, height:18, borderRadius:"50%", background:"#7b2ff7", display:"flex", alignItems:"center", justifyContent:"center" }}><Radio size={8} color="white"/></span>
+        {/* OTURACAQLAR — 6 x 4 */}
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(6,1fr)", rowGap:14, columnGap:4 }}>
+          {Array.from({ length:24 }).map((_, i) => {
+            const m: Member | undefined = speakers[i];
+            const isMe = !!m && m.user_id === session?.user.id;
+            const label = m ? (isMe ? name.split(" ")[0] : "Üzv") : String(i + 1);
+            return (
+              <button key={i}
+                onClick={m ? (isMe ? onLeaveSeat : undefined) : (!iAmSpeaker ? onJoinSeat : undefined)}
+                style={{ background:"none", border:0, padding:0, display:"flex", flexDirection:"column", alignItems:"center", gap:5, cursor:"pointer", minWidth:0 }}>
+                <div style={{ position:"relative", width:46, height:46 }}>
+                  {m ? (
+                    <>
+                      <div style={{ position:"absolute", inset:-3, borderRadius:"50%", border:"2px solid #7b2ff7", animation:"vpulse 1.6s ease-in-out infinite", opacity:.6 }}/>
+                      <div style={{ width:46, height:46, borderRadius:"50%", background:"linear-gradient(135deg,#7b2ff7,#ff3ea5)", border:"2px solid #fff", boxShadow:"0 3px 10px rgba(123,47,247,.3)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:16, fontWeight:700, overflow:"hidden" }}>
+                        {isMe && avatarUrl ? <img src={avatarUrl} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }}/> : label[0]?.toUpperCase()}
+                      </div>
+                      <span style={{ position:"absolute", right:-2, bottom:-2, width:17, height:17, borderRadius:"50%", background: m.is_muted ? "#8e8e93" : "#22c55e", border:"2px solid #f5f5f7", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="#fff"><rect x="8" y="2" width="8" height="13" rx="4"/><path d="M5 11a7 7 0 0 0 14 0" stroke="#fff" strokeWidth="2.5" fill="none"/></svg>
+                      </span>
+                    </>
+                  ) : (
+                    <div style={{ width:46, height:46, borderRadius:"50%", background:"linear-gradient(160deg,#ffffff,#eeeaf6)", border:".5px solid rgba(20,10,40,.08)", boxShadow:"inset 0 1px 0 #fff, 0 2px 6px rgba(20,10,40,.06)", display:"flex", alignItems:"center", justifyContent:"center", color:"#b4aecb" }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M7 11V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v5"/><path d="M5 11h14v3H5z"/><path d="M7 14v6M17 14v6"/></svg>
+                    </div>
+                  )}
                 </div>
-                <p style={{ fontSize:10, fontWeight:600, color:"#1a1a2e" }}>{m.user_id === session?.user.id ? name.split(" ")[0] : "Üzv"}</p>
-              </div>
-            ))}
-            {Array.from({ length: emptySeatCount }).map((_, i) => (
-              <button key={i} onClick={!iAmSpeaker ? onJoinSeat : undefined} style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:6, background:"none", border:"none", cursor:iAmSpeaker ? "default" : "pointer" }}>
-                <div style={{ width:56, height:56, borderRadius:"50%", border:"2px dashed rgba(123,47,247,.35)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, color:"#7b2ff7" }}>+</div>
-                <p style={{ fontSize:10, color:iAmSpeaker ? "#3a2050" : "#7b2ff7" }}>{iAmSpeaker ? "Dolu" : "Qoşul"}</p>
+                <span style={{ fontSize:10, fontWeight: m ? 600 : 500, color: m ? "#111" : "#a19bb5", maxWidth:52, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{label}</span>
               </button>
-            ))}
-          </div>
+            );
+          })}
         </div>
-        {listeners.length > 0 && (
-          <div>
-            <p style={{ fontSize:9, letterSpacing:"0.2em", color:"#5a3a7a", textTransform:"uppercase", marginBottom:10 }}>Dinləyicilər · {listeners.length}</p>
-            <div style={{ display:"flex", gap:12, overflowX:"auto", paddingBottom:4 }}>
-              {listeners.slice(0,8).map((m: Member) => (
-                <div key={m.user_id} style={{ flexShrink:0, textAlign:"center" }}>
-                  <div style={{ width:42, height:42, borderRadius:"50%", border:"2px solid rgba(123,47,247,.4)", background:"rgba(123,47,247,.15)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, fontWeight:700, color:"#c084fc" }}>{(m.user_id === session?.user.id ? name : "Ü")[0]}</div>
-                  <p style={{ fontSize:9, color:"#5a3a7a", marginTop:4 }}>{m.user_id === session?.user.id ? name.split(" ")[0] : "Üzv"}</p>
+
+        {/* Oturacaqlar ilə söhbət arası */}
+        <div style={{ height:22 }}/>
+
+        {/* OTAQ SÖHBƏTİ */}
+        <div ref={feedRef} style={{ marginTop:0, maxHeight:"30dvh", overflowY:"auto", overscrollBehavior:"contain", display:"flex", flexDirection:"column", gap:10 }}>
+          {msgs.map(m => {
+            const me = m.user_id === myId;
+            return (
+              <div key={m.id} style={{ display:"flex", gap:8, alignItems:"flex-start" }}>
+                <div style={{ width:34, height:34, borderRadius:"50%", flexShrink:0, overflow:"hidden", background:"linear-gradient(135deg,#7b2ff7,#ff3ea5)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:13, fontWeight:700 }}>
+                  {m.avatar_url ? <img src={m.avatar_url} alt="" referrerPolicy="no-referrer" style={{ width:"100%", height:"100%", objectFit:"cover" }}/> : (m.display_name?.[0]?.toUpperCase() || "?")}
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
+                <div style={{ minWidth:0, maxWidth:"80%" }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:4, marginBottom:3 }}>
+                    <span style={{ fontSize:12, fontWeight:600, color: me ? "#7b2ff7" : "#3a3a3c", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", maxWidth:150 }}>{m.display_name}</span>
+                    <img src="/images/images/vlogo15.png" alt="" style={{ height:15, width:"auto", flexShrink:0 }}/>
+                  </div>
+                  <div style={{ display:"inline-block", background: me ? "#efe7ff" : "#fff", color:"#111", border: me ? ".5px solid rgba(123,47,247,.18)" : ".5px solid rgba(20,10,40,.08)", boxShadow:"0 1px 3px rgba(20,10,40,.05)", borderRadius:16, borderTopLeftRadius:5, padding:"7px 12px", fontSize:14, lineHeight:1.4, wordBreak:"break-word" }}>{m.content}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
         {error ? <p style={{ color:"#ff3ea5", fontSize:11, textAlign:"center", marginTop:12 }}>{error}</p> : null}
       </div>
       {/* ALT PANEL — mesaj sahəsi + ikonlar */}
-      <div style={{ position:"fixed", bottom:0, left:0, right:0, zIndex:50, background:"rgba(255,255,255,.92)", backdropFilter:"saturate(1.8) blur(20px)", WebkitBackdropFilter:"saturate(1.8) blur(20px)", borderTop:".5px solid rgba(20,10,40,.1)", padding:"8px 12px max(8px,env(safe-area-inset-bottom))", display:"flex", alignItems:"center", gap:8 }}>
-        <button onClick={onOpenChat} style={{ flex:1, minWidth:0, height:40, borderRadius:20, background:"#f4f2f8", border:0, display:"flex", alignItems:"center", gap:8, padding:"0 14px", color:"#8e8e93", fontSize:15, cursor:"text", textAlign:"left", fontFamily:"inherit" }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
-          Mesaj yaz…
-        </button>
-        <button aria-label="Mesajlar" onClick={onOpenChat} style={{ width:40, height:40, borderRadius:"50%", background:"#f4f2f8", border:0, display:"flex", alignItems:"center", justifyContent:"center", color:"#1c1c1e", cursor:"pointer", flexShrink:0 }}>
+      <div style={{ position:"fixed", bottom:kb, left:0, right:0, zIndex:50, background:"rgba(255,255,255,.92)", backdropFilter:"saturate(1.8) blur(20px)", WebkitBackdropFilter:"saturate(1.8) blur(20px)", borderTop:".5px solid rgba(20,10,40,.1)", padding:"8px 12px max(8px,env(safe-area-inset-bottom))", display:"flex", alignItems:"center", gap:8 }}>
+        <input
+          value={draftMsg}
+          onChange={e => setDraftMsg(e.target.value)}
+          onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); sendMsg(); } }}
+          placeholder="Mesaj yaz…"
+          enterKeyHint="send"
+          autoComplete="off"
+          style={{ flex:1, minWidth:0, height:40, borderRadius:20, background:"#f4f2f8", border:0, outline:"none", padding:"0 16px", fontSize:16, color:"#111", fontFamily:"inherit" }}
+        />
+        {draftMsg.trim() && (
+          <button onClick={sendMsg} aria-label="Göndər" style={{ width:40, height:40, borderRadius:"50%", border:0, flexShrink:0, background:"#7b2ff7", color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+          </button>
+        )}
+        <button aria-label="Mesajlar" style={{ width:40, height:40, borderRadius:"50%", background:"#f4f2f8", border:0, display:"flex", alignItems:"center", justifyContent:"center", color:"#1c1c1e", cursor:"pointer", flexShrink:0 }}>
           <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M20.5 11.6c0 4.3-3.8 7.7-8.5 7.7-1.1 0-2.2-.2-3.2-.6L4 20l1.2-3.6a7.3 7.3 0 0 1-1.7-4.8C3.5 7.3 7.3 3.9 12 3.9s8.5 3.4 8.5 7.7z"/></svg>
         </button>
         <button aria-label="Kataloq" style={{ width:40, height:40, borderRadius:"50%", background:"#f4f2f8", border:0, display:"flex", alignItems:"center", justifyContent:"center", color:"#1c1c1e", cursor:"pointer", flexShrink:0 }}>
