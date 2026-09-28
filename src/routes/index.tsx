@@ -2108,7 +2108,7 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
       {/* HƏDİYYƏ ANİMASİYASI — mesaj sahəsinin üstündə */}
       {giftPlay && (
         <div style={{ position:"fixed", left:0, right:0, bottom: kb + 58, height:"42dvh", zIndex:60, pointerEvents:"none", display:"flex", alignItems:"center", justifyContent:"center" }}>
-          {giftPlay.endsWith(".mp4")
+          {/\.(mp4|mov|webm)$/i.test(giftPlay)
             ? <video key={giftPlay} src={`/images/images/${giftPlay}`} autoPlay muted playsInline onEnded={() => setGiftPlay(null)} onError={() => setGiftPlay(null)} style={{ width:"100%", height:"100%", objectFit:"contain", background:"transparent" }}/>
             : <img src={`/images/images/${giftPlay}`} alt="" style={{ width:"100%", height:"100%", objectFit:"contain" }}/>}
         </div>
@@ -2118,7 +2118,7 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
       {giftOpen && (() => {
         const GIFTS: Record<string, { id:string; name:string; price:number; gif:string; icon:any }[]> = {
           "Çanta": [],
-          "Hədiyyə": [{ id:"aslan", name:"Aslan", price:99, gif:"sir.mp4", icon:LION }],
+          "Hədiyyə": [{ id:"aslan", name:"Aslan", price:99, gif:"sir.MOV", icon:LION }],
           "Şanslı": [], "Tədbirlər": [], "İnteraktiv": [],
         };
         const list = GIFTS[giftTab] || [];
