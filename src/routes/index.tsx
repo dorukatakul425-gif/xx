@@ -603,8 +603,8 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
             <button type="button" className="tb-btn" aria-label="Axtar">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
             </button>
-            <button type="button" aria-label="Gündəlik bonus" style={{ width:36, height:36, border:0, background:"none", padding:0, cursor:"pointer", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
-              <img src="/images/images/icon.gif" alt="" style={{ width:36, height:36, objectFit:"contain", display:"block" }}/>
+            <button type="button" aria-label="Gündəlik bonus" style={{ width:42, height:42, border:0, background:"none", padding:0, cursor:"pointer", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
+              <img src="/images/images/icon.gif" alt="" style={{ width:42, height:42, objectFit:"contain", display:"block" }}/>
             </button>
           </div>
         </div>
@@ -1173,33 +1173,33 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
               )}
 
               {/* Header */}
-              <div style={{ flexShrink:0, padding:"max(18px,env(safe-area-inset-top)) 18px 0" }}>
-                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:14 }}>
-                  <button onClick={() => setMagazaOpen(false)} style={{ width:36, height:36, borderRadius:11, background:"rgba(100,80,160,.08)", border:"1px solid rgba(100,80,160,.12)", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}>
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(40,20,100,.5)" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              <div style={{ flexShrink:0, padding:"max(14px,env(safe-area-inset-top)) 16px 0", background:"#fff" }}>
+                <div style={{ display:"flex", alignItems:"center", height:44, marginBottom:6 }}>
+                  <button onClick={() => setMagazaOpen(false)} aria-label="Geri" style={{ width:36, height:36, borderRadius:"50%", background:"#f4f2f8", border:0, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"#1c1c1e", flexShrink:0 }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
                   </button>
-                  <div style={{ textAlign:"center" }}>
-                    <div style={{ fontSize:17, fontWeight:800, color:"#1a1a2e" }}>Dekorasiya Mağazası</div>
-                  </div>
-                  <div style={{ background:"rgba(255,180,0,.08)", border:"1px solid rgba(255,180,0,.18)", borderRadius:12, padding:"6px 10px", display:"flex", alignItems:"center", gap:5 }}>
-                    <JetonImg size={15}/>
-                    <span style={{ fontSize:14, fontWeight:900, color:"#ffd700" }}>{jeton.toLocaleString()}</span>
-                  </div>
+                  <span style={{ marginLeft:8, fontSize:17, fontWeight:700, color:"#111", letterSpacing:-.3 }}>Dekorasiya Mağazası</span>
+                  <button aria-label="Mənim" style={{ marginLeft:"auto", height:32, padding:"0 12px 0 9px", borderRadius:16, background:"#e0102d", border:0, color:"#fff", display:"flex", alignItems:"center", gap:5, fontSize:13, fontWeight:600, cursor:"pointer", boxShadow:"0 2px 8px rgba(224,16,45,.3)" }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c.8-3.7 3.7-5.7 7.5-5.7s6.7 2 7.5 5.7"/></svg>
+                    Mənim
+                  </button>
                 </div>
 
-                {/* Tab seçimi */}
-                <div style={{ display:"flex", gap:8, marginBottom:14, background:"rgba(100,80,160,.07)", borderRadius:14, padding:4 }}>
+                {/* Tab seçimi — sadə yazı */}
+                <div style={{ display:"flex", gap:22, borderBottom:".5px solid rgba(20,10,40,.1)" }}>
                   {([
-                    { key:"cerceve", label:"Çərçivələr", icon:<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="12" cy="12" r="4"/></svg> },
-                    { key:"giris",   label:"Giriş Animasyonu", icon:<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> },
-                  ] as const).map(t => (
-                    <button key={t.key} onClick={() => setMagazaTab(t.key)}
-                      style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:6, padding:"9px 8px", borderRadius:11, border:"none", cursor:"pointer", fontSize:12, fontWeight:700, background: magazaTab===t.key ? "rgba(123,47,247,.3)" : "transparent", color: magazaTab===t.key ? "#c084fc" : "rgba(40,20,80,.55)", transition:".2s", borderBottom: magazaTab===t.key ? "1.5px solid #7b2ff7" : "1.5px solid transparent" }}>
-                      {t.icon}{t.label}
-                    </button>
-                  ))}
+                    { key:"cerceve", label:"Çərçivələr" },
+                    { key:"giris",   label:"Giriş Animasiyası" },
+                  ] as const).map(t => {
+                    const on = magazaTab === t.key;
+                    return (
+                      <button key={t.key} onClick={() => setMagazaTab(t.key)}
+                        style={{ background:"none", border:0, padding:"10px 0", cursor:"pointer", fontSize:15, fontWeight: on ? 500 : 300, color: on ? "#111" : "#8e8e93", borderBottom: on ? "2px solid #111" : "2px solid transparent", marginBottom:-.5, fontFamily:"inherit" }}>
+                        {t.label}
+                      </button>
+                    );
+                  })}
                 </div>
-                <div style={{ height:1, background:"linear-gradient(90deg,transparent,rgba(100,80,160,.09),transparent)" }}/>
               </div>
 
               {/* GİRİŞ ANİMASYONU TAB */}
