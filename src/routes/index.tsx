@@ -2462,273 +2462,190 @@ function VipLevelIcon({ n, state }: { n: number; state: "done" | "active" | "loc
 
 function VipScreen({ onBack }: { onBack: () => void }) {
   const CSS = `
-    @keyframes vsgGlow{0%,100%{filter:drop-shadow(0 0 6px rgba(200,150,0,.4))}50%{filter:drop-shadow(0 0 22px rgba(255,200,0,.9))}}
+    @keyframes vsgGlow{0%,100%{filter:drop-shadow(0 0 6px rgba(192,132,252,.4))}50%{filter:drop-shadow(0 0 20px rgba(192,132,252,.9))}}
     @keyframes vsgShimmer{0%{background-position:-300% 0}100%{background-position:300% 0}}
-    @keyframes vsgScan{0%{transform:translateY(-100%)}100%{transform:translateY(800%)}}
-    @keyframes vsgStar{0%,100%{opacity:.05}50%{opacity:.14}}
+    @keyframes vsgSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
     @keyframes vsgPulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
     @keyframes vsgBar{0%,100%{transform:scaleY(.15)}50%{transform:scaleY(1)}}
-    @keyframes vsgBlink{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:.9;transform:scale(1.2)}}
-    @keyframes vsgBarD{0%,100%{box-shadow:0 0 5px rgba(80,220,80,.5)}50%{box-shadow:0 0 16px rgba(80,220,80,1)}}
-    .vs-scroll{overflow-y:auto;height:100dvh;padding-bottom:40px}
+    @keyframes vsgBlink{0%,100%{opacity:.15;transform:scale(.8)}50%{opacity:.9;transform:scale(1.2)}}
+    .vs-scroll{overflow-y:auto;height:100dvh;padding-bottom:40px;background:#07000f}
     .vs-scroll::-webkit-scrollbar{display:none}
+    .vs-bg{background:radial-gradient(ellipse at 70% 0%,rgba(123,47,247,.35) 0%,transparent 55%),radial-gradient(ellipse at 20% 60%,rgba(255,62,165,.15) 0%,transparent 50%),#07000f;min-height:100dvh}
     .vs-nav{display:flex;align-items:center;justify-content:space-between;padding:max(18px,env(safe-area-inset-top)) 20px 14px}
-    .vs-nav-btn{width:38px;height:38px;border-radius:13px;background:rgba(100,80,160,.08);border:1px solid rgba(100,80,160,.1);display:flex;align-items:center;justify-content:center;cursor:pointer}
-    .vs-card{margin:0 18px 16px;border-radius:24px;overflow:hidden;position:relative}
-    .vs-card-bg{display:none}
-    .vs-card-stars{position:absolute;inset:0;overflow:hidden;pointer-events:none}
-    .vs-card-sheen{position:absolute;inset:0;background:linear-gradient(115deg,transparent 20%,rgba(255,255,255,.015) 38%,rgba(100,80,160,.07) 50%,rgba(255,255,255,.015) 62%,transparent 80%);background-size:300% 100%;animation:vsgShimmer 7s ease-in-out infinite}
-    .vs-card-scanw{position:absolute;inset:0;overflow:hidden}
-    .vs-card-scan{position:absolute;left:0;right:0;height:40px;background:linear-gradient(180deg,transparent,rgba(255,255,255,.008),transparent);animation:vsgScan 8s linear infinite}
-    .vs-card-bd{position:absolute;inset:0;border-radius:24px;border:1px solid rgba(255,255,255,.09)}
-    .vs-card-body{position:relative;z-index:3;padding:20px 22px 18px}
-    .vs-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px}
-    .vs-card-left{display:flex;align-items:center;gap:14px}
-    .vs-info-tag{font-size:9px;font-weight:600;letter-spacing:3px;color:rgba(80,60,140,.25);text-transform:uppercase;margin-bottom:4px}
-    .vs-info-level{font-size:20px;font-weight:800;color:rgba(90,210,90,.95);letter-spacing:-.3px;line-height:1.1;margin-bottom:8px}
-    .vs-active{display:inline-flex;align-items:center;gap:5px;background:rgba(80,200,80,.09);border:1px solid rgba(80,200,80,.22);border-radius:7px;padding:3px 9px}
-    .vs-active-dot{width:5px;height:5px;border-radius:50%;background:#50c050;animation:vsgPulse 2s ease-in-out infinite}
-    .vs-active-txt{font-size:9px;font-weight:700;color:rgba(80,200,80,.85);letter-spacing:.8px}
-    .vs-deer{width:72px;height:72px;flex-shrink:0;animation:vfloat 4s ease-in-out infinite;filter:drop-shadow(0 6px 16px rgba(100,80,160,.25))}
-    .vs-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(100,80,160,.09),transparent);margin-bottom:16px}
-    .vs-exp-label{font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.22);text-transform:uppercase;margin-bottom:7px}
-    .vs-exp-row{display:flex;align-items:baseline;gap:7px;margin-bottom:11px}
-    .vs-exp-n{font-size:26px;font-weight:800;color:#fff;letter-spacing:-.5px}
-    .vs-exp-u{font-size:11px;color:rgba(60,40,120,.3)}
-    .vs-exp-h{font-size:10px;color:rgba(200,155,0,.65)}
-    .vs-bar-track{height:5px;background:rgba(255,255,255,.055);border-radius:3px;overflow:visible;position:relative;margin-bottom:8px}
-    .vs-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#1e6e1e,#3eae3e,#70e070);position:relative;transition:width 2.5s ease-out}
-    .vs-lvl-row{display:flex;justify-content:space-between}
-    .vs-lvl{font-size:9px;color:rgba(255,255,255,.18)}
-    .vs-lvl-g{color:rgba(80,200,80,.4)}
-    /* Velvet anim */
-    .vs-vanim{margin:0 18px 20px;border-radius:20px;overflow:hidden;position:relative;height:72px;background:#08001a}
-    .vs-va-bg{position:absolute;inset:0;background:linear-gradient(135deg,#08001c,#12002e,#08001c)}
+    .vs-nav-btn{width:38px;height:38px;border-radius:13px;background:rgba(123,47,247,.12);border:1px solid rgba(123,47,247,.25);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff}
+    .vs-nav-title{font-size:18px;font-weight:700;color:#fff;letter-spacing:.3px}
+    .vs-user-card{margin:0 16px 20px;background:rgba(255,255,255,.05);border:1px solid rgba(123,47,247,.3);border-radius:18px;padding:16px}
+    .vs-user-row{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+    .vs-user-av{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#7b2ff7,#c084fc);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff;flex-shrink:0;border:2px solid rgba(192,132,252,.4);overflow:hidden}
+    .vs-user-name{font-size:19px;font-weight:700;color:#fff;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .vs-user-vip0{font-size:26px;font-weight:900;color:rgba(192,132,252,.35);letter-spacing:2px}
+    .vs-user-promo{font-size:13px;color:rgba(255,255,255,.55);line-height:1.5}
+    .vs-sec-hdr{display:flex;align-items:center;gap:8px;margin:0 16px 14px}
+    .vs-sec-line{flex:1;height:1px;background:rgba(192,132,252,.2)}
+    .vs-sec-deco{color:#c084fc;font-size:14px}
+    .vs-sec-title{font-size:13px;font-weight:700;color:#c084fc;letter-spacing:1px;white-space:nowrap}
+    .vs-vcard{margin:0 16px 22px;border-radius:18px;overflow:hidden;background:linear-gradient(160deg,#1a0035,#0d001e,#200040);border:1px solid rgba(123,47,247,.4)}
+    .vs-unlock-bar{padding:11px;text-align:center;background:linear-gradient(90deg,rgba(123,47,247,.3),rgba(192,132,252,.5),rgba(255,62,165,.3),rgba(192,132,252,.5),rgba(123,47,247,.3));border-bottom:1px solid rgba(192,132,252,.2);position:relative}
+    .vs-unlock-bar::before,.vs-unlock-bar::after{content:"✦";position:absolute;top:50%;transform:translateY(-50%);color:#c084fc;font-size:14px}
+    .vs-unlock-bar::before{left:12px}
+    .vs-unlock-bar::after{right:12px}
+    .vs-unlock-txt{font-size:15px;font-weight:700;color:#e0c0ff;letter-spacing:.5px}
+    .vs-badges-row{display:flex;justify-content:space-around;padding:28px 16px 20px}
+    .vs-badge-item{display:flex;flex-direction:column;align-items:center;gap:10px}
+    .vs-badge-wrap{width:90px;height:90px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center}
+    .vs-badge-outer{background:radial-gradient(circle at 35% 30%,#2a0060,#0d0020);border:2px solid rgba(123,47,247,.6)}
+    .vs-badge-outer-empty{background:radial-gradient(circle at 35% 30%,#180030,#080010);border:2px solid rgba(123,47,247,.25)}
+    .vs-badge-inner{width:64px;height:64px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#7b2ff7,#3d0880);display:flex;align-items:center;justify-content:center;position:relative}
+    .vs-badge-inner-empty{width:64px;height:64px;border-radius:50%;background:rgba(123,47,247,.08);border:2px dashed rgba(123,47,247,.3);display:flex;align-items:center;justify-content:center}
+    .vs-badge-spin{position:absolute;inset:-2px;border-radius:50%;border:2px solid transparent;border-top-color:#c084fc;border-right-color:#ff3ea5;animation:vsgSpin 3s linear infinite}
+    .vs-badge-lbl{font-size:8px;font-weight:800;color:#ffd700;letter-spacing:1px;position:absolute;bottom:7px}
+    .vs-badge-name{font-size:13px;color:rgba(255,255,255,.8);text-align:center;font-weight:500;max-width:95px;line-height:1.3}
+    .vs-dots{display:flex;justify-content:center;gap:6px;padding:0 0 18px}
+    .vs-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.15)}
+    .vs-dot.on{background:#c084fc}
+    .vs-func-wrap{padding:0 16px;margin-bottom:22px}
+    .vs-func-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .vs-func-item{background:rgba(123,47,247,.1);border:1px solid rgba(123,47,247,.25);border-radius:14px;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:10px}
+    .vs-func-ico{width:50px;height:50px;border-radius:50%;background:radial-gradient(circle at 40% 35%,rgba(123,47,247,.5),rgba(60,0,120,.8));border:1.5px solid rgba(192,132,252,.35);display:flex;align-items:center;justify-content:center}
+    .vs-func-lbl{font-size:12px;color:rgba(255,255,255,.75);text-align:center;line-height:1.35;font-weight:500}
+    .vs-cta{margin:0 16px;background:linear-gradient(135deg,rgba(255,62,165,.15),rgba(123,47,247,.2));border:1px solid rgba(255,62,165,.4);border-radius:28px;padding:16px 20px;text-align:center}
+    .vs-cta-txt{font-size:14px;font-weight:700;color:#ffb0d8}
+    .vs-vanim{margin:0 16px 20px;border-radius:20px;overflow:hidden;position:relative;height:72px;background:#08001a;border:1px solid rgba(123,47,247,.2)}
     .vs-va-g1{position:absolute;width:160px;height:160px;top:-80px;left:15px;border-radius:50%;background:radial-gradient(circle,rgba(123,47,247,.2) 0%,transparent 70%);animation:vsgPulse 3.5s ease-in-out infinite}
     .vs-va-g2{position:absolute;width:130px;height:130px;top:-65px;right:25px;border-radius:50%;background:radial-gradient(circle,rgba(255,62,165,.14) 0%,transparent 70%);animation:vsgPulse 3.5s ease-in-out infinite .8s}
     .vs-va-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
     .vs-va-logo{position:relative;width:50px;height:50px;display:flex;align-items:center;justify-content:center}
-    .vs-va-r1{position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(192,132,252,.2);animation:vrotate 9s linear infinite}
-    .vs-va-r2{position:absolute;inset:6px;border-radius:50%;border:1px dashed rgba(255,62,165,.14);animation:vsgShimmer 6s linear infinite}
+    .vs-va-r1{position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(192,132,252,.2);animation:vsgSpin 9s linear infinite}
+    .vs-va-r2{position:absolute;inset:6px;border-radius:50%;border:1px dashed rgba(255,62,165,.14);animation:vsgSpin 6s linear infinite reverse}
     .vs-va-v{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#1e003e,#320068);border:1.5px solid rgba(123,47,247,.5);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff;font-style:italic}
     .vs-va-bars{position:absolute;right:22px;top:50%;transform:translateY(-50%);display:flex;align-items:flex-end;gap:2.5px;height:32px}
     .vs-va-bar{width:4px;border-radius:2px;transform-origin:bottom}
     .vs-va-stars{position:absolute;left:18px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:7px}
     .vs-vstar{font-size:9px;animation:vsgBlink ease-in-out infinite}
-    .vs-va-bd{position:absolute;inset:0;border-radius:20px;border:1px solid rgba(123,47,247,.2)}
-    /* Road */
-    .vs-road-hdr{padding:0 20px 14px;display:flex;align-items:center;gap:12px}
-    .vs-rh-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(100,80,160,.09),transparent)}
-    .vs-rh-title{font-size:10px;font-weight:700;letter-spacing:3px;color:rgba(80,60,140,.2);text-transform:uppercase;white-space:nowrap}
-    .vs-road{padding:0 18px 8px}
-    .vs-conn{margin-left:20px;height:10px;display:flex;align-items:center}
-    .vs-conn-line{width:2px;height:100%;border-radius:1px}
-    .vs-item{display:flex;align-items:center;gap:14px;padding:10px 14px;border-radius:16px;margin-bottom:2px}
-    .vs-item.done{background:rgba(80,200,80,.03)}
-    .vs-item.active{background:rgba(255,200,0,.05);border:1px solid rgba(255,200,0,.1)}
-    .vs-circle{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative}
-    .vs-circle.done{background:rgba(80,200,80,.1);border:1.5px solid rgba(80,200,80,.3)}
-    .vs-circle.active{background:rgba(255,200,0,.1);border:2px solid rgba(255,200,0,.6);box-shadow:0 0 18px rgba(255,200,0,.18)}
-    .vs-circle.locked{background:rgba(255,255,255,.025);border:1.5px solid rgba(100,80,160,.1)}
-    .vs-chk{position:absolute;bottom:-2px;right:-2px;width:15px;height:15px;border-radius:50%;background:linear-gradient(135deg,#30b030,#50d050);border:2px solid #07000f;display:flex;align-items:center;justify-content:center}
-    .vs-crown{position:absolute;top:-10px;left:50%;transform:translateX(-50%)}
-    .vs-info{flex:1;min-width:0}
-    .vs-name{font-size:13px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:6px}
-    .vs-name.done{color:rgba(30,10,80,.7)}.vs-name.active{color:#fff}.vs-name.locked{color:rgba(80,60,140,.2)}
-    .vs-cur-tag{font-size:8px;font-weight:600;background:rgba(255,200,0,.15);color:rgba(255,200,0,.8);border:1px solid rgba(255,200,0,.2);border-radius:5px;padding:1px 6px;letter-spacing:.5px}
-    .vs-bar-t{height:3px;background:rgba(100,80,160,.08);border-radius:2px;overflow:hidden;margin-bottom:4px}
-    .vs-bar-f{height:100%;border-radius:2px}
-    .vs-sub{display:flex;justify-content:space-between;align-items:center}
-    .vs-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:8px;font-size:9px;font-weight:700;white-space:nowrap;flex-shrink:0}
-    .vs-badge.done{background:rgba(80,200,80,.08);color:rgba(80,200,80,.65);border:1px solid rgba(80,200,80,.14)}
-    .vs-badge.active{background:rgba(255,200,0,.1);color:#ffd700;border:1px solid rgba(255,200,0,.25)}
-    .vs-badge.locked{background:rgba(100,80,160,.06);color:rgba(255,255,255,.18);border:1px solid rgba(100,80,160,.09)}
   `;
 
+  const displayName = (() => { try { const p = localStorage.getItem("velvet_profile"); return p ? JSON.parse(p).username : "İstifadəçi"; } catch { return "İstifadəçi"; } })();
+  const avatarImg = (() => { try { return localStorage.getItem("profile_avatar"); } catch { return null; } })();
+  const avatarLetter = displayName?.[0]?.toUpperCase() || "İ";
+
+  const funcItems = [
+    { label: "Otağı Kilidləmə", icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="1.8" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/><circle cx="12" cy="16" r="1.5" fill="#c084fc" stroke="none"/></svg> },
+    { label: "Ölkə Məlumatını Gizlət", icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><line x1="4" y1="20" x2="20" y2="20"/><line x1="8" y1="12" x2="8" y2="20" strokeDasharray="2,2"/></svg> },
+    { label: "Onlayn Statusunu Gizlət", icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/><path d="M3 12h2M19 12h2M12 3v2M12 19v2"/></svg> },
+    { label: "Tab Xüsusiyyəti", icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c084fc" strokeWidth="1.8" strokeLinecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M9 5v14M2 12h7"/></svg> },
+  ];
+
   return (
-    <main style={{ background:"#ffffff", minHeight:"100dvh", fontFamily:"'Helvetica Neue',Arial,sans-serif" }}>
+    <main style={{ background:"#07000f", minHeight:"100dvh", fontFamily:"'Helvetica Neue',Arial,sans-serif" }}>
       <style>{CSS}</style>
       <div className="vs-scroll">
-        {/* NAV */}
-        <div className="vs-nav">
-          <div className="vs-nav-btn" onClick={onBack}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(40,20,100,.5)" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        <div className="vs-bg">
+          <div className="vs-nav">
+            <button className="vs-nav-btn" onClick={onBack} aria-label="Geri">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <span className="vs-nav-title">VIP</span>
+            <button className="vs-nav-btn" aria-label="Kömək">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(192,132,252,.8)" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.3 2.4c-.5.2-.8.7-.8 1.2v.4"/><circle cx="12" cy="17" r=".6" fill="rgba(192,132,252,.8)" stroke="none"/></svg>
+            </button>
           </div>
-          <span style={{ fontSize:17, fontWeight:700, color:"#1a1a2e" }}>Mənim VIP-im</span>
-          <div className="vs-nav-btn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(40,20,80,.55)" strokeWidth="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
-          </div>
-        </div>
 
-        {/* HERO CARD */}
-        <div className="vs-card">
-          <img src="/images/images/vip.png" style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"cover", borderRadius:24, opacity:1, zIndex:0 }} alt=""/>
-          <div className="vs-card-stars">
-            <svg style={{ position:"absolute", left:-8, bottom:10, animation:"vsgStar 3s infinite" }} width="140" height="140" viewBox="0 0 100 100"><path d="M50 5L61 35L95 35L67 57L79 91L50 70L21 91L33 57L5 35L39 35Z" fill="rgba(255,255,255,.065)"/></svg>
-            <svg style={{ position:"absolute", right:72, top:12, animation:"vsgStar 3.5s infinite .7s" }} width="88" height="88" viewBox="0 0 100 100"><path d="M50 5L61 35L95 35L67 57L79 91L50 70L21 91L33 57L5 35L39 35Z" fill="rgba(100,80,160,.07)"/></svg>
-            <svg style={{ position:"absolute", right:4, bottom:12, animation:"vsgStar 2.8s infinite 1.2s" }} width="48" height="48" viewBox="0 0 100 100"><path d="M50 5L61 35L95 35L67 57L79 91L50 70L21 91L33 57L5 35L39 35Z" fill="rgba(100,80,160,.08)"/></svg>
+          <div className="vs-user-card">
+            <div className="vs-user-row">
+              <div className="vs-user-av">{avatarImg ? <img src={avatarImg} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }}/> : avatarLetter}</div>
+              <div className="vs-user-name">{displayName}</div>
+              <div className="vs-user-vip0">VIP0</div>
+            </div>
+            <div className="vs-user-promo">
+              İstənilən məbləğdə yükləmə edərək VIP olun{" "}
+              <span style={{ color:"#c084fc", fontWeight:600 }}>VIP &gt;</span>
+            </div>
           </div>
-          <div className="vs-card-sheen"/>
-          <div className="vs-card-scanw"><div className="vs-card-scan"/></div>
-          <div className="vs-card-bd"/>
-          <div className="vs-card-body">
-            <div className="vs-card-top">
-              <div className="vs-card-left">
-                {/* Shield Logo */}
-                <div style={{ animation:"vsgGlow 3s ease-in-out infinite", flexShrink:0 }}>
-                  <VipShieldLogo size={58}/>
-                </div>
-                <div>
-                  <div className="vs-info-tag">Velvet VIP</div>
-                  <div className="vs-info-level">Səviyyə 17</div>
-                  <div className="vs-active">
-                    <div className="vs-active-dot"/><span className="vs-active-txt">AKTİV</span>
+
+          <div className="vs-sec-hdr">
+            <div className="vs-sec-line"/><span className="vs-sec-deco">✦</span>
+            <span className="vs-sec-title">VIP Səviyyə Üstünlükləri</span>
+            <span className="vs-sec-deco">✦</span><div className="vs-sec-line"/>
+          </div>
+
+          <div className="vs-vcard">
+            <div className="vs-unlock-bar"><span className="vs-unlock-txt">VIP1 Kilidini Aç</span></div>
+            <div className="vs-badges-row">
+              <div className="vs-badge-item">
+                <div className="vs-badge-wrap vs-badge-outer">
+                  <div className="vs-badge-spin"/>
+                  <div className="vs-badge-inner">
+                    <svg width="30" height="30" viewBox="0 0 40 40">
+                      <circle cx="20" cy="20" r="13" fill="#0d0020" stroke="#c084fc" strokeWidth="1.5"/>
+                      <circle cx="20" cy="20" r="7" fill="none" stroke="#ff3ea5" strokeWidth="1.5"/>
+                      <circle cx="20" cy="20" r="3" fill="#c084fc"/>
+                      <circle cx="13" cy="13" r="2.5" fill="#7b2ff7"/>
+                      <circle cx="27" cy="13" r="2.5" fill="#7b2ff7"/>
+                      <circle cx="20" cy="30" r="2.5" fill="#7b2ff7"/>
+                    </svg>
+                    <span className="vs-badge-lbl">VIP1</span>
                   </div>
                 </div>
+                <div className="vs-badge-name">VIP Nişanı</div>
               </div>
-              {/* 3D Deer */}
-              <svg className="vs-deer" viewBox="0 0 120 120" fill="none">
-                <defs>
-                  <linearGradient id="vsdbb" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#8ab08a"/><stop offset="55%" stopColor="#608060"/><stop offset="100%" stopColor="#3a5a3a"/></linearGradient>
-                  <linearGradient id="vsdff" x1="0%" y1="0%" x2="80%" y2="100%"><stop offset="0%" stopColor="#a0c4a0"/><stop offset="100%" stopColor="#507050"/></linearGradient>
-                  <linearGradient id="vsdaa" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#9ab89a"/><stop offset="100%" stopColor="#4a6a4a"/></linearGradient>
-                  <filter id="vsdss"><feDropShadow dx="0" dy="3" stdDeviation="5" floodColor="rgba(0,0,0,.55)"/></filter>
-                  <filter id="vsdgg"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-                </defs>
-                <ellipse cx="60" cy="70" rx="34" ry="11" fill="rgba(0,0,0,.2)"/>
-                <polygon points="60,8 96,44 60,80 24,44" fill="none" stroke="rgba(80,160,80,.25)" strokeWidth="1.5" filter="url(#vsdgg)"/>
-                <g filter="url(#vsdss)">
-                  <path d="M48 40C44 32 39 24 34 18C37 22 39 18 41 14C43 18 43 24 44 30C46 26 49 22 51 18C50 24 48 32 48 40Z" fill="url(#vsdaa)"/>
-                  <path d="M48 40C42 34 35 30 29 32C33 28 37 24 42 22C44 28 46 34 48 40Z" fill="url(#vsdaa)"/>
-                  <path d="M36 22C32 18 30 13 28 9" stroke="url(#vsdaa)" strokeWidth="3.5" strokeLinecap="round" fill="none"/>
-                  <path d="M72 40C76 32 81 24 86 18C83 22 81 18 79 14C77 18 77 24 76 30C74 26 71 22 69 18C70 24 72 32 72 40Z" fill="url(#vsdaa)"/>
-                  <path d="M72 40C78 34 85 30 91 32C87 28 83 24 78 22C76 28 74 34 72 40Z" fill="url(#vsdaa)"/>
-                  <path d="M84 22C88 18 90 13 92 9" stroke="url(#vsdaa)" strokeWidth="3.5" strokeLinecap="round" fill="none"/>
-                </g>
-                <ellipse cx="60" cy="64" rx="18" ry="20" fill="url(#vsdbb)" filter="url(#vsdss)"/>
-                <ellipse cx="60" cy="62" rx="13" ry="14" fill="url(#vsdff)"/>
-                <ellipse cx="53.5" cy="58" rx="3.5" ry="4" fill="#1a2a1a"/>
-                <ellipse cx="66.5" cy="58" rx="3.5" ry="4" fill="#1a2a1a"/>
-                <ellipse cx="53.5" cy="58" rx="2" ry="2.5" fill="#2d4a2d"/>
-                <ellipse cx="66.5" cy="58" rx="2" ry="2.5" fill="#2d4a2d"/>
-                <circle cx="55" cy="56.5" r="1.5" fill="rgba(200,240,200,.7)"/>
-                <circle cx="68" cy="56.5" r="1.5" fill="rgba(200,240,200,.7)"/>
-                <ellipse cx="60" cy="69" rx="4.5" ry="3" fill="rgba(40,60,40,.7)"/>
-                <ellipse cx="44.5" cy="48" rx="5.5" ry="8.5" fill="url(#vsdbb)" transform="rotate(-18,44.5,48)"/>
-                <ellipse cx="75.5" cy="48" rx="5.5" ry="8.5" fill="url(#vsdbb)" transform="rotate(18,75.5,48)"/>
-                <path d="M51 77Q60 83 69 77L67 88Q60 92 53 88Z" fill="url(#vsdbb)"/>
-              </svg>
+              <div className="vs-badge-item">
+                <div className="vs-badge-wrap vs-badge-outer-empty">
+                  <div className="vs-badge-inner-empty">
+                    <svg width="32" height="32" viewBox="0 0 40 40">
+                      <circle cx="20" cy="20" r="15" fill="none" stroke="rgba(123,47,247,.4)" strokeWidth="2"/>
+                      <circle cx="20" cy="20" r="9" fill="none" stroke="rgba(123,47,247,.3)" strokeWidth="1.5"/>
+                      <path d="M8 20 Q14 10 20 8 Q26 10 32 20" fill="none" stroke="rgba(192,132,252,.4)" strokeWidth="1.5"/>
+                      <circle cx="20" cy="8" r="3" fill="rgba(192,132,252,.3)"/>
+                    </svg>
+                  </div>
+                </div>
+                <div className="vs-badge-name">VIP Profil Çərçivəsi</div>
+              </div>
             </div>
-            <div className="vs-divider"/>
-            <div className="vs-exp-label">TOPLAM TƏCRÜBƏ</div>
-            <div className="vs-exp-row">
-              <div className="vs-exp-n">2,847</div>
-              <div className="vs-exp-u">Exp</div>
-              <div className="vs-exp-h">· VIP18 üçün +1,153 lazım</div>
-            </div>
-            <div className="vs-bar-track">
-              <div className="vs-bar-fill" style={{ width:"68%" }}/>
-              <div style={{ position:"absolute", left:"68%", top:"50%", transform:"translateY(-50%)", width:11, height:11, borderRadius:"50%", background:"#78e878", border:"2.5px solid #131318", animation:"vsgBarD 2s ease-in-out infinite" }}/>
-              {[25,50,75].map(p => <div key={p} style={{ position:"absolute", left:`${p}%`, top:-3, width:1, height:11, background:"rgba(100,80,160,.12)", borderRadius:1 }}/>)}
-            </div>
-            <div className="vs-lvl-row" style={{ marginTop:8 }}>
-              <span className="vs-lvl vs-lvl-g">VIP17 qorunması: 2,400 Exp</span>
-              <span className="vs-lvl">VIP18 →</span>
-            </div>
+            <div className="vs-dots">{[0,1,2,3,4].map(i => <div key={i} className={`vs-dot${i===0?" on":""}`}/>)}</div>
           </div>
-        </div>
 
-        {/* VELVET ANİM */}
-        <div className="vs-vanim">
-          <div className="vs-va-bg"/><div className="vs-va-g1"/><div className="vs-va-g2"/>
-          <div className="vs-va-stars">
-            <span className="vs-vstar" style={{ color:"#ff3ea5", animationDuration:"1.8s" }}>✦</span>
-            <span className="vs-vstar" style={{ color:"#c084fc", animationDuration:"2.3s", animationDelay:".6s", fontSize:7 }}>✦</span>
-            <span className="vs-vstar" style={{ color:"#00d4ff", animationDuration:"1.6s", animationDelay:"1.1s" }}>✦</span>
-          </div>
-          <div className="vs-va-center">
-            <div className="vs-va-logo">
-              <div className="vs-va-r1"/><div className="vs-va-r2"/>
-              {/* orbit dots */}
-              {[
-                { color:"#ff3ea5", delay:"0s" },
-                { color:"#c084fc", delay:"1.2s" },
-                { color:"#00d4ff", delay:"2.4s" },
-              ].map((o, i) => (
-                <div key={i} style={{ position:"absolute", top:"50%", left:"50%", width:5, height:5, borderRadius:"50%", background:o.color, marginLeft:-2.5, marginTop:-2.5, boxShadow:`0 0 6px ${o.color}`, animation:`vorbit 3.5s linear infinite ${o.delay}` }}/>
+          <div className="vs-vanim">
+            <div className="vs-va-g1"/><div className="vs-va-g2"/>
+            <div className="vs-va-stars">
+              <span className="vs-vstar" style={{ color:"#ff3ea5", animationDuration:"1.8s" }}>✦</span>
+              <span className="vs-vstar" style={{ color:"#c084fc", animationDuration:"2.3s", animationDelay:".6s", fontSize:"7px" }}>✦</span>
+              <span className="vs-vstar" style={{ color:"#00d4ff", animationDuration:"1.6s", animationDelay:"1.1s" }}>✦</span>
+            </div>
+            <div className="vs-va-center">
+              <div className="vs-va-logo">
+                <div className="vs-va-r1"/><div className="vs-va-r2"/>
+                {[{c:"#ff3ea5",d:"0s"},{c:"#c084fc",d:"1.2s"},{c:"#00d4ff",d:"2.4s"}].map((o,i) => (
+                  <div key={i} style={{ position:"absolute", top:"50%", left:"50%", width:5, height:5, borderRadius:"50%", background:o.c, marginLeft:-2.5, marginTop:-2.5, animation:`vorbit 3.5s linear infinite ${o.d}` }}/>
+                ))}
+                <div className="vs-va-v">V</div>
+              </div>
+            </div>
+            <div className="vs-va-bars">
+              {["#ff6b35","#ff3ea5","#c084fc","#7b2ff7","#00d4ff","#ff3ea5","#c084fc"].map((c,i) => (
+                <div key={i} className="vs-va-bar" style={{ background:c, height:32, animation:`vsgBar .75s ease-in-out infinite ${i*.1}s`, transformOrigin:"bottom" }}/>
               ))}
-              <div className="vs-va-v">V</div>
             </div>
           </div>
-          <div className="vs-va-bars">
-            {["#ff6b35","#ff3ea5","#c084fc","#7b2ff7","#00d4ff","#ff3ea5","#c084fc"].map((c, i) => (
-              <div key={i} className="vs-va-bar" style={{ background:c, height:32, animation:`vsgBar .75s ease-in-out infinite ${i * 0.1}s`, transformOrigin:"bottom" }}/>
-            ))}
+
+          <div className="vs-sec-hdr">
+            <div className="vs-sec-line"/><span className="vs-sec-deco">✦</span>
+            <span className="vs-sec-title">Funksional Üstünlüklər</span>
+            <span className="vs-sec-deco">✦</span><div className="vs-sec-line"/>
           </div>
-          <div className="vs-va-bd"/>
-        </div>
 
-        {/* VIP YOLU */}
-        <div className="vs-road-hdr">
-          <div className="vs-rh-line"/><div className="vs-rh-title">VIP Yolu</div><div className="vs-rh-line"/>
-        </div>
-
-        <div className="vs-road">
-          {VIP_LEVELS.map((lv, i) => {
-            const isDone = lv.next !== null && CURRENT_EXP >= lv.next;
-            const isActive = !isDone && CURRENT_EXP >= lv.req;
-            const st: "done" | "active" | "locked" = isDone ? "done" : isActive ? "active" : "locked";
-            const prev = VIP_LEVELS[i - 1]?.req ?? 0;
-            const span = lv.next ? lv.next - lv.req : 1;
-            const pct = st === "done" ? 100 : st === "active" ? Math.min(100, Math.round((CURRENT_EXP - lv.req) / span * 100)) : 0;
-            const barC = st === "done" ? "linear-gradient(90deg,#1e6e1e,#3aae3a)" : st === "active" ? "linear-gradient(90deg,#aa7700,#ffd700,#ffee66)" : "rgba(100,80,160,.07)";
-            return (
-              <div key={lv.n}>
-                {i > 0 && (
-                  <div className="vs-conn">
-                    <div className="vs-conn-line" style={{ background: st === "done" ? "rgba(80,200,80,.2)" : st === "active" ? "rgba(255,200,0,.2)" : "rgba(100,80,160,.07)" }}/>
-                  </div>
-                )}
-                <div className={`vs-item ${st}`}>
-                  <div style={{ position:"relative", flexShrink:0 }}>
-                    <div className={`vs-circle ${st}`}>
-                      <VipLevelIcon n={lv.n} state={st}/>
-                      {st === "done" && (
-                        <div className="vs-chk">
-                          <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4"><polyline points="20 6 9 17 4 12"/></svg>
-                        </div>
-                      )}
-                      {st === "active" && (
-                        <div className="vs-crown">
-                          <svg width="16" height="10" viewBox="0 0 16 10">
-                            <defs><linearGradient id={`vcr${lv.n}`} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#ffd700"/><stop offset="100%" stopColor="#cc8800"/></linearGradient></defs>
-                            <path d="M1 9L2.5 1L6 5.5L8 0.5L10 5.5L13.5 1L15 9H1Z" fill={`url(#vcr${lv.n})`}/>
-                          </svg>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div className="vs-info">
-                    <div className={`vs-name ${st}`}>
-                      VIP {lv.n}
-                      {lv.n === 0 && <span style={{ fontSize:10, fontWeight:400, color:"rgba(40,20,80,.55)" }}>· Başlanğıc</span>}
-                      {st === "active" && <span className="vs-cur-tag">CARİ</span>}
-                    </div>
-                    <div className="vs-bar-t"><div className="vs-bar-f" style={{ width:`${pct}%`, background:barC }}/></div>
-                    <div className="vs-sub">
-                      {st === "done" && <span style={{ fontSize:9, color:"rgba(80,200,80,.5)" }}>✓ Tamamlandı</span>}
-                      {st === "active" && <span style={{ fontSize:9, color:"rgba(255,200,0,.6)" }}>{fmtExp(CURRENT_EXP)} / {fmtExp(lv.next ?? lv.req)} Exp</span>}
-                      {st === "locked" && <span style={{ fontSize:9, color:"rgba(100,80,160,.18)" }}>{fmtExp(lv.req)} Exp lazım</span>}
-                      <span style={{ fontSize:9, color:"rgba(100,80,160,.18)" }}>{lv.req > 0 ? fmtExp(lv.req) + " Exp" : "Başlanğıc"}</span>
-                    </div>
-                  </div>
-                  <div className={`vs-badge ${st}`}>
-                    {st === "done" ? "✓ Keçildi" : st === "active" ? "★ Aktiv" : lv.n === 0 ? "Başlanğıc" : "Kilidli"}
-                  </div>
+          <div className="vs-func-wrap">
+            <div className="vs-func-grid">
+              {funcItems.map((item, i) => (
+                <div key={i} className="vs-func-item">
+                  <div className="vs-func-ico">{item.icon}</div>
+                  <div className="vs-func-lbl">{item.label}</div>
                 </div>
-              </div>
-            );
-          })}
+              ))}
+            </div>
+          </div>
+
+          <div className="vs-cta"><div className="vs-cta-txt">İstədiyiniz məbləğdə yükləmə edin və VIP olun!</div></div>
         </div>
       </div>
     </main>
