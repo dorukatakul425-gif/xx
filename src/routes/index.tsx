@@ -509,7 +509,7 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
         .h-orb2{position:absolute;width:200px;height:200px;border-radius:50%;background:#ff3ea5;opacity:.06;top:-20px;right:-40px;pointer-events:none}
         .h-scroll{flex:1;overflow-y:auto;padding-bottom:80px}
         .h-scroll::-webkit-scrollbar{display:none}
-        .topbar{position:relative;z-index:20;background:#f5f5f7 url(/images/images/arxaplan.PNG) center top/cover no-repeat;padding-bottom:26px!important;padding:max(10px,env(safe-area-inset-top)) 16px 12px}
+        .topbar{position:relative;z-index:20;background:linear-gradient(to bottom,rgba(245,245,247,0) 0%,rgba(245,245,247,0) 45%,rgba(245,245,247,.55) 75%,#f5f5f7 100%),url(/images/images/arxaplan.PNG) center top/cover no-repeat,#f5f5f7;padding-bottom:40px!important;padding:max(10px,env(safe-area-inset-top)) 16px 12px}
         .tb-row{display:flex;align-items:center;gap:10px;height:44px}
         .tb-user{display:flex;align-items:center;gap:10px;min-width:0;flex:1;background:none;border:0;padding:0;cursor:pointer;text-align:left}
         .tb-user:active{opacity:.7}
@@ -603,8 +603,8 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
             <button type="button" className="tb-btn" aria-label="Axtar">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
             </button>
-            <button type="button" aria-label="Gündəlik bonus" style={{ width:42, height:42, border:0, background:"none", padding:0, cursor:"pointer", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
-              <img src="/images/images/icon.gif" alt="" style={{ width:42, height:42, objectFit:"contain", display:"block" }}/>
+            <button type="button" aria-label="Gündəlik bonus" style={{ width:36, height:36, overflow:"visible", border:0, background:"none", padding:0, cursor:"pointer", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
+              <img src="/images/images/icon.gif" alt="" style={{ width:36, height:36, objectFit:"contain", display:"block", transform:"scale(1.4)", transformOrigin:"center" }}/>
             </button>
           </div>
         </div>
