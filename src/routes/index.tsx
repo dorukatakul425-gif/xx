@@ -1920,11 +1920,10 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
               <div style={{ fontSize:11, color:"#8e8e93", display:"flex", alignItems:"center", gap:4 }}><span style={{ width:6, height:6, borderRadius:"50%", background:"#22c55e" }}/>{Math.max(members.length,1)} onlayn</div>
             </div>
             <button onClick={() => setFollowing(f => !f)} aria-label={following ? "İzləmədən çıx" : "Otağı izlə"}
-              style={{ height:30, padding:"0 10px", borderRadius:15, border:0, cursor:"pointer", flexShrink:0, display:"flex", alignItems:"center", gap:4, fontSize:12, fontWeight:600, background: following ? "#f4f2f8" : "#7b2ff7", color: following ? "#8e8e93" : "#fff", transition:".2s" }}>
+              style={{ width:30, height:30, borderRadius:"50%", border:0, cursor:"pointer", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", background: following ? "#f4f2f8" : "#7b2ff7", color: following ? "#7b2ff7" : "#fff", transition:"background .2s,color .2s", boxShadow: following ? "none" : "0 2px 8px rgba(123,47,247,.35)" }}>
               {following
-                ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-                : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>}
-              {following ? "İzlənir" : "İzlə"}
+                ? <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.8 4.5c2.1 0 3.6 1.1 5.2 3 1.6-1.9 3.1-3 5.2-3 3.8 0 5.9 3.9 4.4 7.3C19.5 16.4 12 21 12 21z"/></svg>
+                : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.8 4.5c2.1 0 3.6 1.1 5.2 3 1.6-1.9 3.1-3 5.2-3 3.8 0 5.9 3.9 4.4 7.3C19.5 16.4 12 21 12 21z"/></svg>}
             </button>
           </div>
           <div style={{ marginLeft:"auto", display:"flex", gap:6 }}>
@@ -2002,45 +2001,94 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
 function ChatPanel({ session, displayName, avatarUrl, onClose }: { session: Session; displayName: string; avatarUrl: string | null; onClose: () => void }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState("");
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const [vh, setVh] = useState<{ h: number; top: number } | null>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+
+  // Mesajları yüklə + realtime
   useEffect(() => {
     supabase.from("messages").select("*").eq("room_id", ROOM_ID).order("created_at", { ascending: true }).limit(50).then(({ data }) => { if (data) setMessages(data as Message[]); });
     const ch = supabase.channel(`chat-${ROOM_ID}`).on("postgres_changes", { event:"INSERT", schema:"public", table:"messages", filter:`room_id=eq.${ROOM_ID}` }, p => setMessages(prev => [...prev, p.new as Message])).subscribe();
     return () => { supabase.removeChannel(ch); };
   }, []);
-  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior:"smooth" }); }, [messages]);
+
+  // Klaviatura açılanda ekran sürüşməsin: panel görünən sahəyə (visualViewport) uyğunlaşır
+  useEffect(() => {
+    const vv = window.visualViewport;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onResize = () => {
+      if (!vv) return;
+      setVh({ h: vv.height, top: vv.offsetTop });
+      window.scrollTo(0, 0);
+    };
+    onResize();
+    vv?.addEventListener("resize", onResize);
+    vv?.addEventListener("scroll", onResize);
+    return () => {
+      vv?.removeEventListener("resize", onResize);
+      vv?.removeEventListener("scroll", onResize);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, []);
+
+  // Həmişə ən son mesaja sürüşdür (yalnız siyahının içində)
+  useEffect(() => {
+    const el = listRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [messages, vh]);
+
   const send = async () => {
-    if (!text.trim()) return;
-    await supabase.from("messages").insert({ room_id: ROOM_ID, user_id: session.user.id, display_name: displayName, avatar_url: avatarUrl, content: text.trim() });
+    const t = text.trim();
+    if (!t) return;
     setText("");
+    await supabase.from("messages").insert({ room_id: ROOM_ID, user_id: session.user.id, display_name: displayName, avatar_url: avatarUrl, content: t });
   };
+
   return (
-    <div style={{ position:"fixed", inset:0, zIndex:150, display:"flex", flexDirection:"column", background:"rgba(7,0,15,.98)" }}>
-      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:`max(16px,env(safe-area-inset-top)) 20px 14px`, borderBottom:"1px solid rgba(123,47,247,.15)" }}>
-        <p style={{ fontSize:18, fontWeight:800, color:"#1a1a2e" }}>Söhbət</p>
-        <button onClick={onClose} style={{ width:36, height:36, borderRadius:12, background:"rgba(100,80,160,.09)", border:"1px solid rgba(100,80,160,.14)", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}><X size={16} color="rgba(40,20,100,.5)"/></button>
-      </div>
-      <div style={{ flex:1, overflowY:"auto", padding:"16px 20px" }}>
-        {messages.length === 0 && <p style={{ textAlign:"center", color:"#5a3a7a", fontSize:13, marginTop:40 }}>Hələ mesaj yoxdur.</p>}
+    <div style={{ position:"fixed", left:0, right:0, top: vh ? vh.top : 0, height: vh ? vh.h : "100dvh", zIndex:150, display:"flex", flexDirection:"column", background:"#fff", overscrollBehavior:"contain" }}>
+      <header style={{ flexShrink:0, position:"relative", height:52, display:"flex", alignItems:"center", justifyContent:"center", borderBottom:".5px solid rgba(20,10,40,.08)", paddingTop:"env(safe-area-inset-top)" }}>
+        <span style={{ fontSize:17, fontWeight:600, color:"#111" }}>Söhbət</span>
+        <button onClick={onClose} aria-label="Bağla" style={{ position:"absolute", right:8, bottom:6, width:40, height:40, background:"none", border:0, display:"flex", alignItems:"center", justifyContent:"center", color:"#111", cursor:"pointer" }}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </header>
+
+      <div ref={listRef} style={{ flex:1, minHeight:0, overflowY:"auto", WebkitOverflowScrolling:"touch", overscrollBehavior:"contain", padding:"12px 14px" }}>
+        {messages.length === 0 && <p style={{ textAlign:"center", color:"#8e8e93", fontSize:14, marginTop:40 }}>Hələ mesaj yoxdur.</p>}
         {messages.map(msg => {
           const isMe = msg.user_id === session.user.id;
           return (
-            <div key={msg.id} style={{ display:"flex", gap:10, flexDirection: isMe ? "row-reverse" : "row", marginBottom:14 }}>
-              <div style={{ width:32, height:32, borderRadius:"50%", background:"rgba(123,47,247,.3)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, fontWeight:700, color:"#c084fc", flexShrink:0 }}>{msg.display_name[0]}</div>
-              <div style={{ maxWidth:"70%", display:"flex", flexDirection:"column", gap:3, alignItems: isMe ? "flex-end" : "flex-start" }}>
-                {!isMe && <p style={{ fontSize:10, color:"#5a3a7a" }}>{msg.display_name}</p>}
-                <div style={{ borderRadius:16, padding:"8px 14px", fontSize:13, background: isMe ? "linear-gradient(135deg,#7b2ff7,#ff3ea5)" : "rgba(100,80,160,.09)", border: isMe ? "none" : "1px solid rgba(100,80,160,.12)", color:"#1a1a2e" }}>{msg.content}</div>
+            <div key={msg.id} style={{ display:"flex", gap:10, alignItems:"flex-start", marginBottom:14, flexDirection: isMe ? "row-reverse" : "row" }}>
+              <div style={{ width:36, height:36, borderRadius:"50%", flexShrink:0, overflow:"hidden", background:"linear-gradient(135deg,#7b2ff7,#ff3ea5)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:14, fontWeight:700 }}>
+                {msg.avatar_url
+                  ? <img src={msg.avatar_url} alt="" referrerPolicy="no-referrer" style={{ width:"100%", height:"100%", objectFit:"cover" }}/>
+                  : (msg.display_name?.[0]?.toUpperCase() || "?")}
+              </div>
+              <div style={{ maxWidth:"72%", display:"flex", flexDirection:"column", alignItems: isMe ? "flex-end" : "flex-start", gap:4 }}>
+                <div style={{ display:"flex", alignItems:"center", gap:4, flexDirection: isMe ? "row-reverse" : "row" }}>
+                  <span style={{ fontSize:13, fontWeight:600, color:"#3a3a3c", maxWidth:140, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{msg.display_name}</span>
+                  <img src="/images/images/vlogo15.png" alt="" style={{ height:16, width:"auto", objectFit:"contain", flexShrink:0 }}/>
+                </div>
+                <div style={{ borderRadius:18, borderTopLeftRadius: isMe ? 18 : 6, borderTopRightRadius: isMe ? 6 : 18, padding:"8px 13px", fontSize:15, lineHeight:1.4, wordBreak:"break-word", background: isMe ? "#7b2ff7" : "#f2f2f7", color: isMe ? "#fff" : "#111" }}>{msg.content}</div>
               </div>
             </div>
           );
         })}
-        <div ref={bottomRef}/>
       </div>
-      <div style={{ borderTop:"1px solid rgba(123,47,247,.15)", padding:`12px 16px max(12px,env(safe-area-inset-bottom))` }}>
-        <div style={{ display:"flex", alignItems:"center", gap:10, background:"rgba(100,80,160,.07)", border:"1px solid rgba(100,80,160,.12)", borderRadius:24, padding:"8px 16px" }}>
-          <input style={{ flex:1, background:"transparent", border:"none", outline:"none", fontSize:14, color:"#1a1a2e" }} placeholder="Mesaj yaz…" value={text} onChange={e => setText(e.target.value)} onKeyDown={e => e.key === "Enter" && send()}/>
-          <button onClick={send} style={{ width:34, height:34, borderRadius:"50%", background:"linear-gradient(135deg,#7b2ff7,#ff3ea5)", border:"none", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", flexShrink:0 }}><Send size={14} color="white"/></button>
-        </div>
+
+      <div style={{ flexShrink:0, borderTop:".5px solid rgba(20,10,40,.08)", padding:"8px 12px max(8px,env(safe-area-inset-bottom))", display:"flex", alignItems:"center", gap:8, background:"#fff" }}>
+        <input
+          value={text}
+          onChange={e => setText(e.target.value)}
+          onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); send(); } }}
+          placeholder="Mesaj yaz…"
+          enterKeyHint="send"
+          autoComplete="off"
+          style={{ flex:1, minWidth:0, height:40, borderRadius:20, background:"#f4f2f8", border:0, outline:"none", padding:"0 16px", fontSize:16, color:"#111", fontFamily:"inherit" }}
+        />
+        <button onClick={send} disabled={!text.trim()} aria-label="Göndər" style={{ width:40, height:40, borderRadius:"50%", border:0, flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", background: text.trim() ? "#7b2ff7" : "#e5e5ea", color:"#fff", cursor: text.trim() ? "pointer" : "default", transition:"background .15s" }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        </button>
       </div>
     </div>
   );
