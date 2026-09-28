@@ -509,7 +509,7 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
         .h-orb2{position:absolute;width:200px;height:200px;border-radius:50%;background:#ff3ea5;opacity:.06;top:-20px;right:-40px;pointer-events:none}
         .h-scroll{flex:1;overflow-y:auto;padding-bottom:80px}
         .h-scroll::-webkit-scrollbar{display:none}
-        .topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.88);backdrop-filter:saturate(1.8) blur(20px);-webkit-backdrop-filter:saturate(1.8) blur(20px);border-bottom:.5px solid rgba(20,10,40,.08);padding:max(10px,env(safe-area-inset-top)) 16px 12px}
+        .topbar{position:relative;z-index:20;background:transparent;padding:max(10px,env(safe-area-inset-top)) 16px 12px}
         .tb-row{display:flex;align-items:center;gap:10px;height:44px}
         .tb-user{display:flex;align-items:center;gap:10px;min-width:0;flex:1;background:none;border:0;padding:0;cursor:pointer;text-align:left}
         .tb-user:active{opacity:.7}
@@ -586,6 +586,9 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
         .modal-box{background:linear-gradient(145deg,#1a0035,#0d001e);border:1px solid rgba(123,47,247,.5);border-radius:28px;padding:32px 24px 24px;width:min(300px,85vw);text-align:center;animation:vpopIn .3s ease;position:relative}
       `}</style>
       <div className="h-orb1"/><div className="h-orb2"/>
+
+      {/* ÜST ARXA PLAN ŞƏKLİ */}
+      <div aria-hidden="true" style={{ position:"absolute", top:0, left:0, right:0, height:"calc(env(safe-area-inset-top) + 96px)", zIndex:1, pointerEvents:"none", backgroundImage:"url(/images/images/arxaplan.png)", backgroundSize:"cover", backgroundPosition:"center top", WebkitMaskImage:"linear-gradient(to bottom,#000 70%,transparent)", maskImage:"linear-gradient(to bottom,#000 70%,transparent)" }}/>
 
       {/* TOPBAR */}
       <header className="topbar">
@@ -1912,6 +1915,7 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
   const [qtyOpen, setQtyOpen] = useState(false);
   const [giftTo, setGiftTo] = useState<number>(-1);
   const [giftPlay, setGiftPlay] = useState<string|null>(null);
+  const giftVideoRef = useRef<HTMLVideoElement>(null);
   const [giftWarn, setGiftWarn] = useState(false);
   const [jetonBal, setJetonBal] = useState(() => { try { return parseInt(localStorage.getItem("velvet_jeton") || "10000"); } catch { return 10000; } });
   const inputRef = useRef<HTMLInputElement>(null);
@@ -2105,14 +2109,13 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
         </div>
       )}
 
-      {/* HƏDİYYƏ ANİMASİYASI — mesaj sahəsinin üstündə */}
-      {giftPlay && (
-        <div style={{ position:"fixed", left:0, right:0, bottom: kb + 58, height:"42dvh", zIndex:60, pointerEvents:"none", display:"flex", alignItems:"center", justifyContent:"center" }}>
-          {/\.(mp4|mov|webm)$/i.test(giftPlay)
-            ? <video key={giftPlay} src={`/images/images/${giftPlay}`} autoPlay muted playsInline onEnded={() => setGiftPlay(null)} onError={() => setGiftPlay(null)} style={{ width:"100%", height:"100%", objectFit:"contain", background:"transparent" }}/>
-            : <img src={`/images/images/${giftPlay}`} alt="" style={{ width:"100%", height:"100%", objectFit:"contain" }}/>}
-        </div>
-      )}
+      {/* HƏDİYYƏ ANİMASİYASI — səsli video, qara fon şəffaf (screen blend) */}
+      <div style={{ position:"fixed", left:0, right:0, bottom: kb + 58, height:"46dvh", zIndex:60, pointerEvents:"none", display: giftPlay ? "flex" : "none", alignItems:"center", justifyContent:"center" }}>
+        <video ref={giftVideoRef} playsInline preload="auto"
+          onEnded={() => setGiftPlay(null)}
+          onError={() => setGiftPlay(null)}
+          style={{ width:"100%", height:"100%", objectFit:"contain", background:"transparent", mixBlendMode:"screen", opacity:.95 }}/>
+      </div>
 
       {/* HƏDİYYƏ PANELİ */}
       {giftOpen && (() => {
@@ -2135,8 +2138,18 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
           const toName = giftTo < 0 ? "hamıya" : people[giftTo];
           setMsgs(prev => { const next = [...prev, { id: Date.now(), user_id: myId, display_name: name, avatar_url: avatarUrl, content: `🎁 ${toName} ${gift.name} ×${giftQty} göndərdi`, created_at: new Date().toISOString() }]; if (!session) { try { localStorage.setItem("velvet_demo_chat", JSON.stringify(next.slice(-100))); } catch {} } return next; });
           setGiftOpen(false); setQtyOpen(false);
-          setGiftPlay(null); setTimeout(() => setGiftPlay(gift.gif), 30);
-          setTimeout(() => setGiftPlay(g => (g === gift.gif ? null : g)), 15000);
+          const v = giftVideoRef.current;
+          if (v) {
+            const base = gift.gif.replace(/\.[^.]+$/, "");
+            const src = v.canPlayType("video/quicktime") ? `/images/images/${gift.gif}` : `/images/images/${base}.mp4`;
+            v.pause();
+            v.src = src;
+            v.currentTime = 0;
+            v.muted = false;
+            v.volume = 1;
+            setGiftPlay(gift.gif);
+            v.play().catch(() => { v.muted = true; v.play().catch(() => setGiftPlay(null)); });
+          }
         };
         return (
           <div onClick={() => setGiftOpen(false)} style={{ position:"fixed", inset:0, zIndex:70, background:"rgba(0,0,0,.35)", animation:"vfadeIn .2s ease" }}>
