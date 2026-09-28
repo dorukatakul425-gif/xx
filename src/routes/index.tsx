@@ -6,7 +6,6 @@ import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useVoiceRoom } from "@/hooks/use-voice-room";
-import { VelvetVip } from "@/components/VelvetVip";
 
 const ROOM_ID = "11111111-1111-4111-8111-111111111111";
 
@@ -205,7 +204,7 @@ function VelvetApp() {
   if (screen === "login" && !isDemo) return <><style>{GLOBAL_CSS}</style><LoginScreen signIn={signIn} loading={loading} error={error} demoLogin={demoLogin} /></>;
   if (screen === "home" && (session || isDemo)) return <><style>{GLOBAL_CSS}</style><HomeScreen name={displayName} onEnterRoom={() => { enterRoom(); go("room"); }} onProfile={() => go("profile")} /></>;
   if (screen === "profile" && (session || isDemo)) return <><style>{GLOBAL_CSS}</style><ProfileScreen name={displayName} onBack={() => go("home")} onEnterRoom={() => { enterRoom(); go("room"); }} onVip={() => go("vip")} /></>;
-  if (screen === "vip" && (session || isDemo)) return <><style>{GLOBAL_CSS}</style><VelvetVip onBack={() => go("profile")} name={displayName} /></>;
+  if (screen === "vip" && (session || isDemo)) return <><style>{GLOBAL_CSS}</style><VipScreen onBack={() => go("profile")} /></>;
 
   return (
     <>
@@ -2359,6 +2358,380 @@ function ChatPanel({ session, displayName, avatarUrl, onClose }: { session: Sess
         </button>
       </div>
     </div>
+  );
+}
+
+/* ─── VIP SCREEN ─── */
+const VIP_LEVELS = [
+  {n:0,req:0,next:2000},{n:1,req:2000,next:4500},{n:2,req:4500,next:8000},
+  {n:3,req:8000,next:14000},{n:4,req:14000,next:22000},{n:5,req:22000,next:34000},
+  {n:6,req:34000,next:50000},{n:7,req:50000,next:72000},{n:8,req:72000,next:100000},
+  {n:9,req:100000,next:135000},{n:10,req:135000,next:175000},{n:11,req:175000,next:225000},
+  {n:12,req:225000,next:285000},{n:13,req:285000,next:355000},{n:14,req:355000,next:440000},
+  {n:15,req:440000,next:540000},{n:16,req:540000,next:660000},{n:17,req:660000,next:null},
+] as const;
+
+const CURRENT_EXP = 587000;
+
+function fmtExp(n: number) {
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + "M";
+  if (n >= 1000) return (n / 1000).toFixed(n >= 10000 ? 0 : 1) + "K";
+  return String(n);
+}
+
+function VipShieldLogo({ size = 58 }: { size?: number }) {
+  const h = Math.round(size * 136 / 120);
+  return (
+    <svg width={size} height={h} viewBox="0 0 120 136" style={{ filter:"drop-shadow(0 0 12px rgba(255,200,0,.5))" }}>
+      <defs>
+        <linearGradient id="vsg_out" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#a07800"/><stop offset="20%" stopColor="#ffd700"/>
+          <stop offset="40%" stopColor="#ffe566"/><stop offset="60%" stopColor="#ffd700"/>
+          <stop offset="80%" stopColor="#cc9900"/><stop offset="100%" stopColor="#886600"/>
+        </linearGradient>
+        <linearGradient id="vsg_body" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#1e1e1e"/><stop offset="40%" stopColor="#2a2a2a"/>
+          <stop offset="70%" stopColor="#222222"/><stop offset="100%" stopColor="#111111"/>
+        </linearGradient>
+        <linearGradient id="vsg_gold" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#fff8c0"/><stop offset="25%" stopColor="#ffd700"/>
+          <stop offset="60%" stopColor="#cc9900"/><stop offset="100%" stopColor="#886600"/>
+        </linearGradient>
+        <linearGradient id="vsg_vip" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#fff8d0"/><stop offset="35%" stopColor="#ffd700"/>
+          <stop offset="70%" stopColor="#cc8800"/><stop offset="100%" stopColor="#886600"/>
+        </linearGradient>
+        <linearGradient id="vsg_shine" x1="0%" y1="0%" x2="60%" y2="100%">
+          <stop offset="0%" stopColor="rgba(255,255,255,.18)"/><stop offset="100%" stopColor="rgba(255,255,255,0)"/>
+        </linearGradient>
+        <filter id="vsg_shadow"><feDropShadow dx="0" dy="4" stdDeviation="6" floodColor="rgba(100,80,160,.3)"/></filter>
+        <filter id="vsg_gg"><feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="rgba(255,200,0,.5)"/></filter>
+        <filter id="vsg_blur"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <path d="M60 4 C60 4 14 18 10 22 L10 72 C10 102 60 132 60 132 C60 132 110 102 110 72 L110 22 C106 18 60 4 60 4Z" fill="url(#vsg_out)" filter="url(#vsg_shadow)"/>
+      <path d="M60 12 C60 12 20 24 17 27 L17 72 C17 98 60 124 60 124 C60 124 103 98 103 72 L103 27 C100 24 60 12 60 12Z" fill="url(#vsg_body)"/>
+      <path d="M60 18 C60 18 24 29 22 32 L22 72 C22 95 60 118 60 118 C60 118 98 95 98 72 L98 32 C96 29 60 18 60 18Z" fill="none" stroke="url(#vsg_out)" strokeWidth="2.5"/>
+      <path d="M60 22 C60 22 26 32 24 35 L24 72 C24 93 60 114 60 114 C60 114 96 93 96 72 L96 35 C94 32 60 22 60 22Z" fill="rgba(255,220,50,.03)" opacity=".6"/>
+      <path d="M50 14 L50 128" stroke="rgba(100,80,160,.07)" strokeWidth="18"/>
+      <g filter="url(#vsg_gg)" transform="translate(60,38)">
+        <path d="M-22 14 L-26 0 L-14 9 L0 -10 L14 9 L26 0 L22 14Z" fill="url(#vsg_gold)"/>
+        <rect x="-22" y="14" width="44" height="6" rx="3" fill="url(#vsg_gold)"/>
+        <rect x="-22" y="14" width="44" height="2.5" rx="1.2" fill="rgba(255,255,200,.3)"/>
+        <circle cx="0" cy="-11" r="4" fill="#ff3060" filter="url(#vsg_blur)"/>
+        <circle cx="-1.2" cy="-12.2" r="1.5" fill="rgba(255,200,220,.7)"/>
+        <circle cx="-14" cy="9" r="3" fill="#4090ff" filter="url(#vsg_blur)"/>
+        <circle cx="14" cy="9" r="3" fill="#4090ff" filter="url(#vsg_blur)"/>
+        <circle cx="-26" cy="0" r="2.5" fill="#ffd700"/>
+        <circle cx="26" cy="0" r="2.5" fill="#ffd700"/>
+      </g>
+      <text x="60" y="90" textAnchor="middle" fontSize="32" fontWeight="900" letterSpacing="2" fill="url(#vsg_vip)" fontFamily="Arial,sans-serif" filter="url(#vsg_gg)">VIP</text>
+      <g filter="url(#vsg_gg)">
+        <path d="M42 104 L43.5 109 L49 109 L44.5 112 L46 117 L42 114 L38 117 L39.5 112 L35 109 L40.5 109Z" fill="url(#vsg_gold)" opacity=".9"/>
+        <path d="M60 104 L61.5 109 L67 109 L62.5 112 L64 117 L60 114 L56 117 L57.5 112 L53 109 L58.5 109Z" fill="url(#vsg_gold)"/>
+        <path d="M78 104 L79.5 109 L85 109 L80.5 112 L82 117 L78 114 L74 117 L75.5 112 L71 109 L76.5 109Z" fill="url(#vsg_gold)" opacity=".9"/>
+      </g>
+      <path d="M18 22 Q30 15 50 18 L46 50 Q28 42 18 30 Z" fill="url(#vsg_shine)" opacity=".7"/>
+    </svg>
+  );
+}
+
+function VipLevelIcon({ n, state }: { n: number; state: "done" | "active" | "locked" }) {
+  const c = state === "done" ? "rgba(80,200,80,.8)" : state === "active" ? "#ffd700" : "rgba(80,60,140,.2)";
+  const icons: Record<number, JSX.Element> = {
+    0: <svg width="20" height="20" viewBox="0 0 52 52"><defs><radialGradient id={`ig0`} cx="40%" cy="30%" r="70%"><stop offset="0%" stopColor={state==="done"?"#a0e0ff":state==="active"?"#ffe080":"#888"}/><stop offset="100%" stopColor={state==="done"?"#2060b0":state==="active"?"#a06000":"#444"}/></radialGradient></defs><ellipse cx="26" cy="28" rx="14" ry="17" fill={`url(#ig0)`}/><ellipse cx="20" cy="22" rx="4" ry="2.5" fill="rgba(40,20,80,.65)" transform="rotate(-30,20,22)"/><path d="M22 20 L24 24 L21 27 L25 32" stroke="rgba(40,20,100,.5)" strokeWidth="1.2" fill="none" strokeLinecap="round"/></svg>,
+    1: <svg width="20" height="20" viewBox="0 0 52 52"><defs><linearGradient id={`ig1`} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor={state==="done"?"#e8a060":state==="active"?"#ffe080":"#888"}/><stop offset="100%" stopColor={state==="done"?"#7a3a10":state==="active"?"#a06000":"#333"}/></linearGradient></defs><path d="M26 8 L40 14 L40 26 C40 34 33 40 26 44 C19 40 12 34 12 26 L12 14 Z" fill={`url(#ig1)`}/><ellipse cx="20" cy="18" rx="5" ry="2.5" fill="rgba(60,40,120,.5)" transform="rotate(-30,20,18)"/><text x="26" y="30" textAnchor="middle" fontSize="13" fontWeight="900" fill="rgba(255,255,200,.8)" fontFamily="Arial">I</text></svg>,
+    2: <svg width="20" height="20" viewBox="0 0 52 52"><defs><linearGradient id={`ig2`} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#ffe566"/><stop offset="100%" stopColor={state==="done"?"#cc4400":"#886600"}/></linearGradient></defs><path d="M30 8 L18 26 L24 26 L22 44 L34 22 L28 22 Z" fill={`url(#ig2)`}/><path d="M28 12 L20 26 L25 26 L23 38 L31 24 L26 24 Z" fill="rgba(255,240,180,.4)"/></svg>,
+    3: <svg width="20" height="20" viewBox="0 0 52 52"><defs><linearGradient id={`ig3`} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#c0e8ff"/><stop offset="100%" stopColor="#2060b0"/></linearGradient></defs><polygon points="26,9 38,17 14,17" fill={c} opacity=".9"/><polygon points="38,17 32,43 14,17 20,43" fill={`url(#ig3)`}/><polygon points="26,11 35,17 26,17" fill="rgba(40,20,100,.5)"/></svg>,
+    4: <svg width="20" height="20" viewBox="0 0 52 52"><defs><radialGradient id={`ig4`} cx="50%" cy="60%" r="50%"><stop offset="0%" stopColor="#fff060"/><stop offset="60%" stopColor="#ff8000"/><stop offset="100%" stopColor="#660000"/></radialGradient></defs><path d="M26 44 C16 38 10 28 14 18 C16 24 20 22 20 16 C22 22 18 28 22 32 C22 26 26 20 24 12 C28 18 30 26 28 32 C30 28 34 24 32 18 C36 26 36 34 30 40 C28 42 26 44 26 44Z" fill={`url(#ig4)`}/><ellipse cx="26" cy="28" rx="5" ry="6" fill="rgba(255,255,200,.25)"/></svg>,
+    5: <svg width="20" height="20" viewBox="0 0 52 52"><defs><linearGradient id={`ig5`} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#fff0a0"/><stop offset="60%" stopColor="#ffd700"/><stop offset="100%" stopColor="#886600"/></linearGradient></defs><polygon points="26,6 29.8,17.8 42,17.8 32.2,24.8 36,36.4 26,29.8 16,36.4 19.8,24.8 10,17.8 22.2,17.8" fill={`url(#ig5)`}/><polygon points="26,7 29,17 22,17" fill="rgba(255,255,200,.6)"/></svg>,
+    6: <svg width="20" height="20" viewBox="0 0 52 52"><defs><radialGradient id={`ig6`} cx="35%" cy="30%" r="70%"><stop offset="0%" stopColor="#a060ff"/><stop offset="100%" stopColor="#200060"/></radialGradient></defs><ellipse cx="26" cy="28" rx="14" ry="18" fill={`url(#ig6)`}/><path d="M18 22 Q21 18 24 22 Q21 26 18 22Z" fill="rgba(180,100,255,.6)"/><path d="M24 18 Q27 14 30 18 Q27 22 24 18Z" fill="rgba(180,100,255,.6)"/><path d="M30 22 Q33 18 36 22 Q33 26 30 22Z" fill="rgba(180,100,255,.6)"/><ellipse cx="22" cy="26" rx="2" ry="2.5" fill="rgba(0,200,255,.9)"/><ellipse cx="30" cy="26" rx="2" ry="2.5" fill="rgba(0,200,255,.9)"/></svg>,
+    7: <svg width="20" height="20" viewBox="0 0 52 52"><defs><linearGradient id={`ig7`} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#fff0a0"/><stop offset="50%" stopColor="#ffd700"/><stop offset="100%" stopColor="#886600"/></linearGradient></defs><path d="M8 38 L8 24 L16 30 L26 12 L36 30 L44 24 L44 38 Z" fill={`url(#ig7)`}/><rect x="8" y="36" width="36" height="5" rx="2" fill={`url(#ig7)`}/><circle cx="26" cy="36.5" r="3" fill="#ff3060"/><circle cx="16" cy="36.5" r="2.5" fill="#4080ff"/><circle cx="36" cy="36.5" r="2.5" fill="#40c060"/><ellipse cx="16" cy="26" rx="4" ry="2" fill="rgba(255,255,200,.25)" transform="rotate(-30,16,26)"/></svg>,
+    8: <svg width="20" height="20" viewBox="0 0 52 52"><defs><radialGradient id={`ig8`} cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="#60ffff"/><stop offset="70%" stopColor="#0060a0"/><stop offset="100%" stopColor="#001840"/></radialGradient></defs><path d="M6 26 Q16 10 26 10 Q36 10 46 26 Q36 42 26 42 Q16 42 6 26Z" fill="#001840"/><circle cx="26" cy="26" r="12" fill={`url(#ig8)`}/><circle cx="26" cy="26" r="5" fill="rgba(0,10,30,.95)"/><circle cx="22" cy="22" r="3" fill="rgba(200,255,255,.5)"/><line x1="26" y1="26" x2="44" y2="16" stroke="rgba(0,255,255,.7)" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+    9: <svg width="20" height="20" viewBox="0 0 52 52"><defs><linearGradient id={`ig9a`} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#e8f8ff"/><stop offset="100%" stopColor="#2060b8"/></linearGradient><linearGradient id={`ig9b`} x1="100%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stopColor="#c0e8ff"/><stop offset="100%" stopColor="#1040a0"/></linearGradient></defs><polygon points="14,18 26,9 38,18" fill={`url(#ig9a)`}/><polygon points="14,18 9,30 26,44" fill={`url(#ig9b)`}/><polygon points="38,18 43,30 26,44" fill={`url(#ig9a)`} opacity=".7"/><polygon points="14,18 26,9 26,18" fill="rgba(40,20,80,.65)"/></svg>,
+    10: <svg width="20" height="20" viewBox="0 0 52 52"><defs><linearGradient id={`ig10`} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#e8eef4"/><stop offset="60%" stopColor="#7090a8"/><stop offset="100%" stopColor="#304050"/></linearGradient></defs><path d="M26 7 L42 13 L42 27 C42 36 35 42 26 46 C17 42 10 36 10 27 L10 13 Z" fill={`url(#ig10)`}/><circle cx="26" cy="20" r="4" fill="#60d0ff"/><text x="26" y="35" textAnchor="middle" fontSize="11" fontWeight="900" fill="rgba(220,240,255,.9)" fontFamily="Arial">X</text></svg>,
+    11: <svg width="20" height="20" viewBox="0 0 52 52"><defs><linearGradient id={`ig11`} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#ff8040"/><stop offset="100%" stopColor="#600800"/></linearGradient></defs><path d="M26 7 L42 13 L42 27 C42 36 35 42 26 46 C17 42 10 36 10 27 L10 13 Z" fill={`url(#ig11)`}/><path d="M20 32 C18 28 20 22 22 18 C22 22 24 20 24 16 C26 20 25 26 26 28 C26 24 28 20 28 16 C30 20 30 26 28 30 C30 28 32 24 30 20 C32 26 30 32 26 36 C24 38 20 36 20 32Z" fill="rgba(255,200,60,.5)"/></svg>,
+    12: <svg width="20" height="20" viewBox="0 0 52 52"><defs><linearGradient id={`ig12a`} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#e8c0ff"/><stop offset="100%" stopColor="#400080"/></linearGradient><linearGradient id={`ig12b`} x1="100%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stopColor="#c080ff"/><stop offset="100%" stopColor="#200060"/></linearGradient></defs><polygon points="14,18 26,9 38,18" fill={`url(#ig12a)`}/><polygon points="14,18 9,30 26,44" fill={`url(#ig12b)`}/><polygon points="38,18 43,30 26,44" fill={`url(#ig12a)`} opacity=".7"/><polygon points="14,18 26,9 26,18" fill="rgba(255,220,255,.4)"/></svg>,
+    13: <svg width="20" height="20" viewBox="0 0 52 52"><defs><linearGradient id={`ig13a`} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#a0ffb0"/><stop offset="100%" stopColor="#006020"/></linearGradient><linearGradient id={`ig13b`} x1="100%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stopColor="#60e080"/><stop offset="100%" stopColor="#004010"/></linearGradient></defs><polygon points="14,18 26,9 38,18" fill={`url(#ig13a)`}/><polygon points="14,18 9,30 26,44" fill={`url(#ig13b)`}/><polygon points="38,18 43,30 26,44" fill={`url(#ig13a)`} opacity=".7"/><polygon points="14,18 26,9 26,18" fill="rgba(200,255,210,.45)"/></svg>,
+    14: <svg width="20" height="20" viewBox="0 0 52 52"><defs><linearGradient id={`ig14a`} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#ffb0a0"/><stop offset="100%" stopColor="#600000"/></linearGradient><linearGradient id={`ig14b`} x1="100%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stopColor="#ff6050"/><stop offset="100%" stopColor="#400000"/></linearGradient></defs><polygon points="14,18 26,9 38,18" fill={`url(#ig14a)`}/><polygon points="14,18 9,30 26,44" fill={`url(#ig14b)`}/><polygon points="38,18 43,30 26,44" fill={`url(#ig14a)`} opacity=".7"/><polygon points="14,18 26,9 26,18" fill="rgba(255,220,210,.4)"/></svg>,
+    15: <svg width="20" height="20" viewBox="0 0 52 52"><defs><radialGradient id={`ig15`} cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="#fff8a0"/><stop offset="50%" stopColor="#ffc000"/><stop offset="100%" stopColor="#cc2000"/></radialGradient></defs><g style={{animation:"vrotate 4s linear infinite",transformOrigin:"26px 26px"}}><ellipse cx="26" cy="10" rx="2" ry="4" fill="#ffb000" opacity=".8"/><ellipse cx="26" cy="42" rx="2" ry="4" fill="#ffb000" opacity=".8"/><ellipse cx="10" cy="26" rx="4" ry="2" fill="#ffb000" opacity=".8"/><ellipse cx="42" cy="26" rx="4" ry="2" fill="#ffb000" opacity=".8"/></g><circle cx="26" cy="26" r="13" fill={`url(#ig15)`}/><ellipse cx="20" cy="20" rx="4" ry="2.5" fill="rgba(255,255,200,.4)" transform="rotate(-30,20,20)"/></svg>,
+    16: <svg width="20" height="20" viewBox="0 0 52 52"><defs><radialGradient id={`ig16`} cx="40%" cy="30%" r="70%"><stop offset="0%" stopColor="#9060ff"/><stop offset="100%" stopColor="#100030"/></radialGradient></defs><circle cx="26" cy="26" r="18" fill={`url(#ig16)`}/><circle cx="26" cy="26" r="18" fill="none" stroke="rgba(180,100,255,.5)" strokeWidth="1.5"/><polygon points="26,12 29.8,22.1 40.7,22.1 31.9,28.3 34.8,38.5 26,32.4 17.2,38.5 20.1,28.3 11.3,22.1 22.2,22.1" fill="none" stroke="rgba(180,100,255,.6)" strokeWidth="1"/><circle cx="26" cy="26" r="4" fill="#ff1060"/><circle cx="24.5" cy="24.5" r="1.5" fill="rgba(255,180,200,.5)"/></svg>,
+    17: <svg width="22" height="22" viewBox="0 0 52 52"><defs><linearGradient id={`ig17`} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#fff8b0"/><stop offset="50%" stopColor="#ffd700"/><stop offset="100%" stopColor="#886600"/></linearGradient></defs><path d="M6 44 L6 28 L16 36 L26 12 L36 36 L46 28 L46 44 Z" fill={`url(#ig17)`}/><rect x="6" y="42" width="40" height="5" rx="2.5" fill={`url(#ig17)`}/><circle cx="26" cy="43" r="4" fill="#ff1060"/><circle cx="16" cy="43" r="3" fill="#0060ff"/><circle cx="36" cy="43" r="3" fill="#00c040"/><circle cx="26" cy="12" r="3.5" fill="#ff2060"/><ellipse cx="18" cy="22" rx="5" ry="2.5" fill="rgba(255,255,200,.2)" transform="rotate(-30,18,22)"/></svg>,
+  };
+  return icons[n] ?? icons[0];
+}
+
+function VipScreen({ onBack }: { onBack: () => void }) {
+  const CSS = `
+    @keyframes vsgGlow{0%,100%{filter:drop-shadow(0 0 6px rgba(200,150,0,.4))}50%{filter:drop-shadow(0 0 22px rgba(255,200,0,.9))}}
+    @keyframes vsgShimmer{0%{background-position:-300% 0}100%{background-position:300% 0}}
+    @keyframes vsgScan{0%{transform:translateY(-100%)}100%{transform:translateY(800%)}}
+    @keyframes vsgStar{0%,100%{opacity:.05}50%{opacity:.14}}
+    @keyframes vsgPulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
+    @keyframes vsgBar{0%,100%{transform:scaleY(.15)}50%{transform:scaleY(1)}}
+    @keyframes vsgBlink{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:.9;transform:scale(1.2)}}
+    @keyframes vsgBarD{0%,100%{box-shadow:0 0 5px rgba(80,220,80,.5)}50%{box-shadow:0 0 16px rgba(80,220,80,1)}}
+    .vs-scroll{overflow-y:auto;height:100dvh;padding-bottom:40px}
+    .vs-scroll::-webkit-scrollbar{display:none}
+    .vs-nav{display:flex;align-items:center;justify-content:space-between;padding:max(18px,env(safe-area-inset-top)) 20px 14px}
+    .vs-nav-btn{width:38px;height:38px;border-radius:13px;background:rgba(100,80,160,.08);border:1px solid rgba(100,80,160,.1);display:flex;align-items:center;justify-content:center;cursor:pointer}
+    .vs-card{margin:0 18px 16px;border-radius:24px;overflow:hidden;position:relative}
+    .vs-card-bg{display:none}
+    .vs-card-stars{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+    .vs-card-sheen{position:absolute;inset:0;background:linear-gradient(115deg,transparent 20%,rgba(255,255,255,.015) 38%,rgba(100,80,160,.07) 50%,rgba(255,255,255,.015) 62%,transparent 80%);background-size:300% 100%;animation:vsgShimmer 7s ease-in-out infinite}
+    .vs-card-scanw{position:absolute;inset:0;overflow:hidden}
+    .vs-card-scan{position:absolute;left:0;right:0;height:40px;background:linear-gradient(180deg,transparent,rgba(255,255,255,.008),transparent);animation:vsgScan 8s linear infinite}
+    .vs-card-bd{position:absolute;inset:0;border-radius:24px;border:1px solid rgba(255,255,255,.09)}
+    .vs-card-body{position:relative;z-index:3;padding:20px 22px 18px}
+    .vs-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px}
+    .vs-card-left{display:flex;align-items:center;gap:14px}
+    .vs-info-tag{font-size:9px;font-weight:600;letter-spacing:3px;color:rgba(80,60,140,.25);text-transform:uppercase;margin-bottom:4px}
+    .vs-info-level{font-size:20px;font-weight:800;color:rgba(90,210,90,.95);letter-spacing:-.3px;line-height:1.1;margin-bottom:8px}
+    .vs-active{display:inline-flex;align-items:center;gap:5px;background:rgba(80,200,80,.09);border:1px solid rgba(80,200,80,.22);border-radius:7px;padding:3px 9px}
+    .vs-active-dot{width:5px;height:5px;border-radius:50%;background:#50c050;animation:vsgPulse 2s ease-in-out infinite}
+    .vs-active-txt{font-size:9px;font-weight:700;color:rgba(80,200,80,.85);letter-spacing:.8px}
+    .vs-deer{width:72px;height:72px;flex-shrink:0;animation:vfloat 4s ease-in-out infinite;filter:drop-shadow(0 6px 16px rgba(100,80,160,.25))}
+    .vs-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(100,80,160,.09),transparent);margin-bottom:16px}
+    .vs-exp-label{font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.22);text-transform:uppercase;margin-bottom:7px}
+    .vs-exp-row{display:flex;align-items:baseline;gap:7px;margin-bottom:11px}
+    .vs-exp-n{font-size:26px;font-weight:800;color:#fff;letter-spacing:-.5px}
+    .vs-exp-u{font-size:11px;color:rgba(60,40,120,.3)}
+    .vs-exp-h{font-size:10px;color:rgba(200,155,0,.65)}
+    .vs-bar-track{height:5px;background:rgba(255,255,255,.055);border-radius:3px;overflow:visible;position:relative;margin-bottom:8px}
+    .vs-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#1e6e1e,#3eae3e,#70e070);position:relative;transition:width 2.5s ease-out}
+    .vs-lvl-row{display:flex;justify-content:space-between}
+    .vs-lvl{font-size:9px;color:rgba(255,255,255,.18)}
+    .vs-lvl-g{color:rgba(80,200,80,.4)}
+    /* Velvet anim */
+    .vs-vanim{margin:0 18px 20px;border-radius:20px;overflow:hidden;position:relative;height:72px;background:#08001a}
+    .vs-va-bg{position:absolute;inset:0;background:linear-gradient(135deg,#08001c,#12002e,#08001c)}
+    .vs-va-g1{position:absolute;width:160px;height:160px;top:-80px;left:15px;border-radius:50%;background:radial-gradient(circle,rgba(123,47,247,.2) 0%,transparent 70%);animation:vsgPulse 3.5s ease-in-out infinite}
+    .vs-va-g2{position:absolute;width:130px;height:130px;top:-65px;right:25px;border-radius:50%;background:radial-gradient(circle,rgba(255,62,165,.14) 0%,transparent 70%);animation:vsgPulse 3.5s ease-in-out infinite .8s}
+    .vs-va-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+    .vs-va-logo{position:relative;width:50px;height:50px;display:flex;align-items:center;justify-content:center}
+    .vs-va-r1{position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(192,132,252,.2);animation:vrotate 9s linear infinite}
+    .vs-va-r2{position:absolute;inset:6px;border-radius:50%;border:1px dashed rgba(255,62,165,.14);animation:vsgShimmer 6s linear infinite}
+    .vs-va-v{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#1e003e,#320068);border:1.5px solid rgba(123,47,247,.5);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff;font-style:italic}
+    .vs-va-bars{position:absolute;right:22px;top:50%;transform:translateY(-50%);display:flex;align-items:flex-end;gap:2.5px;height:32px}
+    .vs-va-bar{width:4px;border-radius:2px;transform-origin:bottom}
+    .vs-va-stars{position:absolute;left:18px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:7px}
+    .vs-vstar{font-size:9px;animation:vsgBlink ease-in-out infinite}
+    .vs-va-bd{position:absolute;inset:0;border-radius:20px;border:1px solid rgba(123,47,247,.2)}
+    /* Road */
+    .vs-road-hdr{padding:0 20px 14px;display:flex;align-items:center;gap:12px}
+    .vs-rh-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(100,80,160,.09),transparent)}
+    .vs-rh-title{font-size:10px;font-weight:700;letter-spacing:3px;color:rgba(80,60,140,.2);text-transform:uppercase;white-space:nowrap}
+    .vs-road{padding:0 18px 8px}
+    .vs-conn{margin-left:20px;height:10px;display:flex;align-items:center}
+    .vs-conn-line{width:2px;height:100%;border-radius:1px}
+    .vs-item{display:flex;align-items:center;gap:14px;padding:10px 14px;border-radius:16px;margin-bottom:2px}
+    .vs-item.done{background:rgba(80,200,80,.03)}
+    .vs-item.active{background:rgba(255,200,0,.05);border:1px solid rgba(255,200,0,.1)}
+    .vs-circle{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative}
+    .vs-circle.done{background:rgba(80,200,80,.1);border:1.5px solid rgba(80,200,80,.3)}
+    .vs-circle.active{background:rgba(255,200,0,.1);border:2px solid rgba(255,200,0,.6);box-shadow:0 0 18px rgba(255,200,0,.18)}
+    .vs-circle.locked{background:rgba(255,255,255,.025);border:1.5px solid rgba(100,80,160,.1)}
+    .vs-chk{position:absolute;bottom:-2px;right:-2px;width:15px;height:15px;border-radius:50%;background:linear-gradient(135deg,#30b030,#50d050);border:2px solid #07000f;display:flex;align-items:center;justify-content:center}
+    .vs-crown{position:absolute;top:-10px;left:50%;transform:translateX(-50%)}
+    .vs-info{flex:1;min-width:0}
+    .vs-name{font-size:13px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+    .vs-name.done{color:rgba(30,10,80,.7)}.vs-name.active{color:#fff}.vs-name.locked{color:rgba(80,60,140,.2)}
+    .vs-cur-tag{font-size:8px;font-weight:600;background:rgba(255,200,0,.15);color:rgba(255,200,0,.8);border:1px solid rgba(255,200,0,.2);border-radius:5px;padding:1px 6px;letter-spacing:.5px}
+    .vs-bar-t{height:3px;background:rgba(100,80,160,.08);border-radius:2px;overflow:hidden;margin-bottom:4px}
+    .vs-bar-f{height:100%;border-radius:2px}
+    .vs-sub{display:flex;justify-content:space-between;align-items:center}
+    .vs-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:8px;font-size:9px;font-weight:700;white-space:nowrap;flex-shrink:0}
+    .vs-badge.done{background:rgba(80,200,80,.08);color:rgba(80,200,80,.65);border:1px solid rgba(80,200,80,.14)}
+    .vs-badge.active{background:rgba(255,200,0,.1);color:#ffd700;border:1px solid rgba(255,200,0,.25)}
+    .vs-badge.locked{background:rgba(100,80,160,.06);color:rgba(255,255,255,.18);border:1px solid rgba(100,80,160,.09)}
+  `;
+
+  return (
+    <main style={{ background:"#ffffff", minHeight:"100dvh", fontFamily:"'Helvetica Neue',Arial,sans-serif" }}>
+      <style>{CSS}</style>
+      <div className="vs-scroll">
+        {/* NAV */}
+        <div className="vs-nav">
+          <div className="vs-nav-btn" onClick={onBack}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(40,20,100,.5)" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </div>
+          <span style={{ fontSize:17, fontWeight:700, color:"#1a1a2e" }}>Mənim VIP-im</span>
+          <div className="vs-nav-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(40,20,80,.55)" strokeWidth="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+          </div>
+        </div>
+
+        {/* HERO CARD */}
+        <div className="vs-card">
+          <img src="/images/images/vip.png" style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"cover", borderRadius:24, opacity:1, zIndex:0 }} alt=""/>
+          <div className="vs-card-stars">
+            <svg style={{ position:"absolute", left:-8, bottom:10, animation:"vsgStar 3s infinite" }} width="140" height="140" viewBox="0 0 100 100"><path d="M50 5L61 35L95 35L67 57L79 91L50 70L21 91L33 57L5 35L39 35Z" fill="rgba(255,255,255,.065)"/></svg>
+            <svg style={{ position:"absolute", right:72, top:12, animation:"vsgStar 3.5s infinite .7s" }} width="88" height="88" viewBox="0 0 100 100"><path d="M50 5L61 35L95 35L67 57L79 91L50 70L21 91L33 57L5 35L39 35Z" fill="rgba(100,80,160,.07)"/></svg>
+            <svg style={{ position:"absolute", right:4, bottom:12, animation:"vsgStar 2.8s infinite 1.2s" }} width="48" height="48" viewBox="0 0 100 100"><path d="M50 5L61 35L95 35L67 57L79 91L50 70L21 91L33 57L5 35L39 35Z" fill="rgba(100,80,160,.08)"/></svg>
+          </div>
+          <div className="vs-card-sheen"/>
+          <div className="vs-card-scanw"><div className="vs-card-scan"/></div>
+          <div className="vs-card-bd"/>
+          <div className="vs-card-body">
+            <div className="vs-card-top">
+              <div className="vs-card-left">
+                {/* Shield Logo */}
+                <div style={{ animation:"vsgGlow 3s ease-in-out infinite", flexShrink:0 }}>
+                  <VipShieldLogo size={58}/>
+                </div>
+                <div>
+                  <div className="vs-info-tag">Velvet VIP</div>
+                  <div className="vs-info-level">Səviyyə 17</div>
+                  <div className="vs-active">
+                    <div className="vs-active-dot"/><span className="vs-active-txt">AKTİV</span>
+                  </div>
+                </div>
+              </div>
+              {/* 3D Deer */}
+              <svg className="vs-deer" viewBox="0 0 120 120" fill="none">
+                <defs>
+                  <linearGradient id="vsdbb" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#8ab08a"/><stop offset="55%" stopColor="#608060"/><stop offset="100%" stopColor="#3a5a3a"/></linearGradient>
+                  <linearGradient id="vsdff" x1="0%" y1="0%" x2="80%" y2="100%"><stop offset="0%" stopColor="#a0c4a0"/><stop offset="100%" stopColor="#507050"/></linearGradient>
+                  <linearGradient id="vsdaa" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#9ab89a"/><stop offset="100%" stopColor="#4a6a4a"/></linearGradient>
+                  <filter id="vsdss"><feDropShadow dx="0" dy="3" stdDeviation="5" floodColor="rgba(0,0,0,.55)"/></filter>
+                  <filter id="vsdgg"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                </defs>
+                <ellipse cx="60" cy="70" rx="34" ry="11" fill="rgba(0,0,0,.2)"/>
+                <polygon points="60,8 96,44 60,80 24,44" fill="none" stroke="rgba(80,160,80,.25)" strokeWidth="1.5" filter="url(#vsdgg)"/>
+                <g filter="url(#vsdss)">
+                  <path d="M48 40C44 32 39 24 34 18C37 22 39 18 41 14C43 18 43 24 44 30C46 26 49 22 51 18C50 24 48 32 48 40Z" fill="url(#vsdaa)"/>
+                  <path d="M48 40C42 34 35 30 29 32C33 28 37 24 42 22C44 28 46 34 48 40Z" fill="url(#vsdaa)"/>
+                  <path d="M36 22C32 18 30 13 28 9" stroke="url(#vsdaa)" strokeWidth="3.5" strokeLinecap="round" fill="none"/>
+                  <path d="M72 40C76 32 81 24 86 18C83 22 81 18 79 14C77 18 77 24 76 30C74 26 71 22 69 18C70 24 72 32 72 40Z" fill="url(#vsdaa)"/>
+                  <path d="M72 40C78 34 85 30 91 32C87 28 83 24 78 22C76 28 74 34 72 40Z" fill="url(#vsdaa)"/>
+                  <path d="M84 22C88 18 90 13 92 9" stroke="url(#vsdaa)" strokeWidth="3.5" strokeLinecap="round" fill="none"/>
+                </g>
+                <ellipse cx="60" cy="64" rx="18" ry="20" fill="url(#vsdbb)" filter="url(#vsdss)"/>
+                <ellipse cx="60" cy="62" rx="13" ry="14" fill="url(#vsdff)"/>
+                <ellipse cx="53.5" cy="58" rx="3.5" ry="4" fill="#1a2a1a"/>
+                <ellipse cx="66.5" cy="58" rx="3.5" ry="4" fill="#1a2a1a"/>
+                <ellipse cx="53.5" cy="58" rx="2" ry="2.5" fill="#2d4a2d"/>
+                <ellipse cx="66.5" cy="58" rx="2" ry="2.5" fill="#2d4a2d"/>
+                <circle cx="55" cy="56.5" r="1.5" fill="rgba(200,240,200,.7)"/>
+                <circle cx="68" cy="56.5" r="1.5" fill="rgba(200,240,200,.7)"/>
+                <ellipse cx="60" cy="69" rx="4.5" ry="3" fill="rgba(40,60,40,.7)"/>
+                <ellipse cx="44.5" cy="48" rx="5.5" ry="8.5" fill="url(#vsdbb)" transform="rotate(-18,44.5,48)"/>
+                <ellipse cx="75.5" cy="48" rx="5.5" ry="8.5" fill="url(#vsdbb)" transform="rotate(18,75.5,48)"/>
+                <path d="M51 77Q60 83 69 77L67 88Q60 92 53 88Z" fill="url(#vsdbb)"/>
+              </svg>
+            </div>
+            <div className="vs-divider"/>
+            <div className="vs-exp-label">TOPLAM TƏCRÜBƏ</div>
+            <div className="vs-exp-row">
+              <div className="vs-exp-n">2,847</div>
+              <div className="vs-exp-u">Exp</div>
+              <div className="vs-exp-h">· VIP18 üçün +1,153 lazım</div>
+            </div>
+            <div className="vs-bar-track">
+              <div className="vs-bar-fill" style={{ width:"68%" }}/>
+              <div style={{ position:"absolute", left:"68%", top:"50%", transform:"translateY(-50%)", width:11, height:11, borderRadius:"50%", background:"#78e878", border:"2.5px solid #131318", animation:"vsgBarD 2s ease-in-out infinite" }}/>
+              {[25,50,75].map(p => <div key={p} style={{ position:"absolute", left:`${p}%`, top:-3, width:1, height:11, background:"rgba(100,80,160,.12)", borderRadius:1 }}/>)}
+            </div>
+            <div className="vs-lvl-row" style={{ marginTop:8 }}>
+              <span className="vs-lvl vs-lvl-g">VIP17 qorunması: 2,400 Exp</span>
+              <span className="vs-lvl">VIP18 →</span>
+            </div>
+          </div>
+        </div>
+
+        {/* VELVET ANİM */}
+        <div className="vs-vanim">
+          <div className="vs-va-bg"/><div className="vs-va-g1"/><div className="vs-va-g2"/>
+          <div className="vs-va-stars">
+            <span className="vs-vstar" style={{ color:"#ff3ea5", animationDuration:"1.8s" }}>✦</span>
+            <span className="vs-vstar" style={{ color:"#c084fc", animationDuration:"2.3s", animationDelay:".6s", fontSize:7 }}>✦</span>
+            <span className="vs-vstar" style={{ color:"#00d4ff", animationDuration:"1.6s", animationDelay:"1.1s" }}>✦</span>
+          </div>
+          <div className="vs-va-center">
+            <div className="vs-va-logo">
+              <div className="vs-va-r1"/><div className="vs-va-r2"/>
+              {/* orbit dots */}
+              {[
+                { color:"#ff3ea5", delay:"0s" },
+                { color:"#c084fc", delay:"1.2s" },
+                { color:"#00d4ff", delay:"2.4s" },
+              ].map((o, i) => (
+                <div key={i} style={{ position:"absolute", top:"50%", left:"50%", width:5, height:5, borderRadius:"50%", background:o.color, marginLeft:-2.5, marginTop:-2.5, boxShadow:`0 0 6px ${o.color}`, animation:`vorbit 3.5s linear infinite ${o.delay}` }}/>
+              ))}
+              <div className="vs-va-v">V</div>
+            </div>
+          </div>
+          <div className="vs-va-bars">
+            {["#ff6b35","#ff3ea5","#c084fc","#7b2ff7","#00d4ff","#ff3ea5","#c084fc"].map((c, i) => (
+              <div key={i} className="vs-va-bar" style={{ background:c, height:32, animation:`vsgBar .75s ease-in-out infinite ${i * 0.1}s`, transformOrigin:"bottom" }}/>
+            ))}
+          </div>
+          <div className="vs-va-bd"/>
+        </div>
+
+        {/* VIP YOLU */}
+        <div className="vs-road-hdr">
+          <div className="vs-rh-line"/><div className="vs-rh-title">VIP Yolu</div><div className="vs-rh-line"/>
+        </div>
+
+        <div className="vs-road">
+          {VIP_LEVELS.map((lv, i) => {
+            const isDone = lv.next !== null && CURRENT_EXP >= lv.next;
+            const isActive = !isDone && CURRENT_EXP >= lv.req;
+            const st: "done" | "active" | "locked" = isDone ? "done" : isActive ? "active" : "locked";
+            const prev = VIP_LEVELS[i - 1]?.req ?? 0;
+            const span = lv.next ? lv.next - lv.req : 1;
+            const pct = st === "done" ? 100 : st === "active" ? Math.min(100, Math.round((CURRENT_EXP - lv.req) / span * 100)) : 0;
+            const barC = st === "done" ? "linear-gradient(90deg,#1e6e1e,#3aae3a)" : st === "active" ? "linear-gradient(90deg,#aa7700,#ffd700,#ffee66)" : "rgba(100,80,160,.07)";
+            return (
+              <div key={lv.n}>
+                {i > 0 && (
+                  <div className="vs-conn">
+                    <div className="vs-conn-line" style={{ background: st === "done" ? "rgba(80,200,80,.2)" : st === "active" ? "rgba(255,200,0,.2)" : "rgba(100,80,160,.07)" }}/>
+                  </div>
+                )}
+                <div className={`vs-item ${st}`}>
+                  <div style={{ position:"relative", flexShrink:0 }}>
+                    <div className={`vs-circle ${st}`}>
+                      <VipLevelIcon n={lv.n} state={st}/>
+                      {st === "done" && (
+                        <div className="vs-chk">
+                          <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                      )}
+                      {st === "active" && (
+                        <div className="vs-crown">
+                          <svg width="16" height="10" viewBox="0 0 16 10">
+                            <defs><linearGradient id={`vcr${lv.n}`} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#ffd700"/><stop offset="100%" stopColor="#cc8800"/></linearGradient></defs>
+                            <path d="M1 9L2.5 1L6 5.5L8 0.5L10 5.5L13.5 1L15 9H1Z" fill={`url(#vcr${lv.n})`}/>
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="vs-info">
+                    <div className={`vs-name ${st}`}>
+                      VIP {lv.n}
+                      {lv.n === 0 && <span style={{ fontSize:10, fontWeight:400, color:"rgba(40,20,80,.55)" }}>· Başlanğıc</span>}
+                      {st === "active" && <span className="vs-cur-tag">CARİ</span>}
+                    </div>
+                    <div className="vs-bar-t"><div className="vs-bar-f" style={{ width:`${pct}%`, background:barC }}/></div>
+                    <div className="vs-sub">
+                      {st === "done" && <span style={{ fontSize:9, color:"rgba(80,200,80,.5)" }}>✓ Tamamlandı</span>}
+                      {st === "active" && <span style={{ fontSize:9, color:"rgba(255,200,0,.6)" }}>{fmtExp(CURRENT_EXP)} / {fmtExp(lv.next ?? lv.req)} Exp</span>}
+                      {st === "locked" && <span style={{ fontSize:9, color:"rgba(100,80,160,.18)" }}>{fmtExp(lv.req)} Exp lazım</span>}
+                      <span style={{ fontSize:9, color:"rgba(100,80,160,.18)" }}>{lv.req > 0 ? fmtExp(lv.req) + " Exp" : "Başlanğıc"}</span>
+                    </div>
+                  </div>
+                  <div className={`vs-badge ${st}`}>
+                    {st === "done" ? "✓ Keçildi" : st === "active" ? "★ Aktiv" : lv.n === 0 ? "Başlanğıc" : "Kilidli"}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </main>
   );
 }
 
