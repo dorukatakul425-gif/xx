@@ -745,6 +745,8 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
   const [editOpen, setEditOpen] = useState(false);
   const [visitorOpen, setVisitorOpen] = useState(false);
   const [magazaOpen, setMagazaOpen] = useState(false);
+  const [walletOpen, setWalletOpen] = useState(false);
+  const [legalPage, setLegalPage] = useState<null|"terms"|"privacy">(null);
   const [copyDone, setCopyDone] = useState(false);
   const [jeton, setJeton] = useState(() => { try { return parseInt(localStorage.getItem("velvet_jeton") || "10000"); } catch { return 10000; } });
   const [selectedFrame, setSelectedFrame] = useState<string|null>(() => { try { return localStorage.getItem("velvet_frame"); } catch { return null; } });
@@ -1055,7 +1057,7 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
             {
               title:"Hesab və status",
               items:[
-                { icon:WalletCards, label:"Cüzdanım", description:"Balans və ödənişlər" },
+                { icon:WalletCards, label:"Cüzdanım", description:"Balans və ödənişlər", onClick:() => setWalletOpen(true) },
                 { icon:ShieldCheck, label:"VIP", description:"Üstünlüklər və səviyyələr", badge:`VIP ${displayVip}`, badgeClass:"p-badge-vip", onClick:onVip },
                 { icon:Medal, label:"Reytinq", description:"Ümumi sıralamadakı yerin", badge:"#142", badgeClass:"p-badge-rank" },
               ],
@@ -1106,6 +1108,80 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
       </div>
 
       <BottomNav active="profile" onHome={onBack} onRoom={onEnterRoom} onProfile={() => {}}/>
+
+      {/* CÜZDANIM */}
+      {walletOpen && (
+        <div style={{ position:"fixed", inset:0, zIndex:998, background:"#f5f5f7", display:"flex", flexDirection:"column" }}>
+          <header style={{ flexShrink:0, background:"#fff", borderBottom:".5px solid rgba(20,10,40,.08)", padding:"max(10px,env(safe-area-inset-top)) 8px 0" }}>
+            <div style={{ position:"relative", height:44, display:"flex", alignItems:"center" }}>
+              <button onClick={() => setWalletOpen(false)} aria-label="Geri" style={{ width:40, height:40, background:"none", border:0, display:"flex", alignItems:"center", justifyContent:"center", color:"#111", cursor:"pointer" }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              <span style={{ position:"absolute", left:"50%", transform:"translateX(-50%)", fontSize:17, fontWeight:600, color:"#111", letterSpacing:-.3 }}>Cüzdanım</span>
+              <div style={{ marginLeft:"auto", display:"flex" }}>
+                <button aria-label="Dəstək" style={{ width:40, height:40, background:"none", border:0, display:"flex", alignItems:"center", justifyContent:"center", color:"#111", cursor:"pointer" }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="13" width="4" height="6" rx="1.5"/><rect x="17" y="13" width="4" height="6" rx="1.5"/><path d="M19 19c0 1.5-1.5 2.5-4 2.5h-2"/></svg>
+                </button>
+                <button aria-label="Keçmiş" style={{ width:40, height:40, background:"none", border:0, display:"flex", alignItems:"center", justifyContent:"center", color:"#111", cursor:"pointer" }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 7.5V12l3 2"/></svg>
+                </button>
+              </div>
+            </div>
+          </header>
+
+          <div style={{ flex:1, overflowY:"auto", padding:16 }}>
+            <button onClick={() => { setWalletOpen(false); onVip(); }} style={{ width:"100%", display:"flex", alignItems:"center", gap:12, padding:"12px 14px", background:"#fff", border:".5px solid rgba(20,10,40,.08)", borderRadius:16, cursor:"pointer", textAlign:"left", boxShadow:"0 2px 10px rgba(20,10,40,.04)" }}>
+              <img src={`/images/images/VIP${displayVip}.png`} alt={`VIP ${displayVip}`} style={{ width:44, height:44, objectFit:"contain", flexShrink:0 }}/>
+              <span style={{ flex:1, fontSize:14, fontWeight:500, color:"#111", lineHeight:1.35 }}>Səviyyə keçmək üçün EXP lazımdır.</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c7c7cc" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink:0 }}><path d="M9 6l6 6-6 6"/></svg>
+            </button>
+
+            {/* JETON PAKETLƏRİ */}
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:10, marginTop:16 }}>
+              {[
+                { img:1, amt:18546,   bonus:2781,   exp:110,  usd:"0.80" },
+                { img:2, amt:93500,   bonus:14025,  exp:510,  usd:"4.80" },
+                { img:3, amt:222460,  bonus:33369,  exp:1100, usd:"9.99" },
+                { img:4, amt:410888,  bonus:61633,  exp:1899, usd:"19.50" },
+                { img:5, amt:980245,  bonus:147036, exp:5000, usd:"56.99" },
+                { img:6, amt:2156789, bonus:323518, exp:9999, usd:"110.99" },
+              ].map(p => (
+                <div key={p.img} style={{ background:"#fff", border:".5px solid rgba(20,10,40,.08)", borderRadius:16, padding:"8px 6px 10px", display:"flex", flexDirection:"column", alignItems:"center", textAlign:"center", boxShadow:"0 2px 10px rgba(20,10,40,.04)" }}>
+                  <div style={{ width:"100%", background:"#e8f8ee", color:"#15803d", borderRadius:8, padding:"4px 4px", fontSize:9, fontWeight:600, lineHeight:1.25 }}>15% tokenin geri qaytarılması</div>
+                  <img src={`/images/images/v${p.img}.png`} alt="" style={{ width:52, height:52, objectFit:"contain", margin:"8px 0 6px" }}/>
+                  <div style={{ fontSize:15, fontWeight:700, color:"#111", letterSpacing:-.3, fontVariantNumeric:"tabular-nums" }}>{p.amt.toLocaleString("en-US")}</div>
+                  <div style={{ fontSize:11, fontWeight:600, color:"#e0102d", marginTop:1 }}>+{p.bonus.toLocaleString("en-US")}</div>
+                  <div style={{ fontSize:10, fontWeight:500, color:"#8e8e93", marginTop:2 }}>{p.exp} VİP EXP</div>
+                  <button style={{ marginTop:8, width:"100%", height:32, borderRadius:16, border:0, background:"linear-gradient(135deg,#7b2ff7,#9d5cff)", color:"#fff", fontSize:12, fontWeight:600, cursor:"pointer", boxShadow:"0 3px 10px rgba(123,47,247,.3)" }}>USD {p.usd}</button>
+                </div>
+              ))}
+            </div>
+
+            <p style={{ margin:"18px 8px 24px", fontSize:12, lineHeight:1.6, color:"#8e8e93", textAlign:"center" }}>
+              Bu sifarişi təqdim etməklə, siz{" "}
+              <button onClick={() => setLegalPage("terms")} style={{ background:"none", border:0, padding:0, color:"#7b2ff7", fontSize:12, fontWeight:600, cursor:"pointer", fontFamily:"inherit" }}>"Xidmət Şərtləri"</button>
+              {" "}və{" "}
+              <button onClick={() => setLegalPage("privacy")} style={{ background:"none", border:0, padding:0, color:"#7b2ff7", fontSize:12, fontWeight:600, cursor:"pointer", fontFamily:"inherit" }}>"Məxfilik Siyasəti"</button>
+              {" "}ilə razılaşırsınız.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* HÜQUQİ SƏHİFƏ (boş — sonra dizayn) */}
+      {legalPage && (
+        <div style={{ position:"fixed", inset:0, zIndex:1100, background:"#fff", display:"flex", flexDirection:"column" }}>
+          <header style={{ flexShrink:0, borderBottom:".5px solid rgba(20,10,40,.08)", padding:"max(10px,env(safe-area-inset-top)) 8px 0" }}>
+            <div style={{ position:"relative", height:44, display:"flex", alignItems:"center" }}>
+              <button onClick={() => setLegalPage(null)} aria-label="Geri" style={{ width:40, height:40, background:"none", border:0, display:"flex", alignItems:"center", justifyContent:"center", color:"#111", cursor:"pointer" }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              <span style={{ position:"absolute", left:"50%", transform:"translateX(-50%)", fontSize:17, fontWeight:600, color:"#111" }}>{legalPage === "terms" ? "Xidmət Şərtləri" : "Məxfilik Siyasəti"}</span>
+            </div>
+          </header>
+          <div style={{ flex:1, overflowY:"auto", padding:16 }}/>
+        </div>
+      )}
 
       {/* MAĞAZA PANELİ */}
       {magazaOpen && (() => {
