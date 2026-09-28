@@ -219,7 +219,7 @@ function VelvetApp() {
         onProfile={() => setScreen("profile")}
         error={error || voice.error}
       />
-      {showChat && session && <ChatPanel session={session} displayName={displayName} avatarUrl={avatarUrl} onClose={() => setShowChat(false)} />}
+      {showChat && <ChatPanel session={session} displayName={displayName} avatarUrl={avatarUrl} onClose={() => setShowChat(false)} />}
       {myEntrance && <VipEntrance name={displayName} />}
     </>
   );
@@ -1998,7 +1998,7 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
 }
 
 /* ─── CHAT ─── */
-function ChatPanel({ session, displayName, avatarUrl, onClose }: { session: Session; displayName: string; avatarUrl: string | null; onClose: () => void }) {
+function ChatPanel({ session, displayName, avatarUrl, onClose }: { session: Session | null; displayName: string; avatarUrl: string | null; onClose: () => void }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState("");
   const [vh, setVh] = useState<{ h: number; top: number } | null>(null);
@@ -2006,6 +2006,14 @@ function ChatPanel({ session, displayName, avatarUrl, onClose }: { session: Sess
 
   // Mesajları yüklə + realtime
   useEffect(() => {
+    if (!session) {
+      // DEMO: mesajlar cihazda saxlanır
+      try { const d = localStorage.getItem("velvet_demo_chat"); setMessages(d ? JSON.parse(d) : [
+        { id:1, user_id:"bot1", display_name:"Aynur", avatar_url:null, content:"Salam, xoş gəldin! 👋", created_at:new Date().toISOString() },
+        { id:2, user_id:"bot2", display_name:"Rauf", avatar_url:null, content:"Otaq çox gözəldir 🔥", created_at:new Date().toISOString() },
+      ]); } catch {}
+      return;
+    }
     supabase.from("messages").select("*").eq("room_id", ROOM_ID).order("created_at", { ascending: true }).limit(50).then(({ data }) => { if (data) setMessages(data as Message[]); });
     const ch = supabase.channel(`chat-${ROOM_ID}`).on("postgres_changes", { event:"INSERT", schema:"public", table:"messages", filter:`room_id=eq.${ROOM_ID}` }, p => setMessages(prev => [...prev, p.new as Message])).subscribe();
     return () => { supabase.removeChannel(ch); };
@@ -2041,6 +2049,16 @@ function ChatPanel({ session, displayName, avatarUrl, onClose }: { session: Sess
     const t = text.trim();
     if (!t) return;
     setText("");
+    if (!session) {
+      let av: string | null = avatarUrl;
+      try { av = av || localStorage.getItem("profile_avatar"); } catch {}
+      setMessages(prev => {
+        const next = [...prev, { id: Date.now(), user_id:"demo", display_name: displayName, avatar_url: av, content: t, created_at: new Date().toISOString() }].slice(-100);
+        try { localStorage.setItem("velvet_demo_chat", JSON.stringify(next)); } catch {}
+        return next;
+      });
+      return;
+    }
     await supabase.from("messages").insert({ room_id: ROOM_ID, user_id: session.user.id, display_name: displayName, avatar_url: avatarUrl, content: t });
   };
 
@@ -2056,7 +2074,7 @@ function ChatPanel({ session, displayName, avatarUrl, onClose }: { session: Sess
       <div ref={listRef} style={{ flex:1, minHeight:0, overflowY:"auto", WebkitOverflowScrolling:"touch", overscrollBehavior:"contain", padding:"12px 14px" }}>
         {messages.length === 0 && <p style={{ textAlign:"center", color:"#8e8e93", fontSize:14, marginTop:40 }}>Hələ mesaj yoxdur.</p>}
         {messages.map(msg => {
-          const isMe = msg.user_id === session.user.id;
+          const isMe = msg.user_id === (session ? session.user.id : "demo");
           return (
             <div key={msg.id} style={{ display:"flex", gap:10, alignItems:"flex-start", marginBottom:14, flexDirection: isMe ? "row-reverse" : "row" }}>
               <div style={{ width:36, height:36, borderRadius:"50%", flexShrink:0, overflow:"hidden", background:"linear-gradient(135deg,#7b2ff7,#ff3ea5)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:14, fontWeight:700 }}>
