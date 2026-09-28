@@ -151,7 +151,7 @@ function VelvetApp() {
 
 
 
-  const enterRoom = () => { setScreen("room"); setMyEntrance(true); setTimeout(() => setMyEntrance(false), 3500); };
+  const enterRoom = () => { setScreen("room"); };
 
   const go = (s: Screen) => { setScreen(s); localStorage.setItem("velvet_screen", s); };
 
@@ -220,7 +220,6 @@ function VelvetApp() {
         error={error || voice.error}
       />
       {showChat && <ChatPanel session={session} displayName={displayName} avatarUrl={avatarUrl} onClose={() => setShowChat(false)} />}
-      {myEntrance && <VipEntrance name={displayName} />}
     </>
   );
 }
