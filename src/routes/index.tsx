@@ -709,6 +709,142 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
   );
 }
 
+/* ─── XİDMƏT ŞƏRTLƏRİ ─── */
+const VELVET_TERMS: { t: string; p: string[] }[] = [
+ {
+  "t": "Qısa xülasə",
+  "p": [
+   "Bu Xidmət Şərtləri (\"Şərtlər\") siz və Velvet (\"Velvet\", \"biz\") arasında bağlanan hüquqi razılaşmadır. Velvet tətbiqinə, veb saytına, səsli otaqlara, oyunlara və digər xidmətlərə (birlikdə \"Xidmətlər\") daxil olmaqla və ya onlardan istifadə etməklə bu Şərtləri qəbul etmiş olursunuz.",
+   "Paylaşdığınız məzmuna görə məsuliyyət sizin üzərinizdədir. Qaydalara zidd məzmun aşkar edildikdə və ya bizə bildirildikdə, onu öz qərarımızla silə bilərik.",
+   "Şəxsi məlumatlarınızın necə istifadə edildiyini Məxfilik Siyasətimizdən öyrənə bilərsiniz.",
+   "Velvet-dən qanunsuz, aldadıcı, zərərli və ya ayrı-seçkilik xarakterli heç bir məqsəd üçün istifadə etməyəcəyinizi qəbul edirsiniz.",
+   "ŞƏRTLƏRLƏ RAZI DEYİLSİNİZSƏ, XİDMƏTLƏRDƏN İSTİFADƏ ETMƏYİN."
+  ]
+ },
+ {
+  "t": "1. Xidmət haqqında",
+  "p": [
+   "Velvet istifadəçilərə səsli otaqlarda ünsiyyət qurmaq, oyun oynamaq, yeni dostlar tapmaq və əyləncəli vaxt keçirmək imkanı verən sosial platformadır. Platformanın təhlükəsiz və mehriban mühit olaraq qalması hər birimiz üçün vacibdir. Buna görə də Xidmətlərdən yalnız məqsədinə uyğun və bu Şərtlərə əməl etməklə istifadə etməlisiniz."
+  ]
+ },
+ {
+  "t": "2. Yaş həddi",
+  "p": [
+   "Velvet-dən istifadə etmək üçün ən azı 18 yaşınız olmalıdır. Qeydiyyat zamanı yaşınızı düzgün göstərməyi öhdənizə götürürsünüz. Yaş həddinə uyğun olmayan hesablar xəbərdarlıq edilmədən bağlana bilər."
+  ]
+ },
+ {
+  "t": "3. Məxfilik",
+  "p": [
+   "Məxfiliyiniz bizim üçün önəmlidir. Hansı məlumatları topladığımızı, necə istifadə etdiyimizi və necə qoruduğumuzu Məxfilik Siyasətində izah etmişik. Xidmətlərdən istifadə etməklə məlumatlarınızın həmin siyasətə uyğun emal olunmasına razılıq verirsiniz."
+  ]
+ },
+ {
+  "t": "4. Məzmun paylaşımı",
+  "p": [
+   "Velvet-də mesaj, şəkil, səs və digər məzmun (\"Məzmun\") paylaşa bilərsiniz. Paylaşdığınız məzmun sizə məxsusdur, lakin aşağıdakıları ehtiva edən məzmun qadağandır:",
+   "• söyüş, təhqir, hədə və ya başqalarını narahat edən, alçaldan ifadələr;",
+   "• açıq-saçıq, pornoqrafik və insan ləyaqətini alçaldan materiallar;",
+   "• irqçilik, cinsi, dini və ya milli ayrı-seçkilik və nifrət təbliği;",
+   "• terrorizm, zorakılıq və ya hər hansı qanunsuz fəaliyyətə çağırış;",
+   "• böhtan və başqalarının şərəf və ləyaqətini ləkələyən məlumatlar;",
+   "• icazəsiz reklam, satış, spam və başqa saytlara yönləndirmə;",
+   "• virus, zərərli kod və ya sistemlərin işini pozan hər hansı proqram;",
+   "• üçüncü şəxslərin müəllif, əqli mülkiyyət və ya məxfilik hüquqlarını pozan materiallar;",
+   "• başqa şəxsin razılığı olmadan onun şəkli, səsi və ya şəxsi məlumatları.",
+   "Rəy və təklifləriniz bizim üçün dəyərlidir. Onlardan heç bir öhdəlik və ödəniş olmadan istifadə edə biləcəyimizi qəbul edirsiniz."
+  ]
+ },
+ {
+  "t": "5. Başqalarının hüquqlarının qorunması",
+  "p": [
+   "Başqalarının hüquqlarını pozan və ya Velvet İcma Qaydalarına zidd məzmun paylaşmamalısınız. Bu Şərtləri pozan məzmunu silmək və ya hesabı bloklamaq hüququmuz var.",
+   "Başqalarının şəxsiyyət sənədlərini, bank və maliyyə məlumatlarını paylaşmaq qadağandır. İstifadəçilərdən məlumat toplayırsınızsa, onların açıq razılığını almalısınız.",
+   "Velvet adından, loqosundan və ticarət nişanlarından yazılı icazəmiz olmadan istifadə edə bilməzsiniz."
+  ]
+ },
+ {
+  "t": "6. Qeydiyyat və hesab",
+  "p": [
+   "Qeydiyyat üçün istifadəçi adı, e-poçt ünvanı və ya Google hesabı tələb olunur. Hesabınızla bağlı aşağıdakıları öhdənizə götürürsünüz:",
+   "• yalan şəxsi məlumat verməyəcəksiniz;",
+   "• başqası adına hesab yaratmayacaqsınız;",
+   "• hesabınızı yazılı icazəmiz olmadan başqasına verməyəcək və satmayacaqsınız;",
+   "• şifrənizin təhlükəsizliyinə özünüz cavabdehsiniz.",
+   "Qaydaları pozan hesabları dayandırmaq, bağlamaq və ya silmək hüququmuzu saxlayırıq. Bu halda istifadə olunmamış ödənişli xidmətlərin dəyəri geri qaytarılmır."
+  ]
+ },
+ {
+  "t": "7. Xidmətin dayandırılması",
+  "p": [
+   "Bu Şərtləri pozduğunuz və ya bizim üçün hüquqi risk yaratdığınız halda, əvvəlcədən xəbərdarlıq etmədən və heç bir kompensasiya ödəmədən:",
+   "• hesabınızı müvəqqəti və ya birdəfəlik bağlaya bilərik;",
+   "• IP ünvanı, cihaz və digər texniki vasitələrlə girişinizi məhdudlaşdıra bilərik.",
+   "Mümkün olduqda bu barədə sizə məlumat verməyə çalışacağıq, lakin bu bizim öhdəliyimiz deyil."
+  ]
+ },
+ {
+  "t": "8. Virtual valyuta (Jeton)",
+  "p": [
+   "Velvet daxilində istifadə üçün \"Jeton\" adlanan virtual valyuta almaq mümkündür. Jetonlar yalnız tətbiq daxilində çərçivə, giriş animasiyası, hədiyyə və digər xidmətlər üçün istifadə olunur.",
+   "Jetonların real pula dəyişdirilməsi, geri qaytarılması və ya başqa hesaba satılması mümkün deyil. Xərcləmə təsdiqləndikdən sonra əməliyyat geri qaytarılmır.",
+   "Jetonların qiyməti və məzənnəsi ölkəyə görə fərqlənə bilər və Velvet tərəfindən istənilən vaxt dəyişdirilə bilər. Satınalma anında göstərilən qiyməti qəbul etmiş sayılırsınız.",
+   "Paket alışlarında göstərilən 15% bonus və VİP EXP kampaniya şərtlərinə bağlıdır və dəyişdirilə bilər.",
+   "Ödəniş üçün istifadə olunan vəsait qanuni yolla əldə edilməlidir. Qaydaları pozduğunuza görə hesabınız bağlandıqda, hesabdakı jetonlar geri qaytarılmır.",
+   "Ödənişi bankdan geri çağırmaq (chargeback) və ya əsassız mübahisə açmaq qadağandır. Belə hallarda hesab və cihaz birdəfəlik bloklana, jetonlar isə silinə bilər."
+  ]
+ },
+ {
+  "t": "9. VIP statusu və ödənişli xidmətlər",
+  "p": [
+   "Velvet istifadəçilərə VIP səviyyələri, avatar çərçivələri, giriş animasiyaları və digər ödənişli imkanlar təqdim edir. Bu imkanlar Velvet-ə məxsusdur və sizə yalnız şəxsi, müddətli və başqasına ötürülə bilməyən istifadə hüququ verilir.",
+   "VIP səviyyəsi toplanan VİP EXP əsasında hesablanır. Səviyyələrin şərtləri və üstünlükləri Velvet tərəfindən dəyişdirilə bilər.",
+   "Müddətli əşyalar (məsələn, 3, 7 və ya 30 günlük çərçivələr) müddət bitdikdə avtomatik olaraq deaktiv olur.",
+   "App Store və ya Google Play vasitəsilə edilən ödənişlər həmin platformaların qaydalarına tabedir. Aktivləşdirilmiş ödənişli xidmətlər başqasına ötürülmür və geri qaytarılmır.",
+   "Texniki xidmət, yeniləmə və ya nəzarətimizdən kənar səbəblərlə yaranan qısa fasilələrə görə əlavə kompensasiya verilmir."
+  ]
+ },
+ {
+  "t": "10. Məzmun üzərində hüquqlar",
+  "p": [
+   "Paylaşdığınız məzmunun sahibi sizsiniz. Lakin onu Velvet-də paylaşmaqla, Velvet-ə həmin məzmunu Xidmətlər daxilində göstərmək, saxlamaq, formatını dəyişmək və yaymaq üçün pulsuz, qeyri-eksklüziv və dünya üzrə keçərli lisenziya verirsiniz. Şəxsi mesajlarınız Xidmətlərdən kənarda yayılmır.",
+   "Velvet-in dizaynı, loqosu, maskotu, proqram təminatı və digər məzmunu Velvet-ə məxsusdur və qanunla qorunur.",
+   "Qaydalara zidd məzmunu xəbərdarlıq etmədən silə bilərik. Velvet ehtiyat nüsxə xidməti deyil, buna görə vacib məzmununuzun nüsxəsini özünüz saxlayın."
+  ]
+ },
+ {
+  "t": "11. Məsuliyyətin məhdudlaşdırılması",
+  "p": [
+   "Xidmətlər \"olduğu kimi\" təqdim olunur. Qanunla icazə verilən maksimum həddə Velvet Xidmətlərdən istifadə nəticəsində yaranan birbaşa və ya dolayı zərərlərə, məlumat itkisinə, gəlir itkisinə, virus və texniki nasazlıqlara görə məsuliyyət daşımır.",
+   "İstifadəçilərin paylaşdığı məzmuna görə Velvet məsuliyyət daşımır. Qanunsuz fəaliyyət aşkar edildikdə, səlahiyyətli dövlət orqanları ilə qanunvericiliyə uyğun əməkdaşlıq edirik."
+  ]
+ },
+ {
+  "t": "12. Təzminat",
+  "p": [
+   "Xidmətlərdən istifadəniz, bu Şərtləri pozmağınız və ya üçüncü şəxslərin hüquqlarını pozmağınız nəticəsində Velvet-ə qarşı irəli sürülən iddia, zərər və xərcləri (vəkil xərcləri daxil olmaqla) ödəməyi öhdənizə götürürsünüz."
+  ]
+ },
+ {
+  "t": "13. Tətbiq olunan qanun",
+  "p": [
+   "Bu Şərtlər Azərbaycan Respublikasının qanunvericiliyinə uyğun tənzimlənir. Mübahisələr ilk növbədə danışıqlar yolu ilə, razılıq əldə olunmadıqda isə Azərbaycan Respublikasının səlahiyyətli məhkəmələrində həll edilir."
+  ]
+ },
+ {
+  "t": "14. Dəyişikliklər",
+  "p": [
+   "Bu Şərtlərə vaxtaşırı dəyişiklik edə bilərik. Əhəmiyyətli dəyişikliklər barədə tətbiq daxilində məlumat verəcəyik. Dəyişikliklərdən sonra Xidmətlərdən istifadəyə davam etməyiniz yeni Şərtləri qəbul etdiyiniz mənasına gəlir."
+  ]
+ },
+ {
+  "t": "15. Əlaqə",
+  "p": [
+   "Suallarınız üçün Profil → Kömək mərkəzi bölməsindən bizimlə əlaqə saxlaya bilərsiniz."
+  ]
+ }
+];
+
 /* ─── PROFILE ─── */
 const COUNTRY_FLAGS: Record<string,string> = {
   "Azərbaycan":"🇦🇿","Türkiyə":"🇹🇷","Rusiya":"🇷🇺","ABŞ":"🇺🇸","Almaniya":"🇩🇪",
@@ -1148,7 +1284,7 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
               ].map(p => (
                 <div key={p.img} style={{ background:"#fff", border:".5px solid rgba(20,10,40,.08)", borderRadius:16, padding:"8px 6px 10px", display:"flex", flexDirection:"column", alignItems:"center", textAlign:"center", boxShadow:"0 2px 10px rgba(20,10,40,.04)" }}>
                   <div style={{ width:"100%", background:"#e8f8ee", color:"#15803d", borderRadius:8, padding:"4px 4px", fontSize:9, fontWeight:600, lineHeight:1.25 }}>15% tokenin geri qaytarılması</div>
-                  <img src={`/images/images/v${p.img}.png`} alt="" style={{ width:52, height:52, objectFit:"contain", margin:"8px 0 6px" }}/>
+                  <img src={`/images/images/v${p.img}.png`} alt="" style={{ width:72, height:72, objectFit:"contain", margin:"6px 0 4px" }}/>
                   <div style={{ fontSize:15, fontWeight:700, color:"#111", letterSpacing:-.3, fontVariantNumeric:"tabular-nums" }}>{p.amt.toLocaleString("en-US")}</div>
                   <div style={{ fontSize:11, fontWeight:600, color:"#e0102d", marginTop:1 }}>+{p.bonus.toLocaleString("en-US")}</div>
                   <div style={{ fontSize:10, fontWeight:500, color:"#8e8e93", marginTop:2 }}>{p.exp} VİP EXP</div>
@@ -1179,7 +1315,22 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
               <span style={{ position:"absolute", left:"50%", transform:"translateX(-50%)", fontSize:17, fontWeight:600, color:"#111" }}>{legalPage === "terms" ? "Xidmət Şərtləri" : "Məxfilik Siyasəti"}</span>
             </div>
           </header>
-          <div style={{ flex:1, overflowY:"auto", padding:16 }}/>
+          <div style={{ flex:1, overflowY:"auto", padding:"16px 18px 40px" }}>
+            {legalPage === "terms" && (
+              <>
+                <div style={{ fontSize:22, fontWeight:700, color:"#111", letterSpacing:-.4, marginBottom:4 }}>Velvet Xidmət Şərtləri</div>
+                <div style={{ fontSize:12, color:"#8e8e93", marginBottom:18 }}>Son yenilənmə: 28 sentyabr 2026</div>
+                {VELVET_TERMS.map(sec => (
+                  <section key={sec.t} style={{ marginBottom:20 }}>
+                    <h3 style={{ fontSize:15, fontWeight:700, color:"#111", margin:"0 0 8px" }}>{sec.t}</h3>
+                    {sec.p.map((x, i) => (
+                      <p key={i} style={{ fontSize:14, lineHeight:1.6, color:"#3a3a3c", margin:"0 0 8px", paddingLeft: x.startsWith("•") ? 8 : 0 }}>{x}</p>
+                    ))}
+                  </section>
+                ))}
+              </>
+            )}
+          </div>
         </div>
       )}
 
