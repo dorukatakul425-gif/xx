@@ -1897,6 +1897,7 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
 
 /* ─── ROOM ─── */
 function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onToggleMic, onJoinSeat, onLeaveSeat, onLeave, onOpenChat, onHome, onProfile, error }: any) {
+  const [following, setFollowing] = useState(false);
   const speakers = members.filter((m: Member) => !m.is_muted);
   const listeners = members.filter((m: Member) => m.is_muted);
   const emptySeatCount = Math.max(0, 3 - speakers.length);
@@ -1904,22 +1905,41 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
   return (
     <main style={{ background:"#f5f5f7", minHeight:"100dvh", position:"relative", fontFamily:"'Helvetica Neue',Arial,sans-serif", color:"#1a1a2e" }}>
       <style>{`
-        .r-scroll{overflow-y:auto;padding:max(16px,env(safe-area-inset-top)) 16px 160px}
+        .r-scroll{overflow-y:auto;padding:max(16px,env(safe-area-inset-top)) 16px 90px}
         .r-scroll::-webkit-scrollbar{display:none}
       `}</style>
       <div className="r-scroll">
-        <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:20 }}>
-          <div style={{ width:40, height:40, borderRadius:"50%", background:"#7b2ff7", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:900, color:"#1a1a2e", flexShrink:0 }}>V</div>
-          <div style={{ flex:1, minWidth:0 }}>
-            <p style={{ fontSize:9, letterSpacing:"0.28em", color:"#7b2ff7", textTransform:"uppercase" }}>VELVET · VIP</p>
-            <p style={{ fontSize:13, fontWeight:600, color:"#1a1a2e", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>Salam, {name}</p>
+        {/* OTAQ ÜST PANELİ */}
+        <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:18 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:8, minWidth:0, background:"#fff", border:".5px solid rgba(20,10,40,.08)", borderRadius:22, padding:"3px 4px 3px 3px", boxShadow:"0 2px 8px rgba(20,10,40,.06)" }}>
+            <div style={{ width:36, height:36, borderRadius:12, background:"linear-gradient(135deg,#7b2ff7,#ff3ea5)", overflow:"hidden", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:15, fontWeight:700 }}>
+              <img src="/images/images/oda.png" alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}/>
+            </div>
+            <div style={{ minWidth:0, maxWidth:120 }}>
+              <div style={{ fontSize:14, fontWeight:700, color:"#111", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>Qızıl Saatlar</div>
+              <div style={{ fontSize:11, color:"#8e8e93", display:"flex", alignItems:"center", gap:4 }}><span style={{ width:6, height:6, borderRadius:"50%", background:"#22c55e" }}/>{Math.max(members.length,1)} onlayn</div>
+            </div>
+            <button onClick={() => setFollowing(f => !f)} aria-label={following ? "İzləmədən çıx" : "Otağı izlə"}
+              style={{ height:30, padding:"0 10px", borderRadius:15, border:0, cursor:"pointer", flexShrink:0, display:"flex", alignItems:"center", gap:4, fontSize:12, fontWeight:600, background: following ? "#f4f2f8" : "#7b2ff7", color: following ? "#8e8e93" : "#fff", transition:".2s" }}>
+              {following
+                ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>}
+              {following ? "İzlənir" : "İzlə"}
+            </button>
           </div>
-          <button onClick={onLeave} style={{ background:"none", border:"none", cursor:"pointer" }}><MoreHorizontal className="size-5" color="#5a3a7a"/></button>
+          <div style={{ marginLeft:"auto", display:"flex", gap:6 }}>
+            <button aria-label="Töhfə sıralaması" style={{ width:36, height:36, borderRadius:"50%", background:"#fff", border:".5px solid rgba(20,10,40,.08)", boxShadow:"0 2px 8px rgba(20,10,40,.06)", display:"flex", alignItems:"center", justifyContent:"center", color:"#1c1c1e", cursor:"pointer", flexShrink:0 }}>
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#FF9F0A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>
+            </button>
+            <button aria-label="Otaq haqqında" style={{ width:36, height:36, borderRadius:"50%", background:"#fff", border:".5px solid rgba(20,10,40,.08)", boxShadow:"0 2px 8px rgba(20,10,40,.06)", display:"flex", alignItems:"center", justifyContent:"center", color:"#1c1c1e", cursor:"pointer", flexShrink:0 }}>
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="7.8" r=".7" fill="currentColor"/></svg>
+            </button>
+            <button onClick={onLeave} aria-label="Otaqdan çıx" style={{ width:36, height:36, borderRadius:"50%", background:"#fff", border:".5px solid rgba(20,10,40,.08)", boxShadow:"0 2px 8px rgba(20,10,40,.06)", display:"flex", alignItems:"center", justifyContent:"center", color:"#1c1c1e", cursor:"pointer", flexShrink:0 }}>
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#ff3b30" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v9"/><path d="M6.3 6.8a8 8 0 1 0 11.4 0"/></svg>
+            </button>
+          </div>
         </div>
-        <div style={{ display:"flex", alignItems:"flex-end", justifyContent:"space-between", marginBottom:16 }}>
-          <div><p style={{ fontSize:9, letterSpacing:"0.24em", color:"#7b2ff7", textTransform:"uppercase" }}>Gecə Salonu</p><h1 style={{ fontSize:28, fontWeight:900, color:"#1a1a2e" }}>Qızıl Saatlar</h1></div>
-          <div style={{ display:"flex", alignItems:"center", gap:6, borderRadius:20, border:"1px solid rgba(100,80,160,.14)", padding:"5px 10px", background:"rgba(100,80,160,.07)", fontSize:11, color:"#1a1a2e" }}><span style={{ width:6, height:6, borderRadius:"50%", background:"#00d4ff", display:"block" }}/>Canlı · {Math.max(members.length,1)}</div>
-        </div>
+
         <div style={{ background:"rgba(100,80,160,.07)", border:"1px solid rgba(100,80,160,.12)", borderRadius:16, padding:16, marginBottom:16 }}>
           <div style={{ display:"flex", justifyContent:"space-between", marginBottom:14 }}>
             <span style={{ fontSize:9, letterSpacing:"0.2em", color:"#5a3a7a", textTransform:"uppercase" }}>Danışan koltuklar</span>
@@ -1958,16 +1978,22 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
         )}
         {error ? <p style={{ color:"#ff3ea5", fontSize:11, textAlign:"center", marginTop:12 }}>{error}</p> : null}
       </div>
-      <div style={{ position:"fixed", bottom:0, left:0, right:0, background:"rgba(10,0,24,.94)", borderTop:"1px solid rgba(123,47,247,.15)", padding:`12px 20px max(${68}px,calc(env(safe-area-inset-bottom) + 68px))`, zIndex:50 }}>
-        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", background:"rgba(100,80,160,.07)", border:"1px solid rgba(100,80,160,.12)", borderRadius:16, padding:10 }}>
-          <button onClick={onToggleMic} style={{ width:44, height:44, borderRadius:12, background:"rgba(100,80,160,.09)", border:"1px solid rgba(100,80,160,.14)", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}>{muted ? <MicOff size={18} color="#5a3a7a"/> : <Mic size={18} color="#c084fc"/>}</button>
-          <button onClick={onToggleMic} style={{ width:52, height:52, borderRadius:50, background:"linear-gradient(135deg,#7b2ff7,#ff3ea5)", border:"2px solid rgba(80,60,140,.2)", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}><Mic size={22} color="white"/></button>
-          <button onClick={onOpenChat} style={{ width:44, height:44, borderRadius:12, background:"rgba(100,80,160,.09)", border:"1px solid rgba(100,80,160,.14)", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}><MessageCircle size={18} color="#5a3a7a"/></button>
-          <button style={{ width:44, height:44, borderRadius:12, background:"rgba(100,80,160,.09)", border:"1px solid rgba(100,80,160,.14)", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}><Users size={18} color="#5a3a7a"/></button>
-          <button onClick={onLeave} style={{ width:44, height:44, borderRadius:12, background:"rgba(255,60,60,.15)", border:"1px solid rgba(255,60,60,.3)", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}><X size={18} color="#ff4444"/></button>
-        </div>
+      {/* ALT PANEL — mesaj sahəsi + ikonlar */}
+      <div style={{ position:"fixed", bottom:0, left:0, right:0, zIndex:50, background:"rgba(255,255,255,.92)", backdropFilter:"saturate(1.8) blur(20px)", WebkitBackdropFilter:"saturate(1.8) blur(20px)", borderTop:".5px solid rgba(20,10,40,.1)", padding:"8px 12px max(8px,env(safe-area-inset-bottom))", display:"flex", alignItems:"center", gap:8 }}>
+        <button onClick={onOpenChat} style={{ flex:1, minWidth:0, height:40, borderRadius:20, background:"#f4f2f8", border:0, display:"flex", alignItems:"center", gap:8, padding:"0 14px", color:"#8e8e93", fontSize:15, cursor:"text", textAlign:"left", fontFamily:"inherit" }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+          Mesaj yaz…
+        </button>
+        <button aria-label="Mesajlar" onClick={onOpenChat} style={{ width:40, height:40, borderRadius:"50%", background:"#f4f2f8", border:0, display:"flex", alignItems:"center", justifyContent:"center", color:"#1c1c1e", cursor:"pointer", flexShrink:0 }}>
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M20.5 11.6c0 4.3-3.8 7.7-8.5 7.7-1.1 0-2.2-.2-3.2-.6L4 20l1.2-3.6a7.3 7.3 0 0 1-1.7-4.8C3.5 7.3 7.3 3.9 12 3.9s8.5 3.4 8.5 7.7z"/></svg>
+        </button>
+        <button aria-label="Kataloq" style={{ width:40, height:40, borderRadius:"50%", background:"#f4f2f8", border:0, display:"flex", alignItems:"center", justifyContent:"center", color:"#1c1c1e", cursor:"pointer", flexShrink:0 }}>
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg>
+        </button>
+        <button aria-label="Hədiyyə göndər" style={{ width:40, height:40, borderRadius:"50%", background:"linear-gradient(135deg,#ff5f8f,#ff2d55)", border:0, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", cursor:"pointer", flexShrink:0, boxShadow:"0 3px 10px rgba(255,45,85,.35)" }}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v9H5v-9"/><path d="M12 8S10.5 3 8 3.5 7 8 12 8zM12 8s1.5-5 4-4.5S17 8 12 8z"/></svg>
+        </button>
       </div>
-      <BottomNav active="room" onHome={onHome} onRoom={() => {}} onProfile={onProfile}/>
     </main>
   );
 }
