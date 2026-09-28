@@ -845,6 +845,97 @@ const VELVET_TERMS: { t: string; p: string[] }[] = [
  }
 ];
 
+/* ─── MƏXFİLİK SİYASƏTİ ─── */
+const VELVET_PRIVACY: { t: string; p: string[] }[] = [
+ {
+  "t": "Qısa xülasə",
+  "p": [
+   "Bu Məxfilik Siyasəti (\"Siyasət\") Velvet tətbiqindən, veb saytından, səsli otaqlarından, oyunlarından və digər xidmətlərindən (birlikdə \"Xidmətlər\") istifadə edərkən şəxsi məlumatlarınızı necə topladığımızı, istifadə etdiyimizi, paylaşdığımızı və qoruduğumuzu izah edir.",
+   "Bu Siyasəti Xidmət Şərtləri ilə birlikdə oxumağı tövsiyə edirik. Xidmətlərə daxil olmaqla və ya onlardan istifadə etməklə məlumatlarınızın bu Siyasətə uyğun emal olunmasına razılıq verirsiniz.",
+   "Bu Siyasət Azərbaycan Respublikasının \"Fərdi məlumatlar haqqında\" Qanununa və tətbiq olunan digər qanunvericiliyə uyğun hazırlanmışdır.",
+   "MƏXFİLİK SİYASƏTİMİZLƏ RAZI DEYİLSİNİZSƏ, XİDMƏTLƏRDƏN İSTİFADƏ ETMƏYİN."
+  ]
+ },
+ {
+  "t": "1. Hansı məlumatları toplayırıq",
+  "p": [
+   "a) Bizə özünüzün verdiyi məlumatlar:",
+   "• Qeydiyyat məlumatları: e-poçt ünvanı və şifrə, yaxud Google hesabı ilə girişdə adınız, e-poçtunuz və profil şəkliniz.",
+   "• Profil məlumatları: istifadəçi adı, profil və örtük şəkli, cins, yaş, ölkə, şəhər və \"Haqqında\" mətni. Bunların bir hissəsini doldurmaq sizin seçiminizdir.",
+   "• Yaratdığınız məzmun: otaq söhbətlərindəki mesajlar, göndərdiyiniz şəkil və digər materiallar.",
+   "• Dəstək müraciətləri: Kömək mərkəzi vasitəsilə bizə göndərdiyiniz məlumatlar və şikayətlər.",
+   "b) Xidmətlərdən istifadə zamanı avtomatik toplanan məlumatlar:",
+   "• Cihaz məlumatları: cihaz modeli, əməliyyat sistemi, brauzer, tətbiq versiyası və IP ünvanı.",
+   "• İstifadə məlumatları: daxil olduğunuz otaqlar, istifadə etdiyiniz funksiyalar, giriş vaxtları və profil ziyarətləri.",
+   "• Mikrofon: Səsli otaqda danışmaq üçün mikrofon icazəsi tələb olunur. Səs real vaxtda digər iştirakçılara ötürülür və Velvet tərəfindən qeydə alınmır.",
+   "• Əməliyyat məlumatları: Jeton, VIP və digər alışların tarixi, məbləği və məhsulu. Bank kartı nömrəsi və ödəniş şifrəsi kimi həssas məlumatları biz saxlamırıq. Onlar ödəniş xidməti təminatçısı (App Store, Google Play və ya digər) tərəfindən emal olunur.",
+   "c) Üçüncü tərəflərdən alınan məlumatlar:",
+   "• Google ilə daxil olduqda Google hesabınızdakı ad, e-poçt və profil şəkli. Hansı məlumatların ötürülməsi Google hesabınızdakı parametrlərdən asılıdır."
+  ]
+ },
+ {
+  "t": "2. Məlumatlardan necə istifadə edirik",
+  "p": [
+   "• hesab yaratmaq, sizi tanımaq və profilinizi göstərmək;",
+   "• səsli otaqlar, söhbət, oyunlar, mağaza və VIP kimi funksiyaları işlətmək;",
+   "• ödənişləri emal etmək, Jeton balansını və VIP EXP-ni hesablamaq;",
+   "• xidməti təkmilləşdirmək, xətaları aşkar edib düzəltmək;",
+   "• saxtakarlığın, spamın və qaydalara zidd davranışların qarşısını almaq;",
+   "• şikayət və müraciətlərinizə cavab vermək;",
+   "• yeniliklər, kampaniyalar və tədbirlər barədə sizə məlumat vermək.",
+   "Tədbir və müsabiqələrdə iştirak etmək sizin seçiminizdir."
+  ]
+ },
+ {
+  "t": "3. Məlumatları kimlə paylaşırıq",
+  "p": [
+   "Şəxsi məlumatlarınızı satmırıq. Məlumatlarınızı yalnız aşağıdakı hallarda paylaşırıq:",
+   "• Xidmət təminatçıları: server və verilənlər bazası (məs. Supabase), hostinq (məs. Vercel), analitika və ödəniş xidmətləri. Onlar məlumatlarınızdan yalnız bizə xidmət göstərmək üçün istifadə edə bilərlər.",
+   "• Digər istifadəçilər: istifadəçi adınız, profil şəkliniz, ID-niz, VIP səviyyəniz, çərçivəniz, ölkəniz və otaqdakı mesajlarınız başqa istifadəçilərə görünür.",
+   "• Qanuni tələblər: qanunvericilik, məhkəmə qərarı və ya səlahiyyətli dövlət orqanlarının qanuni sorğusu olduqda, həmçinin istifadəçilərin təhlükəsizliyini qorumaq üçün.",
+   "• Biznes dəyişiklikləri: Velvet birləşdikdə, satıldıqda və ya yenidən təşkil olunduqda, məlumatlar bu Siyasətə uyğun olaraq yeni sahibə ötürülə bilər."
+  ]
+ },
+ {
+  "t": "4. Təhlükəsizlik və məlumatların saxlanması",
+  "p": [
+   "Məlumatlarınızı itki, sui-istifadə və icazəsiz dəyişiklikdən qorumaq üçün şifrələnmiş bağlantı (HTTPS), girişə nəzarət və digər ağlabatan təhlükəsizlik tədbirləri tətbiq edirik.",
+   "Lakin heç bir internet ötürülməsi 100% təhlükəsiz deyil. Şifrənizi heç kimlə paylaşmayın və ortaq cihazlarda hesabdan çıxmağı unutmayın. Hesabınızın oğurlandığını düşünürsünüzsə, dərhal bizə bildirin.",
+   "Bəzi məlumatlar (məsələn, profil şəkli və parametrlər) cihazınızın yaddaşında (localStorage) saxlanıla bilər. Cihazın yaddaşını təmizlədikdə bu məlumatlar silinir.",
+   "Serverlərimiz Azərbaycandan kənarda yerləşə bilər. Bu halda məlumatlarınızın qanunvericiliyə uyğun qorunması üçün lazımi tədbirlər görürük."
+  ]
+ },
+ {
+  "t": "5. Hüquqlarınız",
+  "p": [
+   "• Tanış olmaq: Profil məlumatlarınızı istənilən vaxt görə bilərsiniz. Digər məlumatların surətini əldə etmək üçün bizə müraciət edə bilərsiniz.",
+   "• Düzəliş etmək: Profil məlumatlarınızı \"Profili Düzəlt\" bölməsindən dəyişə və ya bizdən düzəliş tələb edə bilərsiniz.",
+   "• Silmək: Məlumatlarınızın silinməsini tələb edə bilərsiniz. Qanuni öhdəliklərimiz üçün lazım olan məlumatlar müəyyən müddət saxlanıla bilər.",
+   "• Razılığı geri götürmək: Mikrofon, bildiriş və digər icazələri cihaz parametrlərindən istənilən vaxt söndürə bilərsiniz. Bu halda həmin funksiyalar işləməyə bilər.",
+   "Hesabınızı silmək üçün: Profil → Parametrlər → Hesabı sil. Hesab silindikdə profiliniz, Jeton balansınız, VIP səviyyəniz, çərçivələriniz və digər əşyalarınız birdəfəlik silinir və geri qaytarılmır. Şəxsiyyətinizi müəyyən etməyən anonim statistik məlumatlar saxlanıla bilər.",
+   "Müraciətinizə cavab verməzdən əvvəl şəxsiyyətinizi təsdiqləməyi xahiş edə bilərik. Müraciətlərə ağlabatan müddətdə və qanunvericiliyə uyğun cavab veririk."
+  ]
+ },
+ {
+  "t": "6. Uşaqlar",
+  "p": [
+   "Velvet yalnız 18 yaş və yuxarı istifadəçilər üçündür. 18 yaşından kiçik şəxslərdən bilərəkdən məlumat toplamırıq. Belə hesab aşkar edildikdə bağlanır və məlumatlar silinir. Valideynsinizsə və övladınızın bizə məlumat verdiyini düşünürsünüzsə, bizimlə əlaqə saxlayın."
+  ]
+ },
+ {
+  "t": "7. Bu Siyasətdə dəyişikliklər",
+  "p": [
+   "Bu Siyasəti vaxtaşırı yeniləyə bilərik. Hüquqlarınıza ciddi təsir edən dəyişikliklər barədə tətbiq daxilində bildiriş göndərəcəyik. Ən son yenilənmə tarixi səhifənin yuxarısında göstərilir. Yenilənmədən sonra Xidmətlərdən istifadəyə davam etməyiniz yeni Siyasəti qəbul etdiyiniz mənasına gəlir."
+  ]
+ },
+ {
+  "t": "8. Əlaqə",
+  "p": [
+   "Bu Siyasətlə bağlı suallarınız varsa və ya hüquqlarınızdan istifadə etmək istəyirsinizsə, Profil → Kömək mərkəzi bölməsindən bizimlə əlaqə saxlayın."
+  ]
+ }
+];
+
 /* ─── PROFILE ─── */
 const COUNTRY_FLAGS: Record<string,string> = {
   "Azərbaycan":"🇦🇿","Türkiyə":"🇹🇷","Rusiya":"🇷🇺","ABŞ":"🇺🇸","Almaniya":"🇩🇪",
@@ -953,6 +1044,8 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
         .p-ring1{position:absolute;width:320px;height:320px;top:-100px;left:-80px;border-radius:50%;border:1px solid rgba(192,132,252,.06);animation:vrotate 20s linear infinite;z-index:2}
         .p-ring2{position:absolute;width:240px;height:240px;top:-60px;left:-40px;border-radius:50%;border:1px dashed rgba(255,62,165,.05);animation:vrotate 14s linear infinite reverse;z-index:2}
         .p-top{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:max(16px,env(safe-area-inset-top)) 18px 0;z-index:8}
+        .p-nb{width:40px;height:40px;border:0;background:none;padding:0;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;filter:drop-shadow(0 1px 3px rgba(0,0,0,.35));transition:transform .14s,opacity .14s}
+        .p-nb:active{transform:scale(.88);opacity:.7}
         .p-ibtn{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;transition:transform .14s ease,filter .14s ease;-webkit-tap-highlight-color:transparent}
         .p-ibtn:active{transform:scale(.88);filter:brightness(.92)}
         .p-upload{position:absolute;bottom:12px;right:14px;z-index:8;display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.55);border:1px solid rgba(100,80,160,.18);border-radius:20px;padding:6px 11px;cursor:pointer}
@@ -975,7 +1068,7 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
         .p-mi{width:100%;height:66px;display:flex;align-items:center;gap:12px;padding:0 14px;border-radius:0;cursor:pointer;background:#fff;border:0;box-shadow:none;text-align:left;transition:background .16s ease}
         .p-mi+.p-mi{border-top:1px solid rgba(74,40,128,.075)}
         .p-mi:active{background:#f7f4fb}
-        .p-mi-l{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#f2eef8;color:#6744a0}
+        .p-mi-l{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;box-shadow:inset 0 -1px 0 rgba(0,0,0,.08)}
         .p-mi-copy{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
         .p-mi-lbl{font-size:13px;line-height:1.25;font-weight:750;color:#1a1a2e}
         .p-mi-desc{font-size:10px;line-height:1.3;color:rgba(40,20,80,.48);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -984,7 +1077,7 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
         .p-badge-vip{background:#fff6d8;color:#8c6600;border:1px solid #f1df9a}
         .p-badge-rank{background:#eaf7fb;color:#17718b;border:1px solid #c9eaf2}
         .p-mi-end>svg{color:rgba(74,40,128,.28)}
-        .p-logout{width:calc(100% - 32px);height:48px;margin:2px 16px 24px;border-radius:12px;border:1px solid rgba(220,50,70,.14);background:#fff7f8;color:#c93d53;box-shadow:none;font-size:12px;font-weight:750}
+        .p-logout{width:calc(100% - 32px);height:50px;margin:2px 16px 24px;border-radius:14px;border:.5px solid rgba(20,10,40,.08);background:#fff;color:#ff3b30;box-shadow:0 2px 10px rgba(20,10,40,.04);font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px}
       `}</style>
       <div className="p-scroll">
         <div className="p-hero">
@@ -1036,68 +1129,15 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
           />
           <div className="p-mesh"/><div className="p-ring1"/><div className="p-ring2"/><div className="p-fade"/>
           <div className="p-top">
-            {/* ── GERİ DÜYMƏSİ ── */}
-            <button className="p-ibtn" onClick={onBack}
-              style={{
-                background:"rgba(0,0,0,.32)",
-                backdropFilter:"blur(12px)",
-                WebkitBackdropFilter:"blur(12px)",
-                boxShadow:"0 2px 12px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.14), inset 0 -1px 0 rgba(0,0,0,.2)",
-                border:"1px solid rgba(255,255,255,.18)",
-              }}>
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.92)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="15 18 9 12 15 6"/>
-              </svg>
+            <button className="p-nb" onClick={onBack} aria-label="Geri">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
             </button>
-
-            {/* Başlıq */}
-            <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:1 }}>
-              <span style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,.95)", letterSpacing:2.5, textTransform:"uppercase", textShadow:"0 1px 4px rgba(0,0,0,.4)" }}>Profil</span>
-            </div>
-
-            {/* ── SAĞ DÜYMƏLƏR ── */}
-            <div style={{ display:"flex", gap:8 }}>
-              {/* Göz */}
-              <button className="p-ibtn" onClick={() => setVisitorOpen(true)}
-                style={{
-                  background:"linear-gradient(145deg,rgba(123,47,247,.75),rgba(88,28,220,.9))",
-                  backdropFilter:"blur(8px)",
-                  WebkitBackdropFilter:"blur(8px)",
-                  boxShadow:"0 4px 14px rgba(123,47,247,.45), inset 0 1px 0 rgba(255,255,255,.22), inset 0 -1px 0 rgba(0,0,0,.15)",
-                  border:"1px solid rgba(192,132,252,.35)",
-                }}>
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <defs>
-                    <linearGradient id="eyeG" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#f0d0ff"/>
-                      <stop offset="100%" stopColor="#c084fc"/>
-                    </linearGradient>
-                  </defs>
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="url(#eyeG)"/>
-                  <circle cx="12" cy="12" r="3" stroke="url(#eyeG)"/>
-                  <circle cx="10.8" cy="10.8" r="1" fill="rgba(255,255,255,.7)" stroke="none"/>
-                </svg>
+            <div style={{ display:"flex", gap:4 }}>
+              <button className="p-nb" onClick={() => setVisitorOpen(true)} aria-label="Profil ziyarətçiləri">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
-
-              {/* Qalem */}
-              <button className="p-ibtn" onClick={() => { setDraft(profileData); setEditOpen(true); }}
-                style={{
-                  background:"linear-gradient(145deg,rgba(255,180,0,.8),rgba(220,100,0,.9))",
-                  backdropFilter:"blur(8px)",
-                  WebkitBackdropFilter:"blur(8px)",
-                  boxShadow:"0 4px 14px rgba(220,120,0,.4), inset 0 1px 0 rgba(255,255,220,.35), inset 0 -1px 0 rgba(0,0,0,.15)",
-                  border:"1px solid rgba(255,210,80,.35)",
-                }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <defs>
-                    <linearGradient id="penG" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%" stopColor="#fff8c0"/>
-                      <stop offset="100%" stopColor="#ffe066"/>
-                    </linearGradient>
-                  </defs>
-                  <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" stroke="url(#penG)"/>
-                  <path d="M15 5l4 4" stroke="rgba(255,255,200,.5)" strokeWidth="1"/>
-                </svg>
+              <button className="p-nb" onClick={() => { setDraft(profileData); setEditOpen(true); }} aria-label="Profili düzəlt">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
               </button>
             </div>
           </div>
@@ -1193,23 +1233,23 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
             {
               title:"Hesab və status",
               items:[
-                { icon:WalletCards, label:"Cüzdanım", description:"Balans və ödənişlər", onClick:() => setWalletOpen(true) },
-                { icon:ShieldCheck, label:"VIP", description:"Üstünlüklər və səviyyələr", badge:`VIP ${displayVip}`, badgeClass:"p-badge-vip", onClick:onVip },
-                { icon:Medal, label:"Reytinq", description:"Ümumi sıralamadakı yerin", badge:"#142", badgeClass:"p-badge-rank" },
+                { icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 7V5.5A1.5 1.5 0 0 0 17.5 4h-12A2.5 2.5 0 0 0 3 6.5v11A2.5 2.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V9a2 2 0 0 0-2-2H5.5A2.5 2.5 0 0 1 3 6.5"/><circle cx="16.5" cy="13.5" r="1.2" fill="currentColor"/></svg>, color:"#34C759", label:"Cüzdanım", description:"Balans və ödənişlər", onClick:() => setWalletOpen(true) },
+                { icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 8l4 4 5-7 5 7 4-4-2 11H5z"/></svg>, color:"#FF9F0A", label:"VIP", description:"Üstünlüklər və səviyyələr", badge:`VIP ${displayVip}`, badgeClass:"p-badge-vip", onClick:onVip },
+                { icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>, color:"#0A84FF", label:"Reytinq", description:"Ümumi sıralamadakı yerin", badge:"#142", badgeClass:"p-badge-rank" },
               ],
             },
             {
               title:"Mağaza və bonuslar",
               items:[
-                { icon:ShoppingBag, label:"Mağaza", description:"Çərçivələr və bəzəklər", onClick:() => setMagazaOpen(true) },
-                { icon:Gift, label:"Gündəlik bonus", description:"Bugünkü hədiyyəni götür" },
+                { icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 7h14l-1 13H6z"/><path d="M9 7V6a3 3 0 0 1 6 0v1"/></svg>, color:"#AF52DE", label:"Mağaza", description:"Çərçivələr və bəzəklər", onClick:() => setMagazaOpen(true) },
+                { icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v9H5v-9"/><path d="M12 8S10.5 3 8 3.5 7 8 12 8zM12 8s1.5-5 4-4.5S17 8 12 8z"/></svg>, color:"#FF375F", label:"Gündəlik bonus", description:"Bugünkü hədiyyəni götür" },
               ],
             },
             {
               title:"Dəstək",
               items:[
-                { icon:BadgeHelp, label:"Kömək mərkəzi", description:"Suallar və dəstək" },
-                { icon:Settings, label:"Parametrlər", description:"Hesab və məxfilik" },
+                { icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.3 2.4c-.5.2-.8.7-.8 1.2v.4"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg>, color:"#32ADE6", label:"Kömək mərkəzi", description:"Suallar və dəstək" },
+                { icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>, color:"#8E8E93", label:"Parametrlər", description:"Hesab və məxfilik" },
               ],
             },
           ].map((section) => (
@@ -1217,10 +1257,9 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
               <div className="p-menu-section-title">{section.title}</div>
               <div className="p-menu-list">
                 {section.items.map((item) => {
-                  const Icon = item.icon;
                   return (
                     <Button key={item.label} type="button" variant="ghost" className="p-mi" onClick={item.onClick}>
-                      <span className="p-mi-l"><Icon size={18} strokeWidth={1.9}/></span>
+                      <span className="p-mi-l" style={{ background:item.color }}>{item.icon}</span>
                       <span className="p-mi-copy">
                         <span className="p-mi-lbl">{item.label}</span>
                         <span className="p-mi-desc">{item.description}</span>
@@ -1238,7 +1277,7 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
         </div>
 
         <Button type="button" variant="outline" onClick={() => { supabase.auth.signOut(); }} className="p-logout">
-          <LogOut size={15} strokeWidth={2}/>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>
           Çıxış
         </Button>
       </div>
@@ -1316,15 +1355,15 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
             </div>
           </header>
           <div style={{ flex:1, overflowY:"auto", padding:"16px 18px 40px" }}>
-            {legalPage === "terms" && (
+            {legalPage && (
               <>
-                <div style={{ fontSize:22, fontWeight:700, color:"#111", letterSpacing:-.4, marginBottom:4 }}>Velvet Xidmət Şərtləri</div>
+                <div style={{ fontSize:22, fontWeight:700, color:"#111", letterSpacing:-.4, marginBottom:4 }}>{legalPage === "terms" ? "Velvet Xidmət Şərtləri" : "Velvet Məxfilik Siyasəti"}</div>
                 <div style={{ fontSize:12, color:"#8e8e93", marginBottom:18 }}>Son yenilənmə: 28 sentyabr 2026</div>
-                {VELVET_TERMS.map(sec => (
+                {(legalPage === "terms" ? VELVET_TERMS : VELVET_PRIVACY).map(sec => (
                   <section key={sec.t} style={{ marginBottom:20 }}>
                     <h3 style={{ fontSize:15, fontWeight:700, color:"#111", margin:"0 0 8px" }}>{sec.t}</h3>
                     {sec.p.map((x, i) => (
-                      <p key={i} style={{ fontSize:14, lineHeight:1.6, color:"#3a3a3c", margin:"0 0 8px", paddingLeft: x.startsWith("•") ? 8 : 0 }}>{x}</p>
+                      <p key={i} style={{ fontSize:14, lineHeight:1.6, color:"#3a3a3c", margin:"0 0 8px", paddingLeft: x.startsWith("•") ? 8 : 0, fontWeight: /^[a-c]\)/.test(x) ? 600 : 400 }}>{x}</p>
                     ))}
                   </section>
                 ))}
