@@ -603,8 +603,8 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
             <button type="button" className="tb-btn" aria-label="Axtar">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
             </button>
-            <button type="button" aria-label="Gündəlik bonus" style={{ width:38, height:38, border:0, background:"none", padding:0, cursor:"pointer", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
-              <img src="/images/images/icon.gif" alt="" style={{ width:38, height:38, objectFit:"contain", display:"block" }}/>
+            <button type="button" aria-label="Gündəlik bonus" style={{ width:36, height:36, border:0, background:"none", padding:0, cursor:"pointer", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
+              <img src="/images/images/icon.gif" alt="" style={{ width:36, height:36, objectFit:"contain", display:"block" }}/>
             </button>
           </div>
         </div>
