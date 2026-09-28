@@ -1,7 +1,7 @@
 // @ts-nocheck — imported prototype contains intentionally loose backend response shapes.
 import { ClientOnly, createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { BadgeHelp, ChevronRight, Crown, Gift, LogOut, Medal, MessageCircle, Mic, MicOff, MoreHorizontal, Radio, Send, Settings, ShieldCheck, ShoppingBag, Users, WalletCards, X } from "lucide-react";
+import { BadgeHelp, ChevronRight, Crown, Gift, Grid2X2, Heart, Info, LogOut, Medal, MessageCircle, Mic, MicOff, MoreHorizontal, Plus, Radio, Send, Settings, ShieldCheck, ShoppingBag, Trophy, Users, WalletCards, X } from "lucide-react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -1954,8 +1954,15 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
   return (
     <main style={{ background:"#f5f5f7", minHeight:"100dvh", position:"relative", fontFamily:"'Helvetica Neue',Arial,sans-serif", color:"#1a1a2e" }}>
       <style>{`
-        .r-scroll{overflow-y:auto;padding:max(16px,env(safe-area-inset-top)) 16px 90px}
+        .r-scroll{height:100dvh;overflow-y:auto;padding:max(16px,env(safe-area-inset-top)) 14px 104px;scrollbar-width:none}
         .r-scroll::-webkit-scrollbar{display:none}
+        .room-native-btn{transition:transform .16s ease,background .2s ease,box-shadow .2s ease;-webkit-tap-highlight-color:transparent}
+        .room-native-btn:active{transform:scale(.9)}
+        .room-native-icon{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.9);border:.5px solid rgba(30,15,60,.1);box-shadow:0 4px 16px rgba(35,18,70,.08);display:flex;align-items:center;justify-content:center}
+        .room-seat{transition:transform .16s ease}.room-seat:active{transform:scale(.92)}
+        .room-dock{box-shadow:0 -8px 30px rgba(35,18,70,.07)}
+        @media(max-width:370px){.r-scroll{padding-left:10px;padding-right:10px}.room-dock-extra{display:none}}
+        @media(prefers-reduced-motion:reduce){.room-native-btn,.room-seat{transition:none!important}.voice-ring{animation:none!important}}
       `}</style>
       <div className="r-scroll">
         {/* OTAQ ÜST PANELİ */}
@@ -1976,15 +1983,9 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
             </button>
           </div>
           <div style={{ marginLeft:"auto", display:"flex", gap:6 }}>
-            <button aria-label="Töhfə sıralaması" style={{ width:36, height:36, borderRadius:"50%", background:"#fff", border:".5px solid rgba(20,10,40,.08)", boxShadow:"0 2px 8px rgba(20,10,40,.06)", display:"flex", alignItems:"center", justifyContent:"center", color:"#1c1c1e", cursor:"pointer", flexShrink:0 }}>
-              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#FF9F0A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>
-            </button>
-            <button aria-label="Otaq haqqında" style={{ width:36, height:36, borderRadius:"50%", background:"#fff", border:".5px solid rgba(20,10,40,.08)", boxShadow:"0 2px 8px rgba(20,10,40,.06)", display:"flex", alignItems:"center", justifyContent:"center", color:"#1c1c1e", cursor:"pointer", flexShrink:0 }}>
-              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="7.8" r=".7" fill="currentColor"/></svg>
-            </button>
-            <button onClick={onLeave} aria-label="Otaqdan çıx" style={{ width:36, height:36, borderRadius:"50%", background:"#fff", border:".5px solid rgba(20,10,40,.08)", boxShadow:"0 2px 8px rgba(20,10,40,.06)", display:"flex", alignItems:"center", justifyContent:"center", color:"#1c1c1e", cursor:"pointer", flexShrink:0 }}>
-              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#ff3b30" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v9"/><path d="M6.3 6.8a8 8 0 1 0 11.4 0"/></svg>
-            </button>
+            <button className="room-native-btn room-native-icon" aria-label="Töhfə sıralaması" style={{ color:"#ff9f0a", cursor:"pointer", flexShrink:0 }}><Trophy size={19} strokeWidth={2}/></button>
+            <button className="room-native-btn room-native-icon" aria-label="Otaq haqqında" style={{ color:"#1c1c1e", cursor:"pointer", flexShrink:0 }}><Info size={19} strokeWidth={2}/></button>
+            <button className="room-native-btn room-native-icon" onClick={onLeave} aria-label="Otaqdan çıx" style={{ color:"#ff3b30", cursor:"pointer", flexShrink:0 }}><LogOut size={19} strokeWidth={2}/></button>
           </div>
         </div>
 
@@ -1997,7 +1998,7 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
             return (
               <button key={i}
                 onClick={m ? (isMe ? onLeaveSeat : undefined) : (!iAmSpeaker ? onJoinSeat : undefined)}
-                style={{ background:"none", border:0, padding:0, display:"flex", flexDirection:"column", alignItems:"center", gap:5, cursor:"pointer", minWidth:0 }}>
+                className="room-seat" style={{ background:"none", border:0, padding:0, display:"flex", flexDirection:"column", alignItems:"center", gap:5, cursor:"pointer", minWidth:0 }}>
                 <div style={{ position:"relative", width:46, height:46 }}>
                   {m ? (
                     <>
@@ -2011,7 +2012,7 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
                     </>
                   ) : (
                     <div style={{ width:46, height:46, borderRadius:"50%", background:"linear-gradient(160deg,#ffffff,#f1edf8)", border:"1.5px dashed rgba(123,47,247,.28)", boxShadow:"0 2px 6px rgba(20,10,40,.05)", display:"flex", alignItems:"center", justifyContent:"center", color:"#7b2ff7" }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                      <Plus size={18} strokeWidth={2.4}/>
                     </div>
                   )}
                 </div>
@@ -2036,7 +2037,7 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
                 ))}
               </div>
               <div style={{ flexShrink:0, height:30, padding:"0 10px", borderRadius:15, background:"#fff", border:".5px solid rgba(20,10,40,.08)", boxShadow:"0 1px 4px rgba(20,10,40,.06)", display:"flex", alignItems:"center", gap:5, color:"#111", fontSize:13, fontWeight:600 }}>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c.8-3.7 3.7-5.7 7.5-5.7s6.7 2 7.5 5.7"/></svg>
+                <Users size={15} strokeWidth={2.1}/>
                 {viewers.length}
               </div>
             </div>
@@ -2094,7 +2095,7 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
       )}
 
       {/* ALT PANEL — mesaj sahəsi + ikonlar */}
-      <div style={{ position:"fixed", bottom:kb, left:0, right:0, zIndex:50, background:"rgba(255,255,255,.92)", backdropFilter:"saturate(1.8) blur(20px)", WebkitBackdropFilter:"saturate(1.8) blur(20px)", borderTop:".5px solid rgba(20,10,40,.1)", padding:"8px 12px max(8px,env(safe-area-inset-bottom))", display:"flex", alignItems:"center", gap:8 }}>
+      <div className="room-dock" style={{ position:"fixed", bottom:kb, left:0, right:0, zIndex:50, background:"rgba(255,255,255,.92)", backdropFilter:"saturate(1.8) blur(20px)", WebkitBackdropFilter:"saturate(1.8) blur(20px)", borderTop:".5px solid rgba(20,10,40,.1)", padding:"8px 12px max(8px,env(safe-area-inset-bottom))", display:"flex", alignItems:"center", gap:8 }}>
         <input
           value={draftMsg}
           onChange={e => setDraftMsg(e.target.value)}
@@ -2109,17 +2110,17 @@ function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onTo
         />
         {draftMsg.trim() && (
           <button onMouseDown={e => e.preventDefault()} onClick={sendMsg} aria-label="Göndər" style={{ width:40, height:40, borderRadius:"50%", border:0, flexShrink:0, background:"#7b2ff7", color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+            <Send size={18} strokeWidth={2.3}/>
           </button>
         )}
         <button aria-label="Mesajlar" style={{ width:40, height:40, borderRadius:"50%", background:"#f4f2f8", border:0, display:"flex", alignItems:"center", justifyContent:"center", color:"#1c1c1e", cursor:"pointer", flexShrink:0 }}>
-          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M20.5 11.6c0 4.3-3.8 7.7-8.5 7.7-1.1 0-2.2-.2-3.2-.6L4 20l1.2-3.6a7.3 7.3 0 0 1-1.7-4.8C3.5 7.3 7.3 3.9 12 3.9s8.5 3.4 8.5 7.7z"/></svg>
+          <MessageCircle size={21} strokeWidth={1.9}/>
         </button>
         <button aria-label="Kataloq" style={{ width:40, height:40, borderRadius:"50%", background:"#f4f2f8", border:0, display:"flex", alignItems:"center", justifyContent:"center", color:"#1c1c1e", cursor:"pointer", flexShrink:0 }}>
-          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg>
+          <Grid2X2 size={21} strokeWidth={1.9}/>
         </button>
         <button aria-label="Hədiyyə göndər" style={{ width:40, height:40, borderRadius:"50%", background:"linear-gradient(135deg,#ff5f8f,#ff2d55)", border:0, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", cursor:"pointer", flexShrink:0, boxShadow:"0 3px 10px rgba(255,45,85,.35)" }}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v9H5v-9"/><path d="M12 8S10.5 3 8 3.5 7 8 12 8zM12 8s1.5-5 4-4.5S17 8 12 8z"/></svg>
+          <Gift size={20} strokeWidth={2}/>
         </button>
       </div>
     </main>
@@ -2234,7 +2235,7 @@ function ChatPanel({ session, displayName, avatarUrl, onClose }: { session: Sess
           style={{ flex:1, minWidth:0, height:40, borderRadius:20, background:"#f4f2f8", border:0, outline:"none", padding:"0 16px", fontSize:16, color:"#111", fontFamily:"inherit" }}
         />
         <button onClick={send} disabled={!text.trim()} aria-label="Göndər" style={{ width:40, height:40, borderRadius:"50%", border:0, flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", background: text.trim() ? "#7b2ff7" : "#e5e5ea", color:"#fff", cursor: text.trim() ? "pointer" : "default", transition:"background .15s" }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+          <Send size={18} strokeWidth={2.3}/>
         </button>
       </div>
     </div>
