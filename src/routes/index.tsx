@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { BadgeHelp, ChevronRight, Crown, Gift, LogOut, Medal, MessageCircle, Mic, MicOff, MoreHorizontal, Radio, Send, Settings, ShieldCheck, ShoppingBag, Users, WalletCards, X } from "lucide-react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
+import roomBackground from "@/assets/velvet-room-bg.jpg";
 import { Button } from "@/components/ui/button";
 import { useVoiceRoom } from "@/hooks/use-voice-room";
 
@@ -30,7 +32,7 @@ function VelvetAppClient() {
 }
 
 type Screen = "login" | "home" | "room" | "profile" | "vip";
-type Member = { user_id: string; role: string; is_muted: boolean };
+type Member = { user_id: string; role: string; is_muted: boolean; seat_index?: number | null; display_name?: string | null; avatar_url?: string | null };
 type Message = { id: number; user_id: string; display_name: string; avatar_url: string | null; content: string; created_at: string };
 
 const GLOBAL_CSS = `
@@ -119,8 +121,8 @@ function VelvetApp() {
 
   useEffect(() => {
     if (!session || screen !== "room") return;
-    supabase.from("room_members").upsert({ room_id: ROOM_ID, user_id: session.user.id, role: "listener", is_muted: true }, { onConflict: "room_id,user_id" });
-    const load = () => supabase.from("room_members").select("user_id,role,is_muted").eq("room_id", ROOM_ID).then(({ data }) => { if (data) setMembers([...data]); });
+    supabase.from("room_members").upsert({ room_id: ROOM_ID, user_id: session.user.id, role: "listener", is_muted: true, seat_index: null, display_name: displayName, avatar_url: avatarUrl }, { onConflict: "room_id,user_id" });
+    const load = () => supabase.from("room_members").select("user_id,role,is_muted,seat_index,display_name,avatar_url").eq("room_id", ROOM_ID).then(({ data }) => { if (data) setMembers([...data]); });
     load();
     const ch = supabase.channel(`rm-${ROOM_ID}`).on("postgres_changes", { event: "*", schema: "public", table: "room_members", filter: `room_id=eq.${ROOM_ID}` }, load).subscribe();
     return () => { supabase.removeChannel(ch); };
@@ -128,7 +130,7 @@ function VelvetApp() {
 
   const signIn = async (provider: "google" | "apple") => {
     setLoading(provider); setError("");
-    const r = await supabase.auth.signInWithOAuth({ provider, options: { redirectTo: window.location.origin } });
+    const r = await lovable.auth.signInWithOAuth(provider, { redirect_uri: window.location.origin });
     if (r.error) setError("Giriş alınmadı. Yenidən cəhd edin.");
     setLoading(null);
   };
@@ -209,14 +211,13 @@ function VelvetApp() {
   return (
     <>
       <style>{GLOBAL_CSS}</style>
-      <RoomScreen name={displayName} avatarUrl={avatarUrl} session={session} members={members} muted={voice.muted} myEntrance={myEntrance}
+      <RoomScreen name={displayName} avatarUrl={avatarUrl} session={session} members={members} muted={voice.muted}
+        connected={voice.connected}
         onToggleMic={voice.toggleMic}
-        onJoinSeat={async () => { if (!session) return; await supabase.from("room_members").update({ role: "speaker", is_muted: false }).eq("room_id", ROOM_ID).eq("user_id", session.user.id); if (voice.muted) voice.toggleMic(); }}
-        onLeaveSeat={async () => { if (!session) return; await supabase.from("room_members").update({ role: "listener", is_muted: true }).eq("room_id", ROOM_ID).eq("user_id", session.user.id); if (!voice.muted) voice.toggleMic(); }}
+        onJoinSeat={async (seatIndex: number) => { if (!session) { setError("Canlı konuşma için gerçek hesapla giriş yapın."); return; } if (seatIndex < 0 || seatIndex > 23) { setError("Boş koltuk bulunamadı."); return; } const micReady = await voice.setMic(true); if (!micReady) return; const { error: seatError } = await supabase.from("room_members").upsert({ room_id: ROOM_ID, user_id: session.user.id, role: "speaker", is_muted: false, seat_index: seatIndex, display_name: displayName, avatar_url: avatarUrl }, { onConflict: "room_id,user_id" }); if (seatError) { await voice.setMic(false); setError("Bu koltuk az önce doldu. Başka bir koltuk seçin."); } else setError(""); }}
+        onLeaveSeat={async () => { if (!session) return; await supabase.from("room_members").update({ role: "listener", is_muted: true, seat_index: null }).eq("room_id", ROOM_ID).eq("user_id", session.user.id); await voice.setMic(false); }}
         onLeave={() => { if (session) supabase.from("room_members").delete().eq("room_id", ROOM_ID).eq("user_id", session.user.id); setScreen("home"); }}
         onOpenChat={() => setShowChat(true)}
-        onHome={() => setScreen("home")}
-        onProfile={() => setScreen("profile")}
         error={error || voice.error}
       />
       {showChat && <ChatPanel session={session} displayName={displayName} avatarUrl={avatarUrl} onClose={() => setShowChat(false)} />}
@@ -1953,349 +1954,86 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
 const LION = <svg viewBox="0 0 64 64" width="100%" height="100%"><defs><radialGradient id="lnMane" cx="50%" cy="50%" r="50%"><stop offset="0" stopColor="#ffb13b"/><stop offset="1" stopColor="#c8561b"/></radialGradient><linearGradient id="lnFace" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#ffe3a3"/><stop offset="1" stopColor="#f5b84f"/></linearGradient></defs><g fill="url(#lnMane)">{Array.from({length:12}).map((_,k)=><ellipse key={k} cx="32" cy="12" rx="7" ry="11" transform={`rotate(${k*30} 32 33)`}/>)}</g><circle cx="32" cy="33" r="17" fill="url(#lnFace)"/><circle cx="19" cy="20" r="4.5" fill="#f5b84f"/><circle cx="45" cy="20" r="4.5" fill="#f5b84f"/><circle cx="19" cy="20" r="2.2" fill="#d98a3a"/><circle cx="45" cy="20" r="2.2" fill="#d98a3a"/><ellipse cx="25.5" cy="30" rx="2.6" ry="3.2" fill="#2b1a10"/><ellipse cx="38.5" cy="30" rx="2.6" ry="3.2" fill="#2b1a10"/><circle cx="26.3" cy="29" r=".9" fill="#fff"/><circle cx="39.3" cy="29" r=".9" fill="#fff"/><ellipse cx="32" cy="40" rx="8" ry="6" fill="#fff3d6"/><path d="M29 36.5h6l-3 3.2z" fill="#6b3a1f"/><path d="M32 39.7v2.3M32 42c-1.5 1.6-3.5 1.6-4.5.4M32 42c1.5 1.6 3.5 1.6 4.5.4" stroke="#6b3a1f" strokeWidth="1.2" fill="none" strokeLinecap="round"/></svg>;
 
 /* ─── ROOM ─── */
-function RoomScreen({ name, avatarUrl, session, members, muted, myEntrance, onToggleMic, onJoinSeat, onLeaveSeat, onLeave, onOpenChat, onHome, onProfile, error }: any) {
-  const [following, setFollowing] = useState(false);
-  const [msgs, setMsgs] = useState<Message[]>([]);
-  const [draftMsg, setDraftMsg] = useState("");
-  const [kb, setKb] = useState(0);
-  const [typing, setTyping] = useState(false);
-  const [giftOpen, setGiftOpen] = useState(false);
-  const [giftTab, setGiftTab] = useState("Hədiyyə");
-  const [giftSel, setGiftSel] = useState<string|null>("aslan");
-  const [giftQty, setGiftQty] = useState(1);
-  const [qtyOpen, setQtyOpen] = useState(false);
-  const [giftTo, setGiftTo] = useState<number>(-1);
-  const [giftPlay, setGiftPlay] = useState<string|null>(null);
-  const giftVideoRef = useRef<HTMLVideoElement>(null);
-  const [giftWarn, setGiftWarn] = useState(false);
-  const [jetonBal, setJetonBal] = useState(() => { try { return parseInt(localStorage.getItem("velvet_jeton") || "10000"); } catch { return 10000; } });
-  const inputRef = useRef<HTMLInputElement>(null);
-  const feedRef = useRef<HTMLDivElement>(null);
-  const myId = session ? session.user.id : "demo";
+function RoomScreen({ name, avatarUrl, session, members, muted, connected, onToggleMic, onJoinSeat, onLeaveSeat, onLeave, onOpenChat, error }: any) {
+  const [sharing, setSharing] = useState(false);
+  const [profile, setProfile] = useState<Member | null>(null);
+  const myMember = session ? members.find((member: Member) => member.user_id === session.user.id) : undefined;
+  const isSpeaker = myMember?.role === "speaker";
+  const speakersBySeat = new Map<number, Member>();
+  members.filter((member: Member) => member.role === "speaker" && member.seat_index != null).forEach((member: Member) => speakersBySeat.set(member.seat_index as number, member));
+  const peopleCount = Math.max(1, members.length);
 
-  // Mesajları yüklə (demo → cihaz, real → Supabase)
-  useEffect(() => {
-    if (!session) {
-      try { const d = localStorage.getItem("velvet_demo_chat"); setMsgs(d ? JSON.parse(d) : [
-        { id:1, user_id:"bot1", display_name:"Aynur", avatar_url:null, content:"Salam, xoş gəldin! 👋", created_at:new Date().toISOString() },
-        { id:2, user_id:"bot2", display_name:"Rauf", avatar_url:null, content:"Otaq çox gözəldir 🔥", created_at:new Date().toISOString() },
-      ]); } catch {}
-      return;
-    }
-    supabase.from("messages").select("*").eq("room_id", ROOM_ID).order("created_at", { ascending: true }).limit(50).then(({ data }) => { if (data) setMsgs(data as Message[]); });
-    const ch = supabase.channel(`room-feed-${ROOM_ID}`).on("postgres_changes", { event:"INSERT", schema:"public", table:"messages", filter:`room_id=eq.${ROOM_ID}` }, pl => setMsgs(prev => [...prev, pl.new as Message])).subscribe();
-    return () => { supabase.removeChannel(ch); };
-  }, [session]);
-
-  // Klaviatura açılanda alt panel klaviaturanın üstünə qalxsın, səhifə sürüşməsin
-  useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-    const on = () => { setKb(Math.max(0, window.innerHeight - vv.height - vv.offsetTop)); window.scrollTo(0, 0); };
-    vv.addEventListener("resize", on); vv.addEventListener("scroll", on);
-    return () => { vv.removeEventListener("resize", on); vv.removeEventListener("scroll", on); };
-  }, []);
-
-  useEffect(() => { const el = feedRef.current; if (el) el.scrollTop = el.scrollHeight; }, [msgs, kb]);
-
-  const sendMsg = async () => {
-    const t = draftMsg.trim();
-    if (!t) return;
-    setDraftMsg("");
-    if (!session) {
-      let av: string | null = avatarUrl;
-      try { av = av || localStorage.getItem("profile_avatar"); } catch {}
-      setMsgs(prev => {
-        const next = [...prev, { id: Date.now(), user_id:"demo", display_name: name, avatar_url: av, content: t, created_at: new Date().toISOString() }].slice(-100);
-        try { localStorage.setItem("velvet_demo_chat", JSON.stringify(next)); } catch {}
-        return next;
-      });
-      return;
-    }
-    await supabase.from("messages").insert({ room_id: ROOM_ID, user_id: session.user.id, display_name: name, avatar_url: avatarUrl, content: t });
+  const takeSeat = async (index: number) => {
+    const occupant = speakersBySeat.get(index);
+    if (occupant?.user_id === session?.user.id) return onLeaveSeat();
+    if (!occupant && !isSpeaker) await onJoinSeat(index);
   };
-  const speakers = members.filter((m: Member) => !m.is_muted);
-  const listeners = members.filter((m: Member) => m.is_muted);
-  const emptySeatCount = Math.max(0, 3 - speakers.length);
-  const iAmSpeaker = session ? !!members.find((m: Member) => m.user_id === session.user.id && !m.is_muted) : false;
+
+  const shareRoom = async () => {
+    setSharing(true);
+    try {
+      if (navigator.share) await navigator.share({ title: "Velvet odası", text: "Velvet odasına katıl", url: window.location.href });
+      else await navigator.clipboard.writeText(window.location.href);
+    } catch {}
+    setTimeout(() => setSharing(false), 1200);
+  };
+
   return (
-    <main style={{ background:"#07000f", minHeight:"100dvh", position:"relative", fontFamily:"'Helvetica Neue',Arial,sans-serif", color:"#fff" }}>
+    <main className="room-shell" style={{ backgroundImage: `linear-gradient(rgba(18,12,101,.12),rgba(18,8,76,.28)),url(${roomBackground})` }}>
       <style>{`
-        .r-scroll{overflow-y:auto;padding:max(16px,env(safe-area-inset-top)) 16px 90px}
-        .r-scroll::-webkit-scrollbar{display:none}
+        .room-shell{position:relative;min-height:100dvh;background-size:cover;background-position:center;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow:hidden}
+        .room-shell:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(24,15,105,.18),rgba(16,8,71,.38));pointer-events:none}
+         .room-ui{position:relative;z-index:2;height:100dvh;max-width:520px;margin:0 auto;display:flex;flex-direction:column;overflow:hidden;padding:max(8px,env(safe-area-inset-top)) 12px calc(70px + env(safe-area-inset-bottom))}
+         .room-top{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:9px;align-items:center;flex-shrink:0}
+        .room-id{display:flex;align-items:center;gap:8px;min-width:0}.room-avatar{width:48px;height:48px;border-radius:13px;border:3px solid rgba(255,255,255,.88);background:linear-gradient(135deg,#ffc5df,#8b72ff);display:grid;place-items:center;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,.3)}
+        .room-avatar img{width:100%;height:100%;object-fit:cover}.room-title{font-size:18px;font-weight:700;line-height:1.15;text-shadow:0 1px 3px rgba(0,0,0,.4);white-space:nowrap}.room-code{font-size:14px;color:rgba(255,255,255,.72);margin-top:3px}.room-crown{font-size:29px;filter:drop-shadow(0 2px 5px rgba(0,0,0,.35))}
+        .room-actions{display:flex;align-items:center;gap:14px}.icon-clear{border:0;background:transparent;color:#fff;padding:3px;display:grid;place-items:center;cursor:pointer}.power{width:34px;height:34px;border:3px solid currentColor;border-radius:50%;font-size:20px;line-height:1}
+         .rank-row{display:flex;gap:8px;align-items:center;margin-top:12px;flex-shrink:0}.rank-pill{height:42px;min-width:0;width:30%;border-radius:12px;background:rgba(18,8,85,.63);display:flex;align-items:center;padding:0 10px;font-size:15px;font-weight:750;color:#ffd64a;white-space:nowrap}.rank-mini{height:42px;width:48px;flex-shrink:0;border-radius:12px;background:rgba(18,8,85,.63);display:grid;place-items:center;color:#fff;font-size:11px}.ad-pill{margin-left:auto;height:42px;width:34%;min-width:0;border-radius:11px;background:linear-gradient(135deg,rgba(104,54,79,.9),rgba(188,94,47,.85));padding:5px 9px;font-size:12px;font-weight:900;color:#ffe55d;display:flex;align-items:center;justify-content:flex-end;text-align:right;line-height:1.05}
+         .seats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:repeat(4,minmax(0,1fr));gap:4px 2px;margin:15px 0 10px;min-height:0;flex:1 1 auto;max-height:340px}.seat{border:0;background:transparent;color:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;min-width:0;min-height:0;cursor:pointer}.seat-circle{width:clamp(30px,10vw,46px);height:clamp(30px,10vw,46px);flex-shrink:0;border-radius:50%;background:rgba(174,170,225,.35);border:1px solid rgba(255,255,255,.24);display:grid;place-items:center;font-size:28px;font-weight:200;box-shadow:inset 0 0 18px rgba(255,255,255,.08)}.seat-label{font-size:12px;line-height:1.1;text-shadow:0 2px 4px rgba(0,0,0,.5)}.seat-live{background:linear-gradient(145deg,#8c61ff,#e24aaa);border:3px solid rgba(255,255,255,.78);font-size:18px;font-weight:800;position:relative}.seat-live:after{content:"";position:absolute;inset:-4px;border:2px solid rgba(91,255,167,.8);border-radius:50%;animation:vpulse 1.4s ease-in-out infinite}.seat-muted:after{border-color:rgba(255,255,255,.35)}
+         .audience{height:52px;flex-shrink:0;border-radius:14px;background:rgba(18,7,79,.68);display:flex;align-items:center;padding:0 12px;margin-top:2px}.listener{width:38px;height:38px;border-radius:50%;background:#2d831d;display:grid;place-items:center;font-size:21px}.audience-count{margin-left:auto;border-left:1px solid rgba(255,255,255,.3);padding-left:14px;text-align:center;font-size:12px}.notice{margin-top:10px;width:74%;flex:0 1 auto;min-height:40px;overflow-y:auto;overscroll-behavior:contain;border-radius:11px;background:rgba(18,7,79,.72);padding:10px 12px;color:#31ef9b;font-size:13px;line-height:1.36}.share-note{margin-top:8px;width:74%;flex-shrink:0;border-radius:11px;background:rgba(18,7,79,.58);padding:7px 11px;color:#31ef9b;font-size:13px;line-height:1.2}.share-btn{border:0;border-radius:17px;background:linear-gradient(90deg,#8f64ff,#d85cff);color:#fff;padding:4px 11px;font-size:12px;margin-left:5px}
+         .room-bottom{position:fixed;z-index:4;left:50%;transform:translateX(-50%);width:calc(100% - 24px);max-width:496px;bottom:max(8px,env(safe-area-inset-bottom));height:50px;display:flex;align-items:center;gap:6px}.say{height:44px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:0;border-radius:25px;background:rgba(19,17,69,.88);color:#fff;text-align:left;padding:0 12px;font-size:14px}.round-action{position:relative;width:42px;height:42px;flex-shrink:0;border:0;border-radius:50%;background:rgba(19,17,69,.9);color:#fff;display:grid;place-items:center}.gift-action{background:linear-gradient(135deg,#5be3ec,#9069ff);font-size:24px}.mic-active{background:#28a96b}.voice-status{position:fixed;z-index:5;left:50%;bottom:74px;transform:translateX(-50%);white-space:nowrap;background:rgba(9,5,54,.84);border:1px solid rgba(255,255,255,.15);padding:6px 11px;border-radius:14px;font-size:11px}
+         @media(max-width:370px){.room-title{font-size:15px}.room-code{font-size:12px}.room-avatar{width:42px;height:42px}.room-actions{gap:4px}.room-crown svg{width:24px}.ad-pill{font-size:11px}.rank-pill{font-size:13px}.round-action{width:36px;height:36px}.room-bottom{gap:4px}.say{font-size:12px;padding:0 8px}.notice,.share-note{width:83%}}
+         @media(max-height:700px){.rank-row{margin-top:7px}.seats{margin:6px 0 5px}.audience{height:43px}.listener{width:32px;height:32px}.notice{margin-top:6px;padding:7px 10px;font-size:12px}.share-note{margin-top:5px;padding:5px 9px;font-size:12px}}
+         @media(prefers-reduced-motion:reduce){.seat-live:after{animation:none}}
       `}</style>
-      <div className="r-scroll">
-        {/* OTAQ ÜST PANELİ */}
-        <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:18 }}>
-          <div style={{ display:"flex", alignItems:"center", gap:8, minWidth:0, background:"rgba(255,255,255,.06)", border:".5px solid rgba(20,10,40,.08)", borderRadius:22, padding:"3px 4px 3px 3px", boxShadow:"0 2px 8px rgba(20,10,40,.06)" }}>
-            <div style={{ width:36, height:36, borderRadius:12, background:"linear-gradient(135deg,#7b2ff7,#ff3ea5)", overflow:"hidden", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:15, fontWeight:700 }}>
-              <img src="/images/images/oda.png" alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}/>
-            </div>
-            <div style={{ minWidth:0, maxWidth:120 }}>
-              <div style={{ fontSize:14, fontWeight:700, color:"#fff", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>Qızıl Saatlar</div>
-              <div style={{ fontSize:11, color:"#8e8e93", display:"flex", alignItems:"center", gap:4 }}><span style={{ width:6, height:6, borderRadius:"50%", background:"#22c55e" }}/>{Math.max(members.length,1)} onlayn</div>
-            </div>
-            <button onClick={() => setFollowing(f => !f)} aria-label={following ? "İzləmədən çıx" : "Otağı izlə"}
-              style={{ width:30, height:30, borderRadius:"50%", border:0, cursor:"pointer", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", background: following ? "rgba(255,255,255,.08)" : "#7b2ff7", color: following ? "#7b2ff7" : "#fff", transition:"background .2s,color .2s", boxShadow: following ? "none" : "0 2px 8px rgba(123,47,247,.35)" }}>
-              {following
-                ? <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.8 4.5c2.1 0 3.6 1.1 5.2 3 1.6-1.9 3.1-3 5.2-3 3.8 0 5.9 3.9 4.4 7.3C19.5 16.4 12 21 12 21z"/></svg>
-                : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.8 4.5c2.1 0 3.6 1.1 5.2 3 1.6-1.9 3.1-3 5.2-3 3.8 0 5.9 3.9 4.4 7.3C19.5 16.4 12 21 12 21z"/></svg>}
-            </button>
+      <div className="room-ui">
+        <header className="room-top">
+          <div className="room-id">
+            <div className="room-avatar">{avatarUrl ? <img src={avatarUrl} alt="" /> : <span>V</span>}</div>
+            <div><div className="room-title">Velvet odası</div><div className="room-code">ID: 10136161</div></div>
           </div>
-          <div style={{ marginLeft:"auto", display:"flex", gap:6 }}>
-            <button aria-label="Töhfə sıralaması" style={{ width:36, height:36, borderRadius:"50%", background:"rgba(255,255,255,.06)", border:".5px solid rgba(20,10,40,.08)", boxShadow:"0 2px 8px rgba(20,10,40,.06)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", cursor:"pointer", flexShrink:0 }}>
-              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#FF9F0A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>
-            </button>
-            <button aria-label="Otaq haqqında" style={{ width:36, height:36, borderRadius:"50%", background:"rgba(255,255,255,.06)", border:".5px solid rgba(20,10,40,.08)", boxShadow:"0 2px 8px rgba(20,10,40,.06)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", cursor:"pointer", flexShrink:0 }}>
-              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="7.8" r=".7" fill="currentColor"/></svg>
-            </button>
-            <button onClick={onLeave} aria-label="Otaqdan çıx" style={{ width:36, height:36, borderRadius:"50%", background:"rgba(255,255,255,.06)", border:".5px solid rgba(20,10,40,.08)", boxShadow:"0 2px 8px rgba(20,10,40,.06)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", cursor:"pointer", flexShrink:0 }}>
-              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#ff3b30" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v9"/><path d="M6.3 6.8a8 8 0 1 0 11.4 0"/></svg>
-            </button>
-          </div>
-        </div>
-
-        {/* OTURACAQLAR — 6 x 4 */}
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(6,1fr)", rowGap:14, columnGap:4 }}>
-          {Array.from({ length:24 }).map((_, i) => {
-            const m: Member | undefined = speakers[i];
-            const isMe = !!m && m.user_id === session?.user.id;
-            const label = m ? (isMe ? name.split(" ")[0] : "Üzv") : String(i + 1);
-            return (
-              <button key={i}
-                onClick={m ? (isMe ? onLeaveSeat : undefined) : (!iAmSpeaker ? onJoinSeat : undefined)}
-                style={{ background:"none", border:0, padding:0, display:"flex", flexDirection:"column", alignItems:"center", gap:5, cursor:"pointer", minWidth:0 }}>
-                <div style={{ position:"relative", width:46, height:46 }}>
-                  {m ? (
-                    <>
-                      <div style={{ position:"absolute", inset:-3, borderRadius:"50%", border:"2px solid #7b2ff7", animation:"vpulse 1.6s ease-in-out infinite", opacity:.6 }}/>
-                      <div style={{ width:46, height:46, borderRadius:"50%", background:"linear-gradient(135deg,#7b2ff7,#ff3ea5)", border:"2px solid #07000f", boxShadow:"0 3px 10px rgba(123,47,247,.3)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:16, fontWeight:700, overflow:"hidden" }}>
-                        {isMe && avatarUrl ? <img src={avatarUrl} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }}/> : label[0]?.toUpperCase()}
-                      </div>
-                      <span style={{ position:"absolute", right:-2, bottom:-2, width:17, height:17, borderRadius:"50%", background: m.is_muted ? "#8e8e93" : "#22c55e", border:"2px solid #07000f", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                        <svg width="9" height="9" viewBox="0 0 24 24" fill="#fff"><rect x="8" y="2" width="8" height="13" rx="4"/><path d="M5 11a7 7 0 0 0 14 0" stroke="#fff" strokeWidth="2.5" fill="none"/></svg>
-                      </span>
-                    </>
-                  ) : (
-                    <div style={{ width:46, height:46, borderRadius:"50%", background:"linear-gradient(160deg,#ffffff,#f1edf8)", border:"1.5px dashed rgba(123,47,247,.28)", boxShadow:"0 2px 6px rgba(20,10,40,.05)", display:"flex", alignItems:"center", justifyContent:"center", color:"#7b2ff7" }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
-                    </div>
-                  )}
-                </div>
-                <span style={{ fontSize:10, fontWeight: m ? 600 : 500, color: m ? "#111" : "#a19bb5", maxWidth:52, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{label}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* İZLƏYİCİLƏR ZOLAĞI */}
-        {(() => {
-          const demoV = ["Aynur","Rauf","Sevinc","Tural","Nigar","Kənan","Leyla","Orxan","Aysel","Elvin"];
-          const cols = ["#7b2ff7","#ff3ea5","#00b4d8","#ff9f0a","#22c55e","#af52de","#ff375f","#0a84ff","#5856d6","#34c759"];
-          const viewers = session ? members.map((m: Member) => (m.user_id === session.user.id ? name : "Üzv")) : [name, ...demoV];
-          return (
-            <div style={{ display:"flex", alignItems:"center", gap:10, margin:"20px 0 12px" }}>
-              <div style={{ flex:1, minWidth:0, overflowX:"auto", WebkitOverflowScrolling:"touch", scrollbarWidth:"none", display:"flex", gap:6, paddingBottom:2 }}>
-                {viewers.map((v: string, i: number) => (
-                  <div key={i} title={v} style={{ width:30, height:30, borderRadius:"50%", flexShrink:0, background:cols[i % cols.length], border:"2px solid #07000f", boxShadow:"0 1px 4px rgba(20,10,40,.12)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:12, fontWeight:700, overflow:"hidden" }}>
-                    {i === 0 && !session && avatarUrl ? <img src={avatarUrl} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }}/> : v[0]?.toUpperCase()}
-                  </div>
-                ))}
-              </div>
-              <div style={{ flexShrink:0, height:30, padding:"0 10px", borderRadius:15, background:"rgba(255,255,255,.06)", border:".5px solid rgba(20,10,40,.08)", boxShadow:"0 1px 4px rgba(20,10,40,.06)", display:"flex", alignItems:"center", gap:5, color:"#fff", fontSize:13, fontWeight:600 }}>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c.8-3.7 3.7-5.7 7.5-5.7s6.7 2 7.5 5.7"/></svg>
-                {viewers.length}
-              </div>
-            </div>
-          );
-        })()}
-
-        {/* OTAQ SÖHBƏTİ */}
-        <div ref={feedRef} style={{ marginTop:0, maxHeight:"30dvh", overflowY:"auto", overscrollBehavior:"contain", display:"flex", flexDirection:"column", gap:10 }}>
-          {msgs.map(m => {
-            const me = m.user_id === myId;
-            return (
-              <div key={m.id} style={{ display:"flex", gap:8, alignItems:"flex-start" }}>
-                <div style={{ width:34, height:34, borderRadius:"50%", flexShrink:0, overflow:"hidden", background:"linear-gradient(135deg,#7b2ff7,#ff3ea5)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:13, fontWeight:700 }}>
-                  {m.avatar_url ? <img src={m.avatar_url} alt="" referrerPolicy="no-referrer" style={{ width:"100%", height:"100%", objectFit:"cover" }}/> : (m.display_name?.[0]?.toUpperCase() || "?")}
-                </div>
-                <div style={{ minWidth:0, maxWidth:"80%" }}>
-                  <div style={{ display:"flex", alignItems:"center", gap:4, marginBottom:3 }}>
-                    <span style={{ fontSize:12, fontWeight:600, color: me ? "#7b2ff7" : "#3a3a3c", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", maxWidth:150 }}>{m.display_name}</span>
-                    <img src="/images/images/vlogo15.png" alt="" style={{ height:15, width:"auto", flexShrink:0 }}/>
-                  </div>
-                  <div style={{ display:"inline-block", background: me ? "#efe7ff" : "#fff", color:"#fff", border: me ? ".5px solid rgba(123,47,247,.18)" : ".5px solid rgba(20,10,40,.08)", boxShadow:"0 1px 3px rgba(20,10,40,.05)", borderRadius:16, borderTopLeftRadius:5, padding:"7px 12px", fontSize:14, lineHeight:1.4, wordBreak:"break-word" }}>{m.content}</div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        {error ? <p style={{ color:"#ff3ea5", fontSize:11, textAlign:"center", marginTop:12 }}>{error}</p> : null}
+          <span className="room-crown"><Crown size={31} fill="currentColor"/></span>
+          <div className="room-actions"><button className="icon-clear" aria-label="Daha çox"><MoreHorizontal size={30}/></button><button className="icon-clear power" onClick={onLeave} aria-label="Otaqdan çıx"><LogOut size={20}/></button></div>
+        </header>
+        <div className="rank-row"><div className="rank-pill"><Medal size={22}/>&nbsp; OP50+</div><div className="rank-mini"><Radio size={18}/><span>0%</span></div><div className="ad-pill">Sınırlı<br/>ücretsiz</div></div>
+        <section className="seats" aria-label="Konuşmacı koltukları">
+           {Array.from({length:24}).map((_,i)=>{const member=speakersBySeat.get(i);const mine=member?.user_id===session?.user.id;const mName=(mine?name:member?.display_name)||"Üye";const mAv=mine?avatarUrl:member?.avatar_url;return <button className="seat" key={i} onClick={()=>member?setProfile(member):takeSeat(i)} aria-label={member ? `${mName} koltuğu` : `${i+1}. koltuğa otur`}><span className={`seat-circle ${member?"seat-live":""} ${member?.is_muted?"seat-muted":""}`} style={{overflow:"visible"}}>{member?(mAv?<img src={mAv} alt={mName} style={{width:"100%",height:"100%",borderRadius:"50%",objectFit:"cover"}}/>:(mName[0]||"V").toUpperCase()):<span>+</span>}{member?.is_muted&&<span style={{position:"absolute",right:-2,bottom:-2,width:20,height:20,borderRadius:"50%",background:"rgba(0,0,0,.7)",fontSize:11,display:"grid",placeItems:"center"}}>🔇</span>}</span><span className="seat-label" style={{maxWidth:64,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{member?mName.split(" ")[0]:i+1}</span></button>})}
+        </section>
+        <section className="audience"><div className="listener">V</div><div className="audience-count"><Users size={20}/><b>{peopleCount}</b></div></section>
+        <section className="notice">Sohbet odasına hoş geldiniz! Lütfen sohbetlerde saygılı olun. Reşit olmayanların yayın yapması veya onları riske atan içerikler paylaşması kesinlikle yasaktır. Cinsel içerikli açık paylaşımlar, kumar, dolandırıcılık, taciz, istismar, tehdit ve diğer kural ihlalleri cezalandırılır. Herhangi bir ihlali lütfen bildirin.</section>
+        <section className="share-note">Daha fazla kişinin katılması için odayı paylaşın <button className="share-btn" onClick={shareRoom}>{sharing?"Kopyalandı":"Paylaş"}</button></section>
+        {error && <div className="voice-status">{error}</div>}
+        {typeof connected === "number" && connected > 0 && <div className="voice-status">🟢 {connected} kişiyle canlı ses bağlantısı</div>}
       </div>
-      {/* YAZARKƏN: mesajlar ekranın ortasında, arxada otaq şəffaf görünür */}
-      {typing && (
-        <div onMouseDown={e => { e.preventDefault(); inputRef.current?.blur(); }} onTouchStart={() => inputRef.current?.blur()}
-          style={{ position:"fixed", left:0, right:0, top:0, bottom: kb + 58, zIndex:45, background:"rgba(7,0,15,.55)", backdropFilter:"blur(6px)", WebkitBackdropFilter:"blur(6px)", display:"flex", flexDirection:"column", justifyContent:"center", padding:"max(16px,env(safe-area-inset-top)) 14px 12px", animation:"vfadeIn .18s ease" }}>
-          <div onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()}
-            ref={el => { if (el) el.scrollTop = el.scrollHeight; }}
-            style={{ maxHeight:"100%", overflowY:"auto", display:"flex", flexDirection:"column", gap:10 }}>
-            {msgs.slice(-30).map(m => {
-              const me = m.user_id === myId;
-              return (
-                <div key={m.id} style={{ display:"flex", gap:8, alignItems:"flex-start" }}>
-                  <div style={{ width:34, height:34, borderRadius:"50%", flexShrink:0, overflow:"hidden", background:"linear-gradient(135deg,#7b2ff7,#ff3ea5)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:13, fontWeight:700, border:"2px solid #07000f" }}>
-                    {m.avatar_url ? <img src={m.avatar_url} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }}/> : (m.display_name?.[0]?.toUpperCase() || "?")}
-                  </div>
-                  <div style={{ minWidth:0, maxWidth:"80%" }}>
-                    <div style={{ display:"flex", alignItems:"center", gap:4, marginBottom:3 }}>
-                      <span style={{ fontSize:12, fontWeight:600, color: me ? "#7b2ff7" : "#3a3a3c" }}>{m.display_name}</span>
-                      <img src="/images/images/vlogo15.png" alt="" style={{ height:15, width:"auto" }}/>
-                    </div>
-                    <div style={{ display:"inline-block", background: me ? "rgba(239,231,255,.95)" : "rgba(255,255,255,.95)", border:".5px solid rgba(20,10,40,.08)", boxShadow:"0 2px 8px rgba(20,10,40,.08)", borderRadius:16, borderTopLeftRadius:5, padding:"7px 12px", fontSize:14, lineHeight:1.4, color:"#fff", wordBreak:"break-word" }}>{m.content}</div>
-                  </div>
-                </div>
-              );
-            })}
+      {profile && (()=>{const mine=profile.user_id===session?.user.id;const pn=(mine?name:profile.display_name)||"Üye";const pa=mine?avatarUrl:profile.avatar_url;return (
+        <div onClick={()=>setProfile(null)} style={{position:"fixed",inset:0,zIndex:80,background:"rgba(0,0,0,.55)",display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
+          <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:480,background:"linear-gradient(180deg,#2a2346,#16122a)",borderRadius:"24px 24px 0 0",padding:"0 20px 28px",color:"#fff",textAlign:"center"}}>
+            <div style={{width:88,height:88,borderRadius:"50%",margin:"-44px auto 10px",border:"3px solid #fff",background:"linear-gradient(145deg,#8c61ff,#e24aaa)",display:"grid",placeItems:"center",fontSize:36,fontWeight:800,overflow:"hidden"}}>{pa?<img src={pa} alt={pn} style={{width:"100%",height:"100%",objectFit:"cover"}}/>:pn[0]?.toUpperCase()}</div>
+            <div style={{fontSize:20,fontWeight:700}}>{pn}</div>
+            <div style={{opacity:.65,fontSize:13,margin:"4px 0 14px"}}>ID: {profile.user_id.slice(0,8)} · {profile.is_muted?"🔇 Sessiz":"🎙️ Konuşuyor"}</div>
+            {mine ? <div style={{display:"flex",gap:10}}>
+              <button onClick={()=>{onToggleMic();setProfile(null);}} style={{flex:1,padding:12,borderRadius:22,border:0,background:"#8c61ff",color:"#fff",fontWeight:700}}>{muted?"Mikrofonu aç":"Mikrofonu kapat"}</button>
+              <button onClick={()=>{onLeaveSeat();setProfile(null);}} style={{flex:1,padding:12,borderRadius:22,border:"1px solid rgba(255,255,255,.3)",background:"transparent",color:"#fff",fontWeight:700}}>Koltuktan in</button>
+            </div> : <button onClick={()=>setProfile(null)} style={{width:"100%",padding:12,borderRadius:22,border:0,background:"#8c61ff",color:"#fff",fontWeight:700}}>Kapat</button>}
           </div>
-        </div>
-      )}
-
-      {/* HƏDİYYƏ ANİMASİYASI — səsli video, qara fon şəffaf (screen blend) */}
-      <div style={{ position:"fixed", left:0, right:0, bottom: kb + 58, height:"46dvh", zIndex:60, pointerEvents:"none", display: giftPlay ? "flex" : "none", alignItems:"center", justifyContent:"center" }}>
-        <video ref={giftVideoRef} playsInline preload="auto"
-          onEnded={() => setGiftPlay(null)}
-          onError={() => setGiftPlay(null)}
-          style={{ width:"100%", height:"100%", objectFit:"contain", background:"transparent", mixBlendMode:"screen", opacity:.95 }}/>
-      </div>
-
-      {/* HƏDİYYƏ PANELİ */}
-      {giftOpen && (() => {
-        const GIFTS: Record<string, { id:string; name:string; price:number; gif:string; icon:any }[]> = {
-          "Çanta": [],
-          "Hədiyyə": [{ id:"aslan", name:"Aslan", price:99, gif:"sir.MOV", icon:LION }],
-          "Şanslı": [], "Tədbirlər": [], "İnteraktiv": [],
-        };
-        const list = GIFTS[giftTab] || [];
-        const all = [...list, ...Array.from({ length: Math.max(0, 8 - list.length) }).map(() => null)];
-        const people = session ? members.map((m: Member) => (m.user_id === session.user.id ? name : "Üzv")) : [name, "Aynur", "Rauf", "Sevinc", "Tural", "Nigar", "Kənan"];
-        const cols = ["#7b2ff7","#ff3ea5","#00b4d8","#ff9f0a","#22c55e","#af52de","#ff375f"];
-        const gift = list.find(g => g.id === giftSel) || null;
-        const send = () => {
-          if (!gift) return;
-          const cost = gift.price * giftQty;
-          if (jetonBal < cost) { setGiftWarn(true); setTimeout(() => setGiftWarn(false), 2200); return; }
-          const nb = jetonBal - cost; setJetonBal(nb);
-          try { localStorage.setItem("velvet_jeton", String(nb)); } catch {}
-          const toName = giftTo < 0 ? "hamıya" : people[giftTo];
-          setMsgs(prev => { const next = [...prev, { id: Date.now(), user_id: myId, display_name: name, avatar_url: avatarUrl, content: `🎁 ${toName} ${gift.name} ×${giftQty} göndərdi`, created_at: new Date().toISOString() }]; if (!session) { try { localStorage.setItem("velvet_demo_chat", JSON.stringify(next.slice(-100))); } catch {} } return next; });
-          setGiftOpen(false); setQtyOpen(false);
-          const v = giftVideoRef.current;
-          if (v) {
-            const base = gift.gif.replace(/\.[^.]+$/, "");
-            const src = v.canPlayType("video/quicktime") ? `/images/images/${gift.gif}` : `/images/images/${base}.mp4`;
-            v.pause();
-            v.src = src;
-            v.currentTime = 0;
-            v.muted = false;
-            v.volume = 1;
-            setGiftPlay(gift.gif);
-            v.play().catch(() => { v.muted = true; v.play().catch(() => setGiftPlay(null)); });
-          }
-        };
-        return (
-          <div onClick={() => setGiftOpen(false)} style={{ position:"fixed", inset:0, zIndex:70, background:"rgba(0,0,0,.35)", animation:"vfadeIn .2s ease" }}>
-            <style>{`@keyframes gsUp{from{transform:translateY(100%)}to{transform:translateY(0)}} .gs-tabs::-webkit-scrollbar,.gs-ppl::-webkit-scrollbar{display:none}`}</style>
-            <div onClick={e => { e.stopPropagation(); setQtyOpen(false); }} style={{ position:"absolute", left:0, right:0, bottom:0, height:"58dvh", maxWidth:520, margin:"0 auto", background:"#17141f", borderRadius:"22px 22px 0 0", boxShadow:"0 -10px 40px rgba(0,0,0,.35)", display:"flex", flexDirection:"column", animation:"gsUp .28s cubic-bezier(.2,.9,.3,1)", color:"#fff", paddingBottom:"env(safe-area-inset-bottom)" }}>
-              <div style={{ width:36, height:4, borderRadius:2, background:"rgba(255,255,255,.2)", margin:"8px auto 6px" }}/>
-
-              {/* Alıcılar */}
-              <div className="gs-ppl" style={{ display:"flex", gap:10, overflowX:"auto", padding:"4px 14px 10px", scrollbarWidth:"none", flexShrink:0 }}>
-                <button onClick={() => setGiftTo(-1)} style={{ flexShrink:0, height:38, padding:"0 12px", borderRadius:19, border: giftTo < 0 ? "1.5px solid #ff3ea5" : "1px solid rgba(255,255,255,.15)", background: giftTo < 0 ? "rgba(255,62,165,.15)" : "transparent", color:"#fff", fontSize:12, fontWeight:600, cursor:"pointer" }}>Hamı</button>
-                {people.map((p: string, k: number) => (
-                  <button key={k} onClick={() => setGiftTo(k)} title={p} style={{ flexShrink:0, width:38, height:38, borderRadius:"50%", padding:0, cursor:"pointer", border: giftTo === k ? "2px solid #ff3ea5" : "2px solid transparent", background:cols[k % cols.length], color:"#fff", fontSize:14, fontWeight:700, overflow:"hidden", boxShadow: giftTo === k ? "0 0 0 3px rgba(255,62,165,.25)" : "none" }}>
-                    {k === 0 && avatarUrl ? <img src={avatarUrl} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }}/> : p[0]?.toUpperCase()}
-                  </button>
-                ))}
-              </div>
-
-              {/* Tablar */}
-              <div className="gs-tabs" style={{ display:"flex", gap:18, overflowX:"auto", padding:"0 14px", borderBottom:".5px solid rgba(255,255,255,.1)", scrollbarWidth:"none", flexShrink:0 }}>
-                {["Çanta","Hədiyyə","Şanslı","Tədbirlər","İnteraktiv"].map(t => (
-                  <button key={t} onClick={() => setGiftTab(t)} style={{ flexShrink:0, background:"none", border:0, padding:"9px 0", fontSize:13, fontWeight: giftTab === t ? 600 : 400, color: giftTab === t ? "#fff" : "rgba(255,255,255,.45)", borderBottom: giftTab === t ? "2px solid #ff3ea5" : "2px solid transparent", marginBottom:-.5, cursor:"pointer", fontFamily:"inherit" }}>{t}</button>
-                ))}
-              </div>
-
-              {/* Hədiyyələr — 4 sütun */}
-              <div style={{ flex:1, minHeight:0, overflowY:"auto", padding:"12px 10px", display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8, alignContent:"start" }}>
-                {list.length === 0 && <div style={{ gridColumn:"1/-1", textAlign:"center", color:"rgba(255,255,255,.4)", fontSize:13, padding:"30px 0" }}>Bu bölmədə hələ əşya yoxdur</div>}
-                {list.length > 0 && all.map((g, k) => g ? (
-                  <button key={g.id} onClick={() => setGiftSel(g.id)} style={{ background: giftSel === g.id ? "rgba(255,62,165,.12)" : "transparent", border: giftSel === g.id ? "1.5px solid #ff3ea5" : "1.5px solid transparent", borderRadius:14, padding:"8px 2px 7px", display:"flex", flexDirection:"column", alignItems:"center", gap:3, cursor:"pointer", color:"#fff" }}>
-                    <div style={{ width:48, height:48 }}>{g.icon}</div>
-                    <span style={{ fontSize:11, fontWeight:500 }}>{g.name}</span>
-                    <span style={{ display:"flex", alignItems:"center", gap:3, fontSize:11, color:"#ffcf5a", fontWeight:600 }}>
-                      <img src="/images/images/jeton.PNG" alt="" style={{ width:12, height:12, objectFit:"contain" }}/>{g.price}
-                    </span>
-                  </button>
-                ) : <div key={"e"+k}/>)}
-              </div>
-
-              {/* Alt: balans + göndər */}
-              <div style={{ flexShrink:0, display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 14px 12px", borderTop:".5px solid rgba(255,255,255,.08)", position:"relative" }}>
-                <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-                  <img src="/images/images/jeton.PNG" alt="" style={{ width:20, height:20, objectFit:"contain" }}/>
-                  <span style={{ fontSize:15, fontWeight:700, color:"#ffcf5a", fontVariantNumeric:"tabular-nums" }}>{jetonBal.toLocaleString()}</span>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" strokeWidth="2.4" strokeLinecap="round"><path d="M9 6l6 6-6 6"/></svg>
-                </div>
-                {giftWarn && <div style={{ position:"absolute", left:14, right:14, top:-40, background:"#ff9f0a", color:"#2a1400", fontSize:13, fontWeight:600, textAlign:"center", borderRadius:12, padding:"8px 10px" }}>Jeton kifayət etmir</div>}
-                <div style={{ display:"flex", alignItems:"stretch", height:38, borderRadius:19, overflow:"visible", border:"1.5px solid #ff3ea5", position:"relative" }}>
-                  <button onClick={e => { e.stopPropagation(); setQtyOpen(o => !o); }} style={{ display:"flex", alignItems:"center", gap:4, padding:"0 10px 0 14px", background:"transparent", border:0, color:"#fff", fontSize:14, fontWeight:600, cursor:"pointer" }}>
-                    {giftQty}
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" style={{ transform: qtyOpen ? "rotate(180deg)" : "none", transition:".2s" }}><path d="M6 15l6-6 6 6"/></svg>
-                  </button>
-                  <button onClick={send} disabled={!gift} style={{ padding:"0 20px", borderRadius:19, margin:-1.5, border:0, background: gift ? "linear-gradient(135deg,#ff5fa8,#ff2d7a)" : "#555", color:"#fff", fontSize:14, fontWeight:700, cursor: gift ? "pointer" : "default", boxShadow: gift ? "0 4px 14px rgba(255,45,122,.45)" : "none" }}>Göndər</button>
-                  {qtyOpen && (
-                    <div onClick={e => e.stopPropagation()} style={{ position:"absolute", bottom:46, left:0, width:74, background:"#241f2e", borderRadius:12, boxShadow:"0 8px 24px rgba(0,0,0,.4)", overflow:"hidden", border:".5px solid rgba(255,255,255,.1)" }}>
-                      {[100,30,10,5,1].map(q => (
-                        <button key={q} onClick={() => { setGiftQty(q); setQtyOpen(false); }} style={{ width:"100%", height:36, background: giftQty === q ? "rgba(255,62,165,.18)" : "transparent", border:0, color: giftQty === q ? "#ff5fa8" : "#fff", fontSize:14, fontWeight:600, cursor:"pointer" }}>{q}</button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      })()}
-
-      {/* ALT PANEL — mesaj sahəsi + ikonlar */}
-      <div style={{ position:"fixed", bottom:kb, left:0, right:0, zIndex:50, background:"rgba(255,255,255,.92)", backdropFilter:"saturate(1.8) blur(20px)", WebkitBackdropFilter:"saturate(1.8) blur(20px)", borderTop:".5px solid rgba(255,255,255,.1)", padding:"8px 12px max(8px,env(safe-area-inset-bottom))", display:"flex", alignItems:"center", gap:8 }}>
-        <input
-          value={draftMsg}
-          onChange={e => setDraftMsg(e.target.value)}
-          onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); sendMsg(); } }}
-          ref={inputRef}
-          onFocus={() => setTyping(true)}
-          onBlur={() => setTimeout(() => setTyping(false), 120)}
-          placeholder="Mesaj yaz…"
-          enterKeyHint="send"
-          autoComplete="off"
-          style={{ flex:1, minWidth:0, height:40, borderRadius:20, background:"rgba(255,255,255,.08)", border:0, outline:"none", padding:"0 16px", fontSize:16, color:"#fff", fontFamily:"inherit" }}
-        />
-        {draftMsg.trim() && (
-          <button onMouseDown={e => e.preventDefault()} onClick={sendMsg} aria-label="Göndər" style={{ width:40, height:40, borderRadius:"50%", border:0, flexShrink:0, background:"#7b2ff7", color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-          </button>
-        )}
-        <button aria-label="Mesajlar" style={{ width:40, height:40, borderRadius:"50%", background:"rgba(255,255,255,.08)", border:0, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", cursor:"pointer", flexShrink:0 }}>
-          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M20.5 11.6c0 4.3-3.8 7.7-8.5 7.7-1.1 0-2.2-.2-3.2-.6L4 20l1.2-3.6a7.3 7.3 0 0 1-1.7-4.8C3.5 7.3 7.3 3.9 12 3.9s8.5 3.4 8.5 7.7z"/></svg>
-        </button>
-        <button aria-label="Kataloq" style={{ width:40, height:40, borderRadius:"50%", background:"rgba(255,255,255,.08)", border:0, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", cursor:"pointer", flexShrink:0 }}>
-          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg>
-        </button>
-        <button aria-label="Hədiyyə göndər" onClick={() => { setGiftOpen(true); setQtyOpen(false); }} style={{ width:40, height:40, borderRadius:"50%", background:"linear-gradient(135deg,#ff5f8f,#ff2d55)", border:0, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", cursor:"pointer", flexShrink:0, boxShadow:"0 3px 10px rgba(255,45,85,.35)" }}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v9H5v-9"/><path d="M12 8S10.5 3 8 3.5 7 8 12 8zM12 8s1.5-5 4-4.5S17 8 12 8z"/></svg>
-        </button>
-      </div>
+        </div>)})()}
+      <footer className="room-bottom">
+        <button className="say" onClick={onOpenChat}>〆&nbsp;&nbsp; Bir şey söyle...</button>
+        <button className="round-action" onClick={onOpenChat} aria-label="Mesajlar"><MessageCircle size={25}/><span style={{position:"absolute",right:-2,top:-5,background:"#ff5a4f",borderRadius:14,padding:"2px 6px",fontSize:11,fontWeight:800}}>32</span></button>
+        <button className="round-action" aria-label="Menü"><span style={{fontSize:24,lineHeight:1}}>⌘</span></button>
+         <button className={`round-action ${!muted?"mic-active":""}`} onClick={isSpeaker?onToggleMic:()=>takeSeat(Array.from({length:24}).findIndex((_,index)=>!speakersBySeat.has(index)))} aria-label={muted?"Mikrofonu aç":"Mikrofonu kapat"}>{muted?<MicOff size={23}/>:<Mic size={23}/>}</button>
+        <button className="round-action gift-action" aria-label="Hediye"><Gift size={25}/></button>
+      </footer>
     </main>
   );
 }
