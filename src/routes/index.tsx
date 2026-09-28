@@ -1147,9 +1147,9 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
         <div style={{ padding:"0 18px", marginTop:-20, position:"relative", zIndex:5 }}>
           <div style={{ display:"flex", alignItems:"flex-end", gap:14, marginBottom:14 }}>
             {/* Avatar */}
-            <div style={{ position:"relative", flexShrink:0, width: selectedFrame ? 110 : 82, height: selectedFrame ? 110 : 82, transition:"width .3s,height .3s" }}>
+            <div style={{ position:"relative", flexShrink:0, width: selectedFrame ? 124 : 82, height: selectedFrame ? 124 : 82, transition:"width .3s,height .3s" }}>
               {/* Qızıl halqa */}
-              <div style={{ position:"absolute", inset: selectedFrame ? 22 : 0, borderRadius:"50%", background:"conic-gradient(#ffd700,#ff8c00,#c084fc,#7b2ff7,#ffd700)", padding:2.5, animation:"vglow 3s ease-in-out infinite", zIndex:1 }}>
+              <div style={{ position:"absolute", inset: selectedFrame ? "18%" : 0, borderRadius:"50%", background: selectedFrame ? "#fff" : "conic-gradient(#ffd700,#ff8c00,#c084fc,#7b2ff7,#ffd700)", padding: selectedFrame ? 1.5 : 2.5, animation:"vglow 3s ease-in-out infinite", zIndex:1 }}>
                 <div style={{ width:"100%", height:"100%", borderRadius:"50%", background:"#e8e0f5", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, fontWeight:900, color:"#1a1a2e", overflow:"hidden", cursor:"pointer" }}
                   onClick={() => setShowAvatarFull(true)}>
                   {avatarPreview
@@ -1161,7 +1161,7 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
               {/* Qanad çərçivəsi — mağazadan alınan, avatarın üstündə */}
               {selectedFrame && (
                 <img
-                  src={`/images/images/frame-${selectedFrame}-flap.gif`}
+                  src={`/images/images/${({ gold:"frame-gold-flap", red:"frame-red-flap", blue:"frame-blue-flap", green:"frame-green-flap", "butterfly-sakura":"frame-butterfly-sakura", "cyber-wings":"frame-cyber-wings", "dragon-obsidian":"frame-dragon-obsidian" } as Record<string,string>)[selectedFrame] || "frame-gold-flap"}.gif`}
                   style={{
                     position:"absolute", inset:0,
                     width:"100%", height:"100%",
@@ -1173,7 +1173,7 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
                 />
               )}
               {/* Online dot */}
-              <div style={{ position:"absolute", bottom: selectedFrame ? 24 : 2, right: selectedFrame ? 24 : 2, width:14, height:14, borderRadius:"50%", background:"#00ff88", border:"2.5px solid #07000f", zIndex:6 }}/>
+              <div style={{ position:"absolute", bottom: selectedFrame ? 26 : 2, right: selectedFrame ? 26 : 2, width:14, height:14, borderRadius:"50%", background:"#00ff88", border:"2.5px solid #07000f", zIndex:6 }}/>
             </div>
             {/* Ad + ID */}
             <div style={{ flex:1, paddingBottom:4 }}>
@@ -1544,7 +1544,7 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
                         {/* Preview */}
                         <div style={{ position:"relative", width:"100%", paddingTop:"100%", background:"rgba(100,80,160,.12)" }}>
                           {/* Avatar ortada */}
-                          <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", width:"46%", height:"46%", borderRadius:"50%", background:"#e8e0f5", border:"2px solid rgba(100,80,160,.15)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, fontWeight:900, color:"#1a1a2e", zIndex:1, overflow:"hidden" }}>
+                          <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", width:"62%", height:"62%", borderRadius:"50%", background:"#e8e0f5", border:"1.5px solid #fff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, fontWeight:900, color:"#1a1a2e", zIndex:1, overflow:"hidden" }}>
                             {avatarPreview ? <img src={avatarPreview} style={{width:"100%",height:"100%",objectFit:"cover",borderRadius:"50%"}} alt=""/> : (profileData.username[0]?.toUpperCase()||"İ")}
                           </div>
                           {/* GIF çərçivə */}
@@ -1611,7 +1611,7 @@ function ProfileScreen({ name, onBack, onEnterRoom, onVip }: { name: string; onB
                 {/* Çərçivə önizleme — böyük */}
                 <div style={{ position:"relative", width:180, height:180, margin:"0 auto 20px" }}>
                   {/* Avatar */}
-                  <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", width:86, height:86, borderRadius:"50%", background:"conic-gradient(#ffd700,#c084fc,#7b2ff7,#ffd700)", padding:2.5, zIndex:1 }}>
+                  <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", width:114, height:114, borderRadius:"50%", background:"#fff", padding:1.5, zIndex:1 }}>
                     <div style={{ width:"100%", height:"100%", borderRadius:"50%", background:"#e8e0f5", display:"flex", alignItems:"center", justifyContent:"center", fontSize:28, fontWeight:900, color:"#1a1a2e", overflow:"hidden" }}>
                       {avatarPreview ? <img src={avatarPreview} style={{width:"100%",height:"100%",objectFit:"cover",borderRadius:"50%"}} alt=""/> : (profileData.username[0]?.toUpperCase()||"İ")}
                     </div>
