@@ -1,7 +1,7 @@
 // @ts-nocheck — imported prototype contains intentionally loose backend response shapes.
 import { ClientOnly, createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { BadgeHelp, ChevronRight, Crown, Gift, LogOut, Medal, MessageCircle, Mic, MicOff, MoreHorizontal, Radio, Send, Settings, ShieldCheck, ShoppingBag, Users, WalletCards, X } from "lucide-react";
+import { BadgeHelp, CalendarDays, ChevronRight, Crown, DoorOpen, Gift, LogOut, Medal, MessageCircle, Mic, MicOff, Minimize2, MoreHorizontal, PackageOpen, Plus, Power, Radio, Send, Settings, ShieldCheck, ShoppingBag, Trophy, UserPlus, Users, WalletCards, X } from "lucide-react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
@@ -534,6 +534,14 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
         .tb-search{margin-top:10px;height:38px;border-radius:12px;background:rgba(255,255,255,.08);display:flex;align-items:center;gap:8px;padding:0 12px;color:#8e8e93;font-size:15px}
         .tb-search input{flex:1;border:0;background:none;outline:none;font-size:15px;color:#fff;min-width:0}
         .tb-search input::placeholder{color:#8e8e93}
+        .quick-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:20px 16px 24px}
+        .quick-item{border:0;background:transparent;padding:0;display:flex;flex-direction:column;align-items:center;gap:8px;color:#fff;cursor:pointer;min-width:0}
+        .quick-item:active .quick-icon{transform:scale(.92)}
+        .quick-icon{position:relative;width:58px;height:58px;border-radius:19px;display:grid;place-items:center;overflow:hidden;transition:transform .14s ease;box-shadow:0 9px 22px var(--quick-shadow),inset 0 1px 1px rgba(255,255,255,.42),inset 0 -8px 18px rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.24)}
+        .quick-icon:before{content:"";position:absolute;inset:1px;border-radius:18px;background:linear-gradient(145deg,rgba(255,255,255,.34),transparent 45%,rgba(0,0,0,.16));pointer-events:none}
+        .quick-icon:after{content:"";position:absolute;width:35px;height:13px;border-radius:50%;left:7px;top:4px;background:rgba(255,255,255,.25);filter:blur(5px);transform:rotate(-18deg);pointer-events:none}
+        .quick-icon svg{position:relative;z-index:1;filter:drop-shadow(0 2px 2px rgba(0,0,0,.34))}
+        .quick-label{max-width:100%;overflow:hidden;text-overflow:ellipsis;font-size:12px;line-height:1.15;font-weight:650;color:rgba(255,255,255,.9);white-space:nowrap}
         .hero-box{margin:8px 16px 14px;border-radius:24px;overflow:hidden;position:relative;height:150px}
         .hero-bg2{position:absolute;inset:0;background:#0d0022}
         .hero-g1{position:absolute;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(123,47,247,.35) 0%,transparent 70%);top:-40px;left:-20px;animation:vpulse 3s ease-in-out infinite}
@@ -660,18 +668,16 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
         })()}
 
         {/* SÜRƏTLİ KEÇİD */}
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8, margin:"20px 16px 24px" }}>
+        <div className="quick-grid">
           {[
-            { l:"Bonus", c:"#ff375f", d:<><rect x="4" y="9" width="16" height="11" rx="2.5"/><path d="M3 9h18M12 9v11M12 9S10 4.5 8 5.5 8.5 9 12 9zM12 9s2-4.5 4-3.5S15.5 9 12 9z"/></> },
-            { l:"Mağaza", c:"#af52de", d:<><path d="M5 8h14l-1.2 11.5a1.5 1.5 0 0 1-1.5 1.5H7.7a1.5 1.5 0 0 1-1.5-1.5z"/><path d="M9 8V7a3 3 0 0 1 6 0v1"/></> },
-            { l:"Reytinq", c:"#ff9f0a", d:<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/> },
-            { l:"Tədbirlər", c:"#32ade6", d:<><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M8 14h3"/></> },
+            { l:"Bonus", from:"#ff7b6d", to:"#ff174d", shadow:"rgba(255,47,90,.38)", icon:<PackageOpen size={29} strokeWidth={2.15}/> },
+            { l:"Mağaza", from:"#d170ff", to:"#7c2cff", shadow:"rgba(156,69,255,.4)", icon:<ShoppingBag size={29} strokeWidth={2.15}/> },
+            { l:"Reytinq", from:"#ffd257", to:"#f47b0b", shadow:"rgba(255,158,28,.4)", icon:<Trophy size={30} strokeWidth={2.15}/> },
+            { l:"Tədbirlər", from:"#5ad8ff", to:"#087ee8", shadow:"rgba(33,169,255,.4)", icon:<CalendarDays size={29} strokeWidth={2.15}/> },
           ].map(q => (
-            <button key={q.l} className="hp" onClick={q.l === "Mağaza" || q.l === "Bonus" ? onProfile : undefined} style={{ background:"none", border:0, padding:0, display:"flex", flexDirection:"column", alignItems:"center", gap:7, cursor:"pointer" }}>
-              <div style={{ width:54, height:54, borderRadius:18, background:`linear-gradient(145deg,${q.c}55,${q.c}18)`, border:`.5px solid ${q.c}77`, boxShadow:`0 6px 18px ${q.c}33`, display:"flex", alignItems:"center", justifyContent:"center" }}>
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{q.d}</svg>
-              </div>
-              <span style={{ fontSize:12, color:"rgba(255,255,255,.82)", fontWeight:500 }}>{q.l}</span>
+            <button key={q.l} className="quick-item" onClick={q.l === "Mağaza" || q.l === "Bonus" ? onProfile : undefined}>
+              <span className="quick-icon" style={{background:`linear-gradient(145deg,${q.from},${q.to})`,"--quick-shadow":q.shadow} as any}>{q.icon}</span>
+              <span className="quick-label">{q.l}</span>
             </button>
           ))}
         </div>
@@ -1957,6 +1963,7 @@ const LION = <svg viewBox="0 0 64 64" width="100%" height="100%"><defs><radialGr
 function RoomScreen({ name, avatarUrl, session, members, muted, connected, onToggleMic, onJoinSeat, onLeaveSeat, onLeave, onOpenChat, error }: any) {
   const [sharing, setSharing] = useState(false);
   const [profile, setProfile] = useState<Member | null>(null);
+  const [roomMenuOpen, setRoomMenuOpen] = useState(false);
   const myMember = session ? members.find((member: Member) => member.user_id === session.user.id) : undefined;
   const isSpeaker = myMember?.role === "speaker";
   const speakersBySeat = new Map<number, Member>();
@@ -1988,12 +1995,20 @@ function RoomScreen({ name, avatarUrl, session, members, muted, connected, onTog
         .room-id{display:flex;align-items:center;gap:8px;min-width:0}.room-avatar{width:48px;height:48px;border-radius:13px;border:3px solid rgba(255,255,255,.88);background:linear-gradient(135deg,#ffc5df,#8b72ff);display:grid;place-items:center;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,.3)}
         .room-avatar img{width:100%;height:100%;object-fit:cover}.room-title{font-size:18px;font-weight:700;line-height:1.15;text-shadow:0 1px 3px rgba(0,0,0,.4);white-space:nowrap}.room-code{font-size:14px;color:rgba(255,255,255,.72);margin-top:3px}.room-crown{font-size:29px;filter:drop-shadow(0 2px 5px rgba(0,0,0,.35))}
         .room-actions{display:flex;align-items:center;gap:14px}.icon-clear{border:0;background:transparent;color:#fff;padding:3px;display:grid;place-items:center;cursor:pointer}.power{width:34px;height:34px;border:3px solid currentColor;border-radius:50%;font-size:20px;line-height:1}
+         .room-menu-backdrop{position:fixed;inset:0;z-index:70;background:rgba(8,8,24,.38);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);display:flex;align-items:flex-start;justify-content:center;padding:max(70px,calc(env(safe-area-inset-top) + 60px)) 14px 20px;animation:vfadeIn .18s ease}
+         .room-menu{width:min(100%,480px);display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;padding:10px 2px 16px;border-bottom:1px solid rgba(255,255,255,.14)}
+         .room-menu-item{border:0;background:transparent;color:#fff;display:flex;flex-direction:column;align-items:center;gap:9px;min-width:0;cursor:pointer}
+         .room-menu-item:active .room-menu-icon{transform:scale(.92)}
+         .room-menu-icon{position:relative;width:clamp(66px,19vw,84px);height:clamp(66px,19vw,84px);border-radius:50%;display:grid;place-items:center;color:#fff;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.5);box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform .14s ease}
+         .room-menu-icon:after{content:"";position:absolute;inset:5px;border-radius:50%;border:1px solid rgba(255,255,255,.4);pointer-events:none}
+         .room-menu-icon svg{position:relative;z-index:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,.45))}
+         .room-menu-label{font-size:clamp(11px,3.3vw,15px);line-height:1.15;text-shadow:0 2px 5px rgba(0,0,0,.6);white-space:nowrap}
          .rank-row{display:flex;gap:8px;align-items:center;margin-top:12px;flex-shrink:0}.rank-pill{height:42px;min-width:0;width:30%;border-radius:12px;background:rgba(18,8,85,.63);display:flex;align-items:center;padding:0 10px;font-size:15px;font-weight:750;color:#ffd64a;white-space:nowrap}.rank-mini{height:42px;width:48px;flex-shrink:0;border-radius:12px;background:rgba(18,8,85,.63);display:grid;place-items:center;color:#fff;font-size:11px}.ad-pill{margin-left:auto;height:42px;width:34%;min-width:0;border-radius:11px;background:linear-gradient(135deg,rgba(104,54,79,.9),rgba(188,94,47,.85));padding:5px 9px;font-size:12px;font-weight:900;color:#ffe55d;display:flex;align-items:center;justify-content:flex-end;text-align:right;line-height:1.05}
-         .seats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:repeat(4,minmax(0,1fr));gap:4px 2px;margin:15px 0 10px;min-height:0;flex:1 1 auto;max-height:340px}.seat{border:0;background:transparent;color:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;min-width:0;min-height:0;cursor:pointer}.seat-circle{width:clamp(30px,10vw,46px);height:clamp(30px,10vw,46px);flex-shrink:0;border-radius:50%;background:rgba(174,170,225,.35);border:1px solid rgba(255,255,255,.24);display:grid;place-items:center;font-size:28px;font-weight:200;box-shadow:inset 0 0 18px rgba(255,255,255,.08)}.seat-label{font-size:12px;line-height:1.1;text-shadow:0 2px 4px rgba(0,0,0,.5)}.seat-live{background:linear-gradient(145deg,#8c61ff,#e24aaa);border:3px solid rgba(255,255,255,.78);font-size:18px;font-weight:800;position:relative}.seat-live:after{content:"";position:absolute;inset:-4px;border:2px solid rgba(91,255,167,.8);border-radius:50%;animation:vpulse 1.4s ease-in-out infinite}.seat-muted:after{border-color:rgba(255,255,255,.35)}
+         .seats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));grid-auto-rows:min-content;align-content:start;gap:4px 2px;margin:15px 0 10px;min-height:0;flex:0 0 auto;max-height:340px}.seat{border:0;background:transparent;color:#fff;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;gap:4px;min-width:0;min-height:0;cursor:pointer}.seat-circle{width:clamp(30px,10vw,46px);height:clamp(30px,10vw,46px);flex-shrink:0;border-radius:50%;background:rgba(174,170,225,.35);border:1px solid rgba(255,255,255,.24);display:grid;place-items:center;box-shadow:inset 0 0 18px rgba(255,255,255,.08)}.seat-plus{display:grid;place-items:center;width:100%;height:100%}.seat-plus svg{width:52%;height:52%;opacity:.9}.seat-label{font-size:12px;line-height:1.1;text-shadow:0 2px 4px rgba(0,0,0,.5);flex-shrink:0}.seat-live{background:linear-gradient(145deg,#8c61ff,#e24aaa);border:3px solid rgba(255,255,255,.78);position:relative}.seat-live:after{content:"";position:absolute;inset:-4px;border:2px solid rgba(91,255,167,.8);border-radius:50%;animation:vpulse 1.4s ease-in-out infinite}.seat-muted:after{border-color:rgba(255,255,255,.35)}
          .audience{height:52px;flex-shrink:0;border-radius:14px;background:rgba(18,7,79,.68);display:flex;align-items:center;padding:0 12px;margin-top:2px}.listener{width:38px;height:38px;border-radius:50%;background:#2d831d;display:grid;place-items:center;font-size:21px}.audience-count{margin-left:auto;border-left:1px solid rgba(255,255,255,.3);padding-left:14px;text-align:center;font-size:12px}.notice{margin-top:10px;width:74%;flex:0 1 auto;min-height:40px;overflow-y:auto;overscroll-behavior:contain;border-radius:11px;background:rgba(18,7,79,.72);padding:10px 12px;color:#31ef9b;font-size:13px;line-height:1.36}.share-note{margin-top:8px;width:74%;flex-shrink:0;border-radius:11px;background:rgba(18,7,79,.58);padding:7px 11px;color:#31ef9b;font-size:13px;line-height:1.2}.share-btn{border:0;border-radius:17px;background:linear-gradient(90deg,#8f64ff,#d85cff);color:#fff;padding:4px 11px;font-size:12px;margin-left:5px}
          .room-bottom{position:fixed;z-index:4;left:50%;transform:translateX(-50%);width:calc(100% - 24px);max-width:496px;bottom:max(8px,env(safe-area-inset-bottom));height:50px;display:flex;align-items:center;gap:6px}.say{height:44px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:0;border-radius:25px;background:rgba(19,17,69,.88);color:#fff;text-align:left;padding:0 12px;font-size:14px}.round-action{position:relative;width:42px;height:42px;flex-shrink:0;border:0;border-radius:50%;background:rgba(19,17,69,.9);color:#fff;display:grid;place-items:center}.gift-action{background:linear-gradient(135deg,#5be3ec,#9069ff);font-size:24px}.mic-active{background:#28a96b}.voice-status{position:fixed;z-index:5;left:50%;bottom:74px;transform:translateX(-50%);white-space:nowrap;background:rgba(9,5,54,.84);border:1px solid rgba(255,255,255,.15);padding:6px 11px;border-radius:14px;font-size:11px}
          @media(max-width:370px){.room-title{font-size:15px}.room-code{font-size:12px}.room-avatar{width:42px;height:42px}.room-actions{gap:4px}.room-crown svg{width:24px}.ad-pill{font-size:11px}.rank-pill{font-size:13px}.round-action{width:36px;height:36px}.room-bottom{gap:4px}.say{font-size:12px;padding:0 8px}.notice,.share-note{width:83%}}
-         @media(max-height:700px){.rank-row{margin-top:7px}.seats{margin:6px 0 5px}.audience{height:43px}.listener{width:32px;height:32px}.notice{margin-top:6px;padding:7px 10px;font-size:12px}.share-note{margin-top:5px;padding:5px 9px;font-size:12px}}
+         @media(max-height:700px){.rank-row{margin-top:7px}.seats{margin:8px 0 5px;gap:3px 2px}.seat-circle{width:clamp(28px,8.6vw,40px);height:clamp(28px,8.6vw,40px)}.audience{height:43px}.listener{width:32px;height:32px}.notice{margin-top:6px;padding:7px 10px;font-size:12px}.share-note{margin-top:5px;padding:5px 9px;font-size:12px}}
          @media(prefers-reduced-motion:reduce){.seat-live:after{animation:none}}
       `}</style>
       <div className="room-ui">
@@ -2003,11 +2018,11 @@ function RoomScreen({ name, avatarUrl, session, members, muted, connected, onTog
             <div><div className="room-title">Velvet odası</div><div className="room-code">ID: 10136161</div></div>
           </div>
           <span className="room-crown"><Crown size={31} fill="currentColor"/></span>
-          <div className="room-actions"><button className="icon-clear" aria-label="Daha çox"><MoreHorizontal size={30}/></button><button className="icon-clear power" onClick={onLeave} aria-label="Otaqdan çıx"><LogOut size={20}/></button></div>
+          <div className="room-actions"><button className="icon-clear" aria-label="Daha çox"><MoreHorizontal size={30}/></button><button className="icon-clear power" onClick={()=>setRoomMenuOpen(true)} aria-label="Otaq menyusu"><LogOut size={20}/></button></div>
         </header>
         <div className="rank-row"><div className="rank-pill"><Medal size={22}/>&nbsp; OP50+</div><div className="rank-mini"><Radio size={18}/><span>0%</span></div><div className="ad-pill">Sınırlı<br/>ücretsiz</div></div>
         <section className="seats" aria-label="Konuşmacı koltukları">
-           {Array.from({length:24}).map((_,i)=>{const member=speakersBySeat.get(i);const mine=member?.user_id===session?.user.id;const mName=(mine?name:member?.display_name)||"Üye";const mAv=mine?avatarUrl:member?.avatar_url;return <button className="seat" key={i} onClick={()=>member?setProfile(member):takeSeat(i)} aria-label={member ? `${mName} koltuğu` : `${i+1}. koltuğa otur`}><span className={`seat-circle ${member?"seat-live":""} ${member?.is_muted?"seat-muted":""}`} style={{overflow:"visible"}}>{member?(mAv?<img src={mAv} alt={mName} style={{width:"100%",height:"100%",borderRadius:"50%",objectFit:"cover"}}/>:(mName[0]||"V").toUpperCase()):<span>+</span>}{member?.is_muted&&<span style={{position:"absolute",right:-2,bottom:-2,width:20,height:20,borderRadius:"50%",background:"rgba(0,0,0,.7)",fontSize:11,display:"grid",placeItems:"center"}}>🔇</span>}</span><span className="seat-label" style={{maxWidth:64,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{member?mName.split(" ")[0]:i+1}</span></button>})}
+           {Array.from({length:24}).map((_,i)=>{const member=speakersBySeat.get(i);const mine=member?.user_id===session?.user.id;const mName=(mine?name:member?.display_name)||"Üye";const mAv=mine?avatarUrl:member?.avatar_url;return <button className="seat" key={i} onClick={()=>member?setProfile(member):takeSeat(i)} aria-label={member ? `${mName} koltuğu` : `${i+1}. koltuğa otur`}><span className={`seat-circle ${member?"seat-live":""} ${member?.is_muted?"seat-muted":""}`} style={{overflow:"visible"}}>{member?(mAv?<img src={mAv} alt={mName} style={{width:"100%",height:"100%",borderRadius:"50%",objectFit:"cover"}}/>:(mName[0]||"V").toUpperCase()):<span className="seat-plus"><Plus strokeWidth={2.4}/></span>}{member?.is_muted&&<span style={{position:"absolute",right:-2,bottom:-2,width:20,height:20,borderRadius:"50%",background:"rgba(0,0,0,.7)",fontSize:11,display:"grid",placeItems:"center"}}>🔇</span>}</span><span className="seat-label" style={{maxWidth:64,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{member?mName.split(" ")[0]:i+1}</span></button>})}
         </section>
         <section className="audience"><div className="listener">V</div><div className="audience-count"><Users size={20}/><b>{peopleCount}</b></div></section>
         <section className="notice">Sohbet odasına hoş geldiniz! Lütfen sohbetlerde saygılı olun. Reşit olmayanların yayın yapması veya onları riske atan içerikler paylaşması kesinlikle yasaktır. Cinsel içerikli açık paylaşımlar, kumar, dolandırıcılık, taciz, istismar, tehdit ve diğer kural ihlalleri cezalandırılır. Herhangi bir ihlali lütfen bildirin.</section>
@@ -2015,6 +2030,14 @@ function RoomScreen({ name, avatarUrl, session, members, muted, connected, onTog
         {error && <div className="voice-status">{error}</div>}
         {typeof connected === "number" && connected > 0 && <div className="voice-status">🟢 {connected} kişiyle canlı ses bağlantısı</div>}
       </div>
+      {roomMenuOpen && <div className="room-menu-backdrop" onClick={()=>setRoomMenuOpen(false)}>
+        <div className="room-menu" role="menu" aria-label="Otaq seçimləri" onClick={event=>event.stopPropagation()}>
+          <button className="room-menu-item" onClick={onLeave} role="menuitem"><span className="room-menu-icon"><Power size={38} strokeWidth={2.15}/></span><span className="room-menu-label">Çıxış et</span></button>
+          <button className="room-menu-item" onClick={async()=>{await shareRoom();setRoomMenuOpen(false);}} role="menuitem"><span className="room-menu-icon"><UserPlus size={38} strokeWidth={2.15}/></span><span className="room-menu-label">Dəvət et</span></button>
+          <button className="room-menu-item" onClick={onLeave} role="menuitem"><span className="room-menu-icon"><Minimize2 size={38} strokeWidth={2.15}/></span><span className="room-menu-label">Kiçilt</span></button>
+          <button className="room-menu-item" onClick={onLeave} role="menuitem"><span className="room-menu-icon"><DoorOpen size={38} strokeWidth={2.15}/></span><span className="room-menu-label">Otaq dəyiş</span></button>
+        </div>
+      </div>}
       {profile && (()=>{const mine=profile.user_id===session?.user.id;const pn=(mine?name:profile.display_name)||"Üye";const pa=mine?avatarUrl:profile.avatar_url;return (
         <div onClick={()=>setProfile(null)} style={{position:"fixed",inset:0,zIndex:80,background:"rgba(0,0,0,.55)",display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
           <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:480,background:"linear-gradient(180deg,#2a2346,#16122a)",borderRadius:"24px 24px 0 0",padding:"0 20px 28px",color:"#fff",textAlign:"center"}}>
