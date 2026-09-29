@@ -658,14 +658,14 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
             <div style={{ margin:"-18px 16px 0", position:"relative", height:168, borderRadius:24, overflow:"hidden", zIndex:5 }}>
               <div style={{ display:"flex", height:"100%", transform:`translateX(-${slide*100}%)`, transition:"transform .5s cubic-bezier(.2,.8,.2,1)" }}>
                 {SL.map((x, i) => (
-                  <div key={i} className="hp" style={{ flex:"0 0 100%", position:"relative", background:x.g, padding:18, overflow:"hidden", cursor:"pointer" }}>
-                    {x.img && <img src={x.img} alt="" style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"cover", zIndex:3 }}/>}
+                  <div key={i} className="hp" style={{ flex:"0 0 100%", position:"relative", background: x.img ? "#140a24" : x.g, padding:18, overflow:"hidden", cursor:"pointer" }}>
+                    {x.img && <img src={x.img} alt="" loading="eager" fetchPriority="high" decoding="async" onLoad={e => { e.currentTarget.style.opacity = "1"; }} style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"cover", zIndex:3, opacity:0, transition:"opacity .35s ease" }}/>}
                     <div style={{ position:"absolute", right:-18, top:-10, width:170, height:170, borderRadius:"50%", background:"radial-gradient(circle,rgba(255,255,255,.22),transparent 65%)" }}/>
-                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{ position:"absolute", right:16, top:28, opacity:.9, animation:"hpFloat 3s ease-in-out infinite", filter:"drop-shadow(0 6px 14px rgba(0,0,0,.25))" }}>{x.ic}</svg>
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{ display: x.img ? "none" : "block", position:"absolute", right:16, top:28, opacity:.9, animation:"hpFloat 3s ease-in-out infinite", filter:"drop-shadow(0 6px 14px rgba(0,0,0,.25))" }}>{x.ic}</svg>
                     <div style={{ position:"absolute", inset:0, overflow:"hidden", pointerEvents:"none" }}>
                       <div style={{ position:"absolute", top:0, bottom:0, width:"40%", background:"linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent)", animation:"hpShine 3.5s ease-in-out infinite" }}/>
                     </div>
-                    <div style={{ position:"relative", maxWidth:"62%" }}>
+                    <div style={{ position:"relative", maxWidth:"62%", display: x.img ? "none" : "block" }}>
                       <div style={{ display:"inline-block", fontSize:10, letterSpacing:1.5, background:"rgba(0,0,0,.25)", padding:"3px 8px", borderRadius:10, marginBottom:10, color:"#fff" }}>YENİ</div>
                       <div style={{ fontSize:21, fontWeight:800, lineHeight:1.15, color:"#fff" }}>{x.t}</div>
                       <div style={{ fontSize:12, color:"rgba(255,255,255,.88)", margin:"6px 0 12px", lineHeight:1.4 }}>{x.s}</div>
