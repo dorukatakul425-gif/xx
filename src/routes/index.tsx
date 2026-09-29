@@ -652,7 +652,7 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
         {(() => {
           const SL = [
             { img:"/images/images/turnir.JPG", t:"Həftəlik Turnir", s:"Domino çempionatı • 50,000 jeton mükafat", b:"Qoşul", g:"linear-gradient(120deg,#3C3489 0%,#7b2ff7 55%,#ff3ea5 100%)", ic:<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/> },
-            { img:"/images/images/vipheftesi.PNG", t:"VIP həftəsi", s:"İlk yükləmədə +30% bonus jeton", b:"Bax", g:"linear-gradient(120deg,#412402 0%,#BA7517 55%,#FAC775 100%)", ic:<path d="M3 8l4 4 5-7 5 7 4-4-2 11H5z"/> },
+            { img:"/images/images/vipheftesi.JPG", t:"VIP həftəsi", s:"İlk yükləmədə +30% bonus jeton", b:"Bax", g:"linear-gradient(120deg,#412402 0%,#BA7517 55%,#FAC775 100%)", ic:<path d="M3 8l4 4 5-7 5 7 4-4-2 11H5z"/> },
           ];
           return (
             <div style={{ margin:"-18px 16px 0", position:"relative", height:168, borderRadius:24, overflow:"hidden", zIndex:5 }}>
