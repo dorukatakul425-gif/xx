@@ -4,8 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { BadgeHelp, CalendarDays, ChevronRight, Crown, DoorOpen, Gift, LogOut, Medal, MessageCircle, Mic, MicOff, Minimize2, MoreHorizontal, PackageOpen, Plus, Power, Radio, Send, Settings, ShieldCheck, ShoppingBag, Trophy, UserPlus, Users, WalletCards, X } from "lucide-react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
-import roomBackground from "@/assets/velvet-room-bg.jpg";
+const roomBackground = "/images/images/velvet-room-bg.jpg";
 import { Button } from "@/components/ui/button";
 import { useVoiceRoom } from "@/hooks/use-voice-room";
 
@@ -130,7 +129,7 @@ function VelvetApp() {
 
   const signIn = async (provider: "google" | "apple") => {
     setLoading(provider); setError("");
-    const r = await lovable.auth.signInWithOAuth(provider, { redirect_uri: window.location.origin });
+    const r = await supabase.auth.signInWithOAuth({ provider, options: { redirectTo: window.location.origin } });
     if (r.error) setError("Giriş alınmadı. Yenidən cəhd edin.");
     setLoading(null);
   };
