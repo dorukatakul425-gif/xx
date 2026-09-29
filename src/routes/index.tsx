@@ -505,7 +505,7 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
   const [showModal, setShowModal] = useState<"Domino" | "Kart" | null>(null);
   const [slide, setSlide] = useState(0);
   const [roomCat, setRoomCat] = useState(0);
-  useEffect(() => { const t = setInterval(() => setSlide(x => (x + 1) % 3), 3500); return () => clearInterval(t); }, []);
+  useEffect(() => { const t = setInterval(() => setSlide(x => (x + 1) % 2), 3500); return () => clearInterval(t); }, []);
   useEffect(() => {
     if (!showModal) return;
     const closeOnEscape = (event: KeyboardEvent) => { if (event.key === "Escape") setShowModal(false); };
@@ -651,15 +651,15 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
         {/* BANNER SLAYDER */}
         {(() => {
           const SL = [
-            { t:"Həftəlik Turnir", s:"Domino çempionatı • 50,000 jeton mükafat", b:"Qoşul", g:"linear-gradient(120deg,#3C3489 0%,#7b2ff7 55%,#ff3ea5 100%)", ic:<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/> },
-            { t:"VIP həftəsi", s:"İlk yükləmədə +30% bonus jeton", b:"Bax", g:"linear-gradient(120deg,#412402 0%,#BA7517 55%,#FAC775 100%)", ic:<path d="M3 8l4 4 5-7 5 7 4-4-2 11H5z"/> },
-            { t:"Yeni çərçivələr", s:"Obsidian Əjdaha mağazada", b:"Mağaza", g:"linear-gradient(120deg,#04342C 0%,#0F6E56 50%,#00d4ff 100%)", ic:<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/> },
+            { img:"/images/images/turnir.JPG", t:"Həftəlik Turnir", s:"Domino çempionatı • 50,000 jeton mükafat", b:"Qoşul", g:"linear-gradient(120deg,#3C3489 0%,#7b2ff7 55%,#ff3ea5 100%)", ic:<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/> },
+            { img:"/images/images/vipheftesi.PNG", t:"VIP həftəsi", s:"İlk yükləmədə +30% bonus jeton", b:"Bax", g:"linear-gradient(120deg,#412402 0%,#BA7517 55%,#FAC775 100%)", ic:<path d="M3 8l4 4 5-7 5 7 4-4-2 11H5z"/> },
           ];
           return (
             <div style={{ margin:"-18px 16px 0", position:"relative", height:168, borderRadius:24, overflow:"hidden", zIndex:5 }}>
               <div style={{ display:"flex", height:"100%", transform:`translateX(-${slide*100}%)`, transition:"transform .5s cubic-bezier(.2,.8,.2,1)" }}>
                 {SL.map((x, i) => (
                   <div key={i} className="hp" style={{ flex:"0 0 100%", position:"relative", background:x.g, padding:18, overflow:"hidden", cursor:"pointer" }}>
+                    {x.img && <img src={x.img} alt="" style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"cover", zIndex:3 }}/>}
                     <div style={{ position:"absolute", right:-18, top:-10, width:170, height:170, borderRadius:"50%", background:"radial-gradient(circle,rgba(255,255,255,.22),transparent 65%)" }}/>
                     <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{ position:"absolute", right:16, top:28, opacity:.9, animation:"hpFloat 3s ease-in-out infinite", filter:"drop-shadow(0 6px 14px rgba(0,0,0,.25))" }}>{x.ic}</svg>
                     <div style={{ position:"absolute", inset:0, overflow:"hidden", pointerEvents:"none" }}>
