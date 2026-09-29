@@ -4,7 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { BadgeHelp, CalendarDays, ChevronRight, Crown, DoorOpen, Gift, LogOut, Medal, MessageCircle, Mic, MicOff, Minimize2, MoreHorizontal, PackageOpen, Plus, Power, Radio, Send, Settings, ShieldCheck, ShoppingBag, Trophy, UserPlus, Users, WalletCards, X } from "lucide-react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-const roomBackground = "/images/images/velvet-room-bg.JPG";
+import { lovable } from "@/integrations/lovable";
+import roomBackground from "@/assets/velvet-room-bg.jpg";
+import dominoArtwork from "@/assets/domino-4d.jpg";
+import homeHeader from "@/assets/home-header.jpg";
 import { Button } from "@/components/ui/button";
 import { useVoiceRoom } from "@/hooks/use-voice-room";
 
@@ -129,7 +132,7 @@ function VelvetApp() {
 
   const signIn = async (provider: "google" | "apple") => {
     setLoading(provider); setError("");
-    const r = await supabase.auth.signInWithOAuth({ provider, options: { redirectTo: window.location.origin } });
+    const r = await lovable.auth.signInWithOAuth(provider, { redirect_uri: window.location.origin });
     if (r.error) setError("Giriş alınmadı. Yenidən cəhd edin.");
     setLoading(null);
   };
@@ -500,10 +503,16 @@ function BottomNav({ active, onHome, onRoom, onProfile }: { active: Screen; onHo
 
 /* ─── HOME ─── */
 function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoom: () => void; onProfile: () => void }) {
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState<"Domino" | "Kart" | null>(null);
   const [slide, setSlide] = useState(0);
   const [roomCat, setRoomCat] = useState(0);
   useEffect(() => { const t = setInterval(() => setSlide(x => (x + 1) % 3), 3500); return () => clearInterval(t); }, []);
+  useEffect(() => {
+    if (!showModal) return;
+    const closeOnEscape = (event: KeyboardEvent) => { if (event.key === "Escape") setShowModal(false); };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [showModal]);
   return (
     <main style={{ background:"#07000f", minHeight:"100dvh", display:"flex", flexDirection:"column", fontFamily:"'Helvetica Neue',Arial,sans-serif", position:"relative", overflow:"hidden" }}>
       <style>{`
@@ -511,7 +520,7 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
         .h-orb2{position:absolute;width:200px;height:200px;border-radius:50%;background:#ff3ea5;opacity:.06;top:-20px;right:-40px;pointer-events:none}
         .h-scroll{flex:1;overflow-y:auto;padding-bottom:80px}
         .h-scroll::-webkit-scrollbar{display:none}
-        .topbar{position:relative;z-index:20;background:linear-gradient(to bottom,rgba(7,0,15,0) 0%,rgba(7,0,15,0) 45%,rgba(7,0,15,.55) 75%,#07000f 100%),url(/images/images/arxaplan.PNG) center top/cover no-repeat,#07000f;padding-bottom:40px!important;padding:max(10px,env(safe-area-inset-top)) 16px 12px}
+        .topbar{position:relative;z-index:20;background-image:linear-gradient(to bottom,rgba(7,0,15,.12) 0%,rgba(7,0,15,.25) 24%,rgba(7,0,15,.72) 64%,#07000f 100%),url("${homeHeader}");background-position:center top;background-size:cover;background-repeat:no-repeat;padding-bottom:40px!important;padding:max(10px,env(safe-area-inset-top)) 16px 12px}
         .tb-row{display:flex;align-items:center;gap:10px;height:44px}
         .tb-user{display:flex;align-items:center;gap:10px;min-width:0;flex:1;background:none;border:0;padding:0;cursor:pointer;text-align:left}
         .tb-user:active{opacity:.7}
@@ -592,8 +601,15 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
         .rc-avs{display:flex;margin-bottom:8px}
         .rc-av{width:26px;height:26px;border-radius:50%;border:2px solid #0a0018;margin-left:-7px}
         .rc-av:first-child{margin-left:0}
-        .modal-overlay{position:fixed;inset:0;background:rgba(100,80,160,.35);z-index:200;display:flex;align-items:center;justify-content:center;animation:vfadeIn .2s ease}
-        .modal-box{background:linear-gradient(145deg,#1a0035,#0d001e);border:1px solid rgba(123,47,247,.5);border-radius:28px;padding:32px 24px 24px;width:min(300px,85vw);text-align:center;animation:vpopIn .3s ease;position:relative}
+         @keyframes dominoHover{0%,100%{transform:translateY(0) scale(1.03)}50%{transform:translateY(-4px) scale(1.07)}}
+         .domino-art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;animation:dominoHover 4s ease-in-out infinite}
+         .game-card{position:relative;height:120px;border-radius:20px;overflow:hidden;padding:12px;text-align:left;color:#fff;box-shadow:0 8px 20px rgba(80,34,140,.24)}
+         .game-card:active{transform:scale(.96)}
+         .modal-overlay{position:fixed;inset:0;background:rgba(5,1,14,.75);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;animation:vfadeIn .2s ease}
+         .modal-box{background:linear-gradient(155deg,#29134a,#110b20 70%);border:1px solid rgba(255,255,255,.2);border-radius:24px;padding:28px 24px 24px;width:min(350px,100%);text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.48);animation:vfadeIn .24s ease;position:relative}
+         .modal-confirm{background:linear-gradient(135deg,#7b2ff7,#e535a4);color:#fff;box-shadow:0 6px 20px rgba(123,47,247,.28)}
+         .modal-confirm:hover{filter:brightness(1.08)}
+         @media(prefers-reduced-motion:reduce){.domino-art{animation:none}.modal-overlay,.modal-box{animation:none}}
       `}</style>
       <div className="h-orb1"/><div className="h-orb2"/>
 
@@ -681,18 +697,16 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
           ))}
         </div>
 
-        {/* OYUNLAR 2x2 */}
+        {/* OYUNLAR */}
         <div className="hp-h"><b>Oyunlar</b><span>Hamısı ›</span></div>
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, margin:"0 16px 26px" }}>
           {[
-            { n:"Domino", p:"1.2K", c1:"#7b2ff7", c2:"#3C3489", img:"/images/images/domino.PNG" },
+            { n:"Domino", p:"1.2K", c1:"#7b2ff7", c2:"#3C3489", img:dominoArtwork },
             { n:"Kart", p:"840", c1:"#ff3ea5", c2:"#72243E", img:null },
-            { n:"Zər", p:"563", c1:"#00b4d8", c2:"#0C447C", img:null },
-            { n:"Loto", p:"310", c1:"#EF9F27", c2:"#633806", img:null },
           ].map(g => (
-            <div key={g.n} className="hp" onClick={() => setShowModal(true)} style={{ position:"relative", height:120, borderRadius:20, overflow:"hidden", background:`linear-gradient(150deg,${g.c1},${g.c2})`, padding:12, cursor:"pointer", boxShadow:`0 8px 20px ${g.c1}33` }}>
+            <Button type="button" key={g.n} variant="ghost" className="game-card hp w-full" aria-label={`${g.n} — tezliklə`} onClick={() => setShowModal(g.n as "Domino" | "Kart")} style={{ background:g.img ? "#160817" : `linear-gradient(150deg,${g.c1},${g.c2})` }}>
               {g.img
-                ? <img src={g.img} alt="" style={{ position:"absolute", right:-4, bottom:-6, width:92, height:92, objectFit:"contain", opacity:.95, filter:"drop-shadow(0 6px 12px rgba(0,0,0,.35))" }}/>
+                ? <img className="domino-art" src={g.img} alt="" loading="lazy" width={1024} height={768}/>
                 : <div style={{ position:"absolute", right:-10, bottom:-18, width:96, height:96, borderRadius:"50%", background:"rgba(255,255,255,.14)" }}/>}
               <span style={{ position:"absolute", right:10, top:10, fontSize:10, background:"rgba(0,0,0,.28)", padding:"3px 7px", borderRadius:9, color:"#fff" }}>Tezliklə</span>
               <div style={{ position:"absolute", left:12, bottom:12 }}>
@@ -701,7 +715,7 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
                   <span style={{ width:6, height:6, borderRadius:"50%", background:"#5DCAA5", animation:"hpLive 1.4s infinite" }}/>{g.p} oynayır
                 </div>
               </div>
-            </div>
+            </Button>
           ))}
         </div>
 
@@ -748,18 +762,14 @@ function HomeScreen({ name, onEnterRoom, onProfile }: { name: string; onEnterRoo
       </div>
 
       {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal-box" onClick={e => e.stopPropagation()}>
-            <button onClick={() => setShowModal(false)} style={{ position:"absolute", top:14, right:14, width:28, height:28, borderRadius:"50%", background:"rgba(100,80,160,.09)", border:"1px solid rgba(100,80,160,.14)", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(40,20,100,.5)" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </button>
-            <div style={{ width:70, height:70, borderRadius:"50%", background:"linear-gradient(135deg,#7b2ff7,#ff3ea5)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 16px", animation:"vpulse 2s ease-in-out infinite" }}>
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><rect x="2" y="6" width="20" height="12" rx="6"/><path d="M8 12h4M10 10v4"/><circle cx="16" cy="11" r="1.5" fill="white"/><circle cx="18" cy="13" r="1.5" fill="white"/></svg>
-            </div>
-            <p style={{ fontSize:9, letterSpacing:3, color:"#c084fc", textTransform:"uppercase", fontWeight:700, marginBottom:8 }}>Domino</p>
-            <p style={{ fontSize:22, fontWeight:900, color:"#fff", marginBottom:8 }}>Tezliklə!</p>
-            <p style={{ fontSize:12, color:"#c084fc", lineHeight:1.6, marginBottom:20 }}>Bu oyun hazırlanır. Tezliklə aktiv olacaqdır. Bildiriş almaq üçün gözləyin.</p>
-            <button onClick={() => setShowModal(false)} style={{ width:"100%", height:48, borderRadius:14, background:"linear-gradient(135deg,#7b2ff7,#ff3ea5)", border:"none", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>Anladım</button>
+         <div className="modal-overlay" onClick={() => setShowModal(false)}>
+           <div className="modal-box" role="dialog" aria-modal="true" aria-labelledby="game-coming-title" onClick={e => e.stopPropagation()}>
+             <Button type="button" variant="ghost" size="icon" aria-label="Bağla" onClick={() => setShowModal(false)} className="absolute right-3 top-3 rounded-full text-white/70 hover:bg-white/10 hover:text-white"><X size={19}/></Button>
+             <div style={{ width:78, height:78, borderRadius:18, overflow:"hidden", margin:"0 auto 18px", boxShadow:"0 8px 24px rgba(123,47,247,.32)" }}>{showModal === "Domino" ? <img src={dominoArtwork} alt="" width={1024} height={768} style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"73% center" }}/> : <div className="flex h-full w-full items-center justify-center bg-primary text-primary-foreground"><Trophy size={32}/></div>}</div>
+             <p style={{ fontSize:11, color:"#dcb9ff", fontWeight:700, marginBottom:8 }}>{showModal.toLocaleUpperCase("az")}</p>
+             <h2 id="game-coming-title" style={{ fontSize:23, fontWeight:800, color:"#fff", marginBottom:10 }}>Tezliklə yayımlanacaq</h2>
+             <p style={{ fontSize:14, color:"#c9bed7", lineHeight:1.55, marginBottom:24 }}>{showModal} oyunu hazırlanır. Çox yaxında burada oynaya biləcəksiniz.</p>
+             <Button type="button" onClick={() => setShowModal(false)} className="modal-confirm h-12 w-full rounded-xl">Bağla</Button>
           </div>
         </div>
       )}
@@ -2510,4 +2520,3 @@ function VipEntrance({ name }: { name: string }) {
     </div>
   );
 }
-// build 1790629251
