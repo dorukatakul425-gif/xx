@@ -162,5 +162,6 @@ export function useVoiceRoom(roomId: string, session: Session | null, enabled: b
     }
   }, [muted]);
 
-  return { muted, error, toggleMic };
+  const setMic = async (on: boolean) => { if (on === muted) { await toggleMic(); } return true; };
+  return { muted, error, toggleMic, setMic, connected: 0 };
 }
